@@ -1,0 +1,334 @@
+[
+  {
+    "protocol": "V1",
+    "services": {
+      "archive": {
+        "mode": "node"
+      },
+      "history": {
+        "mode": "node"
+      },
+      "searcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "data-fetcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "subgraph": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
+      "blacklist": {
+        "min_collateral_amount": 0,
+        "min_borrow_amount": 0,
+        "min_health_factor": 0.1,
+        "sleep_time": 0
+      },
+      "path_factory": {
+        "min_health_factor": 0.8,
+        "max_health_factor": 1,
+        "min_estimate_profit": 0.025
+      },
+      "liquidator": {
+        "active": false,
+        "flashbots": true,
+        "builder0x69": true,
+        "beaverbuild": true,
+        "rsync-builder": true
+      }
+    }
+  },
+  {
+    "protocol": "V2",
+    "services": {
+      "archive": {
+        "mode": "node"
+      },
+      "history": {
+        "mode": "node"
+      },
+      "searcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "data-fetcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "subgraph": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
+      "blacklist": {
+        "min_collateral_amount": 0,
+        "min_borrow_amount": 0,
+        "min_health_factor": 0.1,
+        "sleep_time": 0
+      },
+      "path_factory": {
+        "min_health_factor": 0.8,
+        "max_health_factor": 1,
+        "min_estimate_profit": 0.025
+      },
+      "liquidator": {
+        "active": false,
+        "flashbots": true,
+        "vuilder0x69": true,
+        "beaverbuild": true,
+        "rsync-builder": true
+      }
+    }
+  },
+  {
+    "protocol": "V3",
+    "services": {
+      "archive": {
+        "mode": "node"
+      },
+      "history": {
+        "mode": "node"
+      },
+      "searcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "data-fetcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "subgraph": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
+      "blacklist": {
+        "min_collateral_amount": 0,
+        "min_borrow_amount": 0,
+        "min_health_factor": 0.1,
+        "sleep_time": 0
+      },
+      "path_factory": {
+        "min_health_factor": 0.8,
+        "max_health_factor": 1,
+        "min_estimate_profit": 0.025
+      },
+      "liquidator": {
+        "active": false,
+        "flashbots": true,
+        "vuilder0x69": true,
+        "beaverbuild": true,
+        "rsync-builder": true
+      }
+    }
+  },
+  {
+    "protocol": "Compound",
+    "services": {
+      "archive": {
+        "mode": "node"
+      },
+      "history": {
+        "mode": "node"
+      },
+      "searcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "data-fetcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "subgraph": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
+      "blacklist": {
+        "min_collateral_amount": 0,
+        "min_borrow_amount": 0,
+        "min_health_factor": 0.1,
+        "sleep_time": 0
+      },
+      "path_factory": {
+        "min_health_factor": 0.8,
+        "max_health_factor": 1,
+        "min_estimate_profit": 0.025
+      },
+      "liquidator": {
+        "active": false,
+        "flashbots": true,
+        "vuilder0x69": true,
+        "beaverbuild": true,
+        "rsync-builder": true
+      }
+    }
+  },
+  {
+    "protocol": "Liquity",
+    "services": {
+      "archive": {
+        "mode": "node"
+      },
+      "history": {
+        "mode": "node"
+      },
+      "searcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "data-fetcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "subgraph": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
+      "blacklist": {
+        "min_collateral_amount": 0,
+        "min_borrow_amount": 0,
+        "min_health_factor": 0.1,
+        "sleep_time": 0
+      },
+      "path_factory": {
+        "min_health_factor": 0.8,
+        "max_health_factor": 1,
+        "min_estimate_profit": 0.025
+      },
+      "liquidator": {
+        "active": false,
+        "flashbots": true,
+        "vuilder0x69": true,
+        "beaverbuild": true,
+        "rsync-builder": true
+      }
+    }
+  },
+  {
+    "protocol": "MakerDAO_CDP",
+    "services": {
+      "archive": {
+        "mode": "node"
+      },
+      "history": {
+        "mode": "node"
+      },
+      "subgraph": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 100,
+        "update_time": 5
+      },
+      "blacklist": {
+        "min_collateral_amount": 0,
+        "min_borrow_amount": 0,
+        "min_health_factor": 0.1,
+        "sleep_time": 0
+      },
+      "searcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "data-fetcher": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "path_factory": {
+        "min_health_factor": 0.8,
+        "max_health_factor": 20,
+        "min_estimate_profit": 50
+      },
+      "liquidator": {
+        "active": false,
+        "flashbots": true,
+        "vuilder0x69": true,
+        "beaverbuild": true,
+        "rsync-builder": true
+      }
+    }
+  },
+  {
+    "protocol": "registry",
+    "services": {
+      "tester": {
+        "force": false
+      }
+    }
+  },
+  {
+    "protocol": "updator",
+    "services": {
+      "tester": {}
+    }
+  }
+]

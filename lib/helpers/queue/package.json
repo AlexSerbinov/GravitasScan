@@ -1,0 +1,17 @@
+{
+  "name": "@cybridge/queue",
+  "version": "1.1.1",
+  "description": "Unblocking async queue.",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "metatests test/"
+  },
+  "keywords": [
+    "queue"
+  ],
+  "author": "Sergey Didkovsky <didkovsky.dev@proton.me>",
+  "license": "ISC",
+  "devDependencies": {
+    "metatests": "^0.8.2"
+  }
+}

@@ -35,8 +35,8 @@ const processes = createRegister()
  * @param {*} message - message
  */
 const rr = (ev, message) => {
-  const { process } = processes.next()
-  process.send({ type: ev, message })
+    const { process } = processes.next()
+    process.send({ type: ev, message })
 }
 
 /**
@@ -45,7 +45,7 @@ const rr = (ev, message) => {
  * @param {*} message - message
  */
 const broadcast = (ev, message) => {
-  for (const { process } of processes.all) process.send({ type: ev, message })
+    for (const { process } of processes.all) process.send({ type: ev, message })
 }
 
 /**
@@ -53,13 +53,13 @@ const broadcast = (ev, message) => {
  * @param {*} listen - struct contains topics and events
  */
 const subs = listen => {
-  for (const ev in listen) {
-    const { topic, roundrobing } = listen[ev]
-    mq.subscribe(topic, message => {
-      if (roundrobing) rr(ev, message)
-      else broadcast(ev, message)
-    })
-  }
+    for (const ev in listen) {
+        const { topic, roundrobing } = listen[ev]
+        mq.subscribe(topic, message => {
+            if (roundrobing) rr(ev, message)
+            else broadcast(ev, message)
+        })
+    }
 }
 
 /**
@@ -67,7 +67,7 @@ const subs = listen => {
  * @param {number} pid - process id
  */
 const onStart = pid => {
-  mq.sendEvent(name, "start", { pid })
+    mq.sendEvent(name, "start", { pid })
 }
 
 /**
@@ -75,14 +75,14 @@ const onStart = pid => {
  * @param {number} pid - process id
  */
 const onStop = pid => {
-  const p = processes.remove(pid)
-  if (p.process) p.process.kill()
-  mq.sendEvent(name, "stop", { pid })
-  if (processes.all.length === 0) {
-    setTimeout(() => {
-      process.exit(0)
-    }, 100)
-  }
+    const p = processes.remove(pid)
+    if (p.process) p.process.kill()
+    mq.sendEvent(name, "stop", { pid })
+    if (processes.all.length === 0) {
+        setTimeout(() => {
+            process.exit(0)
+        }, 100)
+    }
 }
 
 /**
@@ -91,14 +91,14 @@ const onStop = pid => {
  * @param {*} msg - message
  */
 const onMessage = (pid, msg) => {
-  const { type, message } = msg
-  if (type === "error") return onError(pid, message)
-  if (type === "warn") return onWarn(pid, message)
-  if (type === "stop") return onStop(pid, message)
-  const { notify } = params
-  if (!notify) return
-  const { topic } = notify[type]
-  mq.notify(topic, message)
+    const { type, message } = msg
+    if (type === "error") return onError(pid, message)
+    if (type === "warn") return onWarn(pid, message)
+    if (type === "stop") return onStop(pid, message)
+    const { notify } = params
+    if (!notify) return
+    const { topic } = notify[type]
+    mq.notify(topic, message)
 }
 
 /**
@@ -107,10 +107,10 @@ const onMessage = (pid, msg) => {
  * @param {*} error - Error
  */
 const onError = (pid, message) => {
-  const { process } = processes.remove(pid)
-  console.error(message)
-  if (process) process.kill()
-  mq.sendEvent(name, "error", { pid, message })
+    const { process } = processes.remove(pid)
+    console.error(message)
+    if (process) process.kill()
+    mq.sendEvent(name, "error", { pid, message })
 }
 
 /**
@@ -119,7 +119,7 @@ const onError = (pid, message) => {
  * @param {*} msg - warmn message
  */
 const onWarn = (pid, message) => {
-  mq.sendEvent(name, "warn", { pid, message })
+    mq.sendEvent(name, "warn", { pid, message })
 }
 
 /**
@@ -127,9 +127,9 @@ const onWarn = (pid, message) => {
  * @param {number} pid - process id
  */
 const onClose = pid => {
-  processes.remove(pid)
-  if (restart) startProcess(name, params)
-  mq.sendEvent(name, "close", { pid })
+    processes.remove(pid)
+    if (restart) startProcess(name, params)
+    mq.sendEvent(name, "close", { pid })
 }
 
 /**
@@ -139,16 +139,16 @@ const onClose = pid => {
  * @returns { pid, process }
  */
 const startProcess = (name, params) => {
-  const p = JSON.stringify(params)
-  const path = `${__dirname}/process.js`
-  const process = fork(path, [name, p, debug])
-  const { pid } = process
-  processes.add(pid, process)
-  process.on("close", () => onClose(pid))
-  process.on("error", error => onError(pid, error))
-  process.on("message", m => onMessage(pid, m))
-  onStart(pid)
-  return { pid, process }
+    const p = JSON.stringify(params)
+    const path = `${__dirname}/process.js`
+    const process = fork(path, [name, p, debug])
+    const { pid } = process
+    processes.add(pid, process)
+    process.on("close", () => onClose(pid))
+    process.on("error", error => onError(pid, error))
+    process.on("message", m => onMessage(pid, m))
+    onStart(pid)
+    return { pid, process }
 }
 
 /**
@@ -157,41 +157,41 @@ const startProcess = (name, params) => {
  * @param {*} params - service sparams
  */
 const startCLuster = async (name, params) => {
-  const { forks } = params
-  for (let i = 0; i < forks; i++) startProcess(name, params)
-  const { listen } = params
-  if (listen) subs(listen)
+    const { forks } = params
+    for (let i = 0; i < forks; i++) startProcess(name, params)
+    const { listen } = params
+    if (listen) subs(listen)
 }
 
 /**
  * Catch and report cluster errors
  */
 process.on("uncaughtException", error => {
-  console.error(error)
-  const message = error.message || "Undefined"
-  mq.sendEvent(name, "cluster-error", { message })
-  setTimeout(() => {
-    process.exit(1)
-  }, 300)
+    console.error(error)
+    const message = error.message || "Undefined"
+    mq.sendEvent(name, "cluster-error", { message })
+    setTimeout(() => {
+        process.exit(1)
+    }, 300)
 })
 
 /**
  * Get SIGINT signal
  */
 process.on("SIGINT", () => {
-  restart = false
-  broadcast("stop", {})
+    restart = false
+    broadcast("stop", {})
 })
 
 /**
  * Stop service by mqtt command
  */
 mq.onCommand(name, msg => {
-  const { type } = msg
-  if (type === "stop") {
-    restart = false
-    broadcast("stop", {})
-  }
+    const { type } = msg
+    if (type === "stop") {
+        restart = false
+        broadcast("stop", {})
+    }
 })
 
 /**

@@ -28,7 +28,6 @@ const node = (name, params) => {
 
   process.argv[2] = name;
   process.argv[3] = JSON.stringify(params);
-  process.env.PROTOCOL = process.argv[4];
   process.argv[4] = debug;
   require(`${__dirname}/cluster.js`);
 };

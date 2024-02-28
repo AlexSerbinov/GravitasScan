@@ -1,67 +1,60 @@
-global.$ = $ // Use global.$ to enable the use of $ in other folders
-require("../lib/helpers/config.helper")
+$.global = $
 const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
-const { syncSettings } = require("../lib/helpers/config.helper")
 const { configurePool } = require("../lib/ethers/pool")
+const defaultSettings = require("../configs/DefaultSettings.json")
+const redis = require("../lib/redis/redis/lib/redis")
 
-// Define the protocol to use from service.json
 const protocol = $.params.PROTOCOL
 
-// Initialize Ethereum connection pool with WebSocket RPC endpoint
-configurePool([process.env.RPC_WSS])
+// Now we save the path for config params for each protocol in service.json.
+const configPath = $.params.configPath
+const config = require(`${process.cwd()}${configPath}`)
 
-// Sync settings specific to the protocol being used, typically for fetching and executing transactions
-const settings = await syncSettings(protocol, "searcher")
+configurePool([config.RPC_WSS])
 
-// Create a new instance of the transmit fetcher with the synced settings
-let fetcher = createTransmitFetcher(protocol, settings)
+// We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
+
+// Moved from config.helper. Earlier this was called syncSettings.
+const settings = defaultSettings.find(s => s.protocol === protocol).services["searcher"]
+
+let fetcher = createTransmitFetcher(protocol, settings, config)
 
 fetcher.on("response", async data => {
-    // Skip processing if there is no simulate data
     if (data.simulateData.length == 0) return
-    // Determine users eligible for liquidation based on the fetched data
     let userToLiquidate = fetcher.userToExecute(data)
     if (userToLiquidate.length == 0) return
-    // Execute liquidation for each eligible user
     userToLiquidate.forEach(userData => fetcher.executeUser(userData.user, userData.hf, data.rawTransmit))
 })
 
-// Event listener for liquidation events
 fetcher.on("liquidate", data => {
     $.send("liquidate", data.resp)
 })
 
-// Event listener for additional information events
 fetcher.on("info", data => {
     $.send("info", data)
 })
 
-// Event listener for delete events
 fetcher.on("delete", data => {
     $.send("delete", data)
 })
 
-// Event listener for reject events
 fetcher.on("reject", data => {
     $.send("reject", data)
 })
 
-// Event listener for error events
 fetcher.on("error", data => {
     $.send("error", data)
 })
 
-// Custom event listener for receiving reserves data
 $.on(`onReservesData`, data => {
     fetcher.setGlobalReservesData(data)
 })
 
-// Custom event listener for receiving updated settings
 $.on(`onSettings`, settings => {
     fetcher.settings = settings
 })
 
-// Function to emit a start event, indicating the searcher has begun its operation
 const sendStartEvent = function () {
     const date = new Date().toUTCString()
     $.send("start", { m: date })
@@ -70,11 +63,9 @@ const sendStartEvent = function () {
 sendStartEvent()
 
 $.on("transmit", async data => {
-    // Check if the transmitted data includes the specific protocol
     if (!Object.keys(data.assets).includes(protocol)) {
         return
     }
-    // Fetch users by asset from Redis
     const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
     if (usersByAssets.length == 0) return
     usersByAssets.forEach((user, index) => {

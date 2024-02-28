@@ -5,8 +5,9 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "all": "node _system/start services.json",
-    "debug": "node _system/debug services.json"
+    "all": "node _system/start",
+    "transmit": "node _system/start transmitServices.json",
+    "debugTransmit": "node _system/debug transmitServices.json"
   },
   "dependencies": {
     "@cybridge/providers-pool": "^1.0.0",

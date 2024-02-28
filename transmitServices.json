@@ -1,0 +1,186 @@
+{
+  "V1TransmitFetcher": {
+    "forks": 1,
+    "script": "services/transmitFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "transmit": {
+        "topic": "data/eth/pending/transmit_assets",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:V1",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:V1",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "delete": {
+        "topic": "event:delete:transmit_fetcher:V1"
+      },
+      "reject": {
+        "topic": "event:reject:transmit_fetcher:V1"
+      },
+      "error": {
+        "topic": "event:error:transmit_fetcher:V1"
+      },
+      "start": {
+        "topic": "event:start:transmit_fetcher:V1"
+      },
+      "stop": {
+        "topic": "event:stop:transmit_fetcher:V1"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:transmit_fetcher:V1"
+      },
+      "info": {
+        "topic": "event:info:transmit_fetcher:V1"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V1",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V2TransmitFetcher": {
+    "forks": 1,
+    "script": "services/transmitFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "transmit": {
+        "topic": "data/eth/pending/transmit_assets",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:V2",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:V2",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "delete": {
+        "topic": "event:delete:transmit_fetcher:V2"
+      },
+      "reject": {
+        "topic": "event:reject:transmit_fetcher:V2"
+      },
+      "error": {
+        "topic": "event:error:transmit_fetcher:V2"
+      },
+      "start": {
+        "topic": "event:start:transmit_fetcher:V2"
+      },
+      "stop": {
+        "topic": "event:stop:transmit_fetcher:V2"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:transmit_fetcher:V2"
+      },
+      "info": {
+        "topic": "event:info:transmit_fetcher:V2"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V2",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V3TransmitFetcher": {
+    "forks": 1,
+    "script": "services/transmitFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "transmit": {
+        "topic": "data/eth/pending/transmit_assets",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:V3",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:V3",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "delete": {
+        "topic": "event:delete:transmit_fetcher:V3"
+      },
+      "reject": {
+        "topic": "event:reject:transmit_fetcher:V3"
+      },
+      "error": {
+        "topic": "event:error:transmit_fetcher:V3"
+      },
+      "start": {
+        "topic": "event:start:transmit_fetcher:V3"
+      },
+      "stop": {
+        "topic": "event:stop:transmit_fetcher:V3"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:transmit_fetcher:V3"
+      },
+      "info": {
+        "topic": "event:info:transmit_fetcher:V3"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V3",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "compoundTransmitFetcher": {
+    "forks": 1,
+    "script": "services/transmitFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "transmit": {
+        "topic": "data/eth/pending/transmit_assets",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:Compound",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:Compound",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "delete": {
+        "topic": "event:delete:transmit_fetcher:Compound"
+      },
+      "reject": {
+        "topic": "event:reject:transmit_fetcher:Compound"
+      },
+      "error": {
+        "topic": "event:error:transmit_fetcher:Compound"
+      },
+      "start": {
+        "topic": "event:start:transmit_fetcher:Compound"
+      },
+      "stop": {
+        "topic": "event:stop:transmit_fetcher:Compound"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:transmit_fetcher:Compound"
+      },
+      "info": {
+        "topic": "event:info:transmit_fetcher:Compound"
+      }
+    },
+    "params": {
+      "PROTOCOL": "Compound",
+      "configPath": "/configs/Main.json"
+    }
+  }
+}

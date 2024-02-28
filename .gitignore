@@ -6,14 +6,13 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+.vscode
 
 # Logs
 logs/
 
 # COnfig
 # Config
-sys.config.json
-services.json
 
 # For mac
 .DS_Store

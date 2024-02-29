@@ -7,7 +7,9 @@
   "scripts": {
     "all": "node _system/start",
     "transmit": "node _system/start transmitServices.json",
-    "debugTransmit": "node _system/debug transmitServices.json"
+    "debugTransmit": "node _system/debug transmitServices.json",
+    "dataFetcher": "node _system/start dataFetcherServices.json",
+    "debugDataFetcher": "node _system/debug dataFetcherServices.json"
   },
   "dependencies": {
     "@cybridge/providers-pool": "^1.0.0",

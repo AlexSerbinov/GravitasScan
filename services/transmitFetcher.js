@@ -1,4 +1,3 @@
-$.global = $
 const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
 const defaultSettings = require("../configs/DefaultSettings.json")
@@ -16,69 +15,71 @@ configurePool([config.RPC_WSS])
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 // Moved from config.helper. Earlier this was called syncSettings.
-const settings = defaultSettings.find(s => s.protocol === protocol).services["searcher"]
+const settings = defaultSettings.find(s => s.protocol === protocol).services["data-fetcher"]
 
 let fetcher = createTransmitFetcher(protocol, settings, config)
 
 fetcher.on("response", async data => {
-    if (data.simulateData.length == 0) return
-    let userToLiquidate = fetcher.userToExecute(data)
-    if (userToLiquidate.length == 0) return
-    userToLiquidate.forEach(userData => fetcher.executeUser(userData.user, userData.hf, data.rawTransmit))
+  if (data.simulateData.length == 0) return
+  let userToLiquidate = fetcher.userToExecute(data)
+  if (userToLiquidate.length == 0) return
+  userToLiquidate.forEach(userData => fetcher.executeUser(userData.user, userData.hf, data.rawTransmit))
 })
 
 fetcher.on("liquidate", data => {
-    $.send("liquidate", data.resp)
+  $.send("liquidate", data.resp)
 })
 
 fetcher.on("info", data => {
-    $.send("info", data)
+  $.send("info", data)
 })
 
 fetcher.on("delete", data => {
-    $.send("delete", data)
+  $.send("delete", data)
 })
 
 fetcher.on("reject", data => {
-    $.send("reject", data)
+  $.send("reject", data)
 })
 
 fetcher.on("error", data => {
-    $.send("error", data)
+  $.send("error", data)
 })
 
 $.on(`onReservesData`, data => {
-    fetcher.setGlobalReservesData(data)
+  fetcher.setGlobalReservesData(data)
 })
 
 $.on(`onSettings`, settings => {
-    fetcher.settings = settings
+  fetcher.settings = settings
 })
 
 const sendStartEvent = function () {
-    const date = new Date().toUTCString()
-    $.send("start", { m: date })
+  const date = new Date().toUTCString()
+  $.send("start", { date })
 }
 
 sendStartEvent()
 
 $.on("transmit", async data => {
-    if (!Object.keys(data.assets).includes(protocol)) {
-        return
-    }
-    const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
-    if (usersByAssets.length == 0) return
-    usersByAssets.forEach((user, index) => {
-        fetcher.request(user, data, index + 1 == usersByAssets.length)
-    })
+  if (!Object.keys(data.assets).includes(protocol)) {
+    return
+  }
+  const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
+  if (usersByAssets.length == 0) return
+  usersByAssets.forEach((user, index) => {
+    fetcher.request(user, data, index + 1 == usersByAssets.length)
+  })
 })
 
 $.onExit(async () => {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            const { pid } = process
-            console.log(pid, "Ready to exit.")
-            resolve()
-        }, 100) // Set a small timeout to ensure async cleanup can complete
-    })
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const { pid } = process
+      console.log(pid, "Ready to exit.")
+      const date = new Date().toUTCString()
+      $.send("stop", { date })
+      resolve()
+    }, 100) // Set a small timeout to ensure async cleanup can complete
+  })
 })

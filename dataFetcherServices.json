@@ -1,0 +1,198 @@
+{
+  "V1DataFetcher": {
+    "forks": 1,
+    "script": "services/dataFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "searcherExecute": {
+        "topic": "execute:searcher:V1",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:V1",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:V1",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "pushToRedis": {
+        "topic": "event:pushToRedis:data_fetcher:V1"
+      },
+      "deleteFromRedis": {
+        "topic": "event:deleteFromRedis:data_fetcher:V1"
+      },
+      "reject": {
+        "topic": "event:reject:data_fetcher:V1"
+      },
+      "error": {
+        "topic": "event:error:data_fetcher:V1"
+      },
+      "start": {
+        "topic": "event:start:data_fetcher:V1"
+      },
+      "stop": {
+        "topic": "event:stop:data_fetcher:V1"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:data_fetcher:V1"
+      },
+      "info": {
+        "topic": "event:info:data_fetcher:V1"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V1",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V2DataFetcher": {
+    "forks": 1,
+    "script": "services/dataFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "searcherExecute": {
+        "topic": "execute:searcher:V2",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:V2",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:V2",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "pushToRedis": {
+        "topic": "event:pushToRedis:data_fetcher:V2"
+      },
+      "deleteFromRedis": {
+        "topic": "event:deleteFromRedis:data_fetcher:V2"
+      },
+      "reject": {
+        "topic": "event:reject:data_fetcher:V2"
+      },
+      "error": {
+        "topic": "event:error:data_fetcher:V2"
+      },
+      "start": {
+        "topic": "event:start:data_fetcher:V2"
+      },
+      "stop": {
+        "topic": "event:stop:data_fetcher:V2"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:data_fetcher:V2"
+      },
+      "info": {
+        "topic": "event:info:data_fetcher:V2"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V2",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V3DataFetcher": {
+    "forks": 1,
+    "script": "services/dataFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "searcherExecute": {
+        "topic": "execute:searcher:V3",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:V3",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:V3",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "pushToRedis": {
+        "topic": "event:pushToRedis:data_fetcher:V3"
+      },
+      "deleteFromRedis": {
+        "topic": "event:deleteFromRedis:data_fetcher:V3"
+      },
+      "reject": {
+        "topic": "event:reject:data_fetcher:V3"
+      },
+      "error": {
+        "topic": "event:error:data_fetcher:V3"
+      },
+      "start": {
+        "topic": "event:start:data_fetcher:V3"
+      },
+      "stop": {
+        "topic": "event:stop:data_fetcher:V3"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:data_fetcher:V3"
+      },
+      "info": {
+        "topic": "event:info:data_fetcher:V3"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V3",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "compoundDataFetcher": {
+    "forks": 1,
+    "script": "services/dataFetcher.js",
+    "namespace": "namespace",
+    "listen": {
+      "searcherExecute": {
+        "topic": "execute:searcher:Compound",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data:reserves:Compound",
+        "roundrobing": false
+      },
+      "onSettings": {
+        "topic": "settings:searcher:Compound",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "pushToRedis": {
+        "topic": "event:pushToRedis:data_fetcher:Compound"
+      },
+      "deleteFromRedis": {
+        "topic": "event:deleteFromRedis:data_fetcher:Compound"
+      },
+      "reject": {
+        "topic": "event:reject:data_fetcher:Compound"
+      },
+      "error": {
+        "topic": "event:error:data_fetcher:Compound"
+      },
+      "start": {
+        "topic": "event:start:data_fetcher:Compound"
+      },
+      "stop": {
+        "topic": "event:stop:data_fetcher:Compound"
+      },
+      "liquidate": {
+        "topic": "event:liquidate:data_fetcher:Compound"
+      },
+      "info": {
+        "topic": "event:info:data_fetcher:Compound"
+      }
+    },
+    "params": {
+      "PROTOCOL": "Compound",
+      "configPath": "/configs/Main.json"
+    }
+  }
+}

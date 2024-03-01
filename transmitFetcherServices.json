@@ -24,7 +24,7 @@
       "reject": {
         "topic": "event:reject:transmit_fetcher:V1"
       },
-      "error": {
+      "errorMessage": {
         "topic": "event:error:transmit_fetcher:V1"
       },
       "start": {
@@ -70,7 +70,7 @@
       "reject": {
         "topic": "event:reject:transmit_fetcher:V2"
       },
-      "error": {
+      "errorMessage": {
         "topic": "event:error:transmit_fetcher:V2"
       },
       "start": {
@@ -116,7 +116,7 @@
       "reject": {
         "topic": "event:reject:transmit_fetcher:V3"
       },
-      "error": {
+      "errorMessage": {
         "topic": "event:error:transmit_fetcher:V3"
       },
       "start": {
@@ -162,7 +162,7 @@
       "reject": {
         "topic": "event:reject:transmit_fetcher:Compound"
       },
-      "error": {
+      "errorMessage": {
         "topic": "event:error:transmit_fetcher:Compound"
       },
       "start": {

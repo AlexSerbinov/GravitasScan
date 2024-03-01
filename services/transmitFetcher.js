@@ -42,8 +42,8 @@ fetcher.on("reject", data => {
   $.send("reject", data)
 })
 
-fetcher.on("error", data => {
-  $.send("error", data)
+fetcher.on("errorMessage", data => { // we use "errorMessage" instead of "error" because "error" is locke by _service
+  $.send("errorMessage", { error: data.toString() }) 
 })
 
 $.on(`onReservesData`, data => {
@@ -86,5 +86,5 @@ $.onExit(async () => {
 
 process.on("uncaughtException", error => {
   console.error(error)
-  fetcher.emit("error", error)
+  fetcher.emit("errorMessage", error)
 })

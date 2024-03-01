@@ -60,8 +60,8 @@ fetcher.on("reject", data => {
   $.send("reject", data)
 })
 
-fetcher.on("error", data => {
-  $.send("error", { m: data.toString() }) // for some reason messages not sended to topic error, that's way I'm use error. TODO: Fix it
+fetcher.on("errorMessage", data => { // we use "errorMessage" instead of "error" because "error" is locke by _service
+  $.send("errorMessage", { error: data.toString() }) 
 })
 
 /**
@@ -94,8 +94,7 @@ $.onExit(async () => {
   })
 })
 
-
 process.on("uncaughtException", error => {
   console.error(error)
-  fetcher.emit("error", error)
+  fetcher.emit("errorMessage", error)
 })

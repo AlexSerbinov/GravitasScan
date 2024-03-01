@@ -6,8 +6,8 @@
   "license": "ISC",
   "scripts": {
     "all": "node _system/start",
-    "transmit": "node _system/start transmitServices.json",
-    "debugTransmit": "node _system/debug transmitServices.json",
+    "transmit": "node _system/start transmitFetcherServices.json",
+    "debugTransmitFetcher": "node _system/debug transmitFetcherServices.json",
     "dataFetcher": "node _system/start dataFetcherServices.json",
     "debugDataFetcher": "node _system/debug dataFetcherServices.json"
   },

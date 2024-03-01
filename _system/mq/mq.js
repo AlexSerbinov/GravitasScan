@@ -1,6 +1,6 @@
-'use strict'
-const { connect } = require('mqtt')
-const assert = require('node:assert/strict')
+"use strict"
+const { connect } = require("mqtt")
+const assert = require("node:assert/strict")
 
 /**
  * mqtt instance
@@ -51,7 +51,7 @@ const countListeners = channel => {
  */
 const parse = buff => {
   try {
-    const str = buff.toString('utf8')
+    const str = buff.toString("utf8")
     return JSON.parse(str)
   } catch {
     return
@@ -70,8 +70,7 @@ const onMessage = (channel, message) => {
     const obj = parse(message)
     if (!obj) return
     const callbacks = listeners.get(channel)
-    for (const callback of callbacks) 
-    callback(obj)
+    for (const callback of callbacks) callback(obj)
   })
 }
 
@@ -81,16 +80,16 @@ const onMessage = (channel, message) => {
  * @param {object} options - connection options
  * https://github.com/mqttjs/MQTT.js#mqttconnecturl-options
  */
-const prepare = (url, options)=> {
+const prepare = (url, options) => {
   const fn = resolve => {
     mqtt = connect(url, options)
-    mqtt.on('message', onMessage)
-    mqtt.on('connect', () => {
+    mqtt.on("message", onMessage)
+    mqtt.on("connect", () => {
       connected = true
       resolve()
     })
   }
-  
+
   return new Promise(fn)
 }
 
@@ -100,13 +99,13 @@ const prepare = (url, options)=> {
  * @param {function} callback - listener
  */
 const subscribe = (channel, callback) => {
-  assert(connected, 'Client is not connected.')
+  assert(connected, "Client is not connected.")
   let callbacks = []
-  if (listeners.has(channel))
-  callbacks = listeners.get(channel)
-  else mqtt.subscribe(channel, err => {
-    if (err) throw err
-  })
+  if (listeners.has(channel)) callbacks = listeners.get(channel)
+  else
+    mqtt.subscribe(channel, err => {
+      if (err) throw err
+    })
 
   callbacks.push(callback)
   listeners.set(channel, callbacks)
@@ -115,11 +114,11 @@ const subscribe = (channel, callback) => {
 /**
  * Remove all listeners for channel,
  * and unsubscribe mqtt from channel
- * @param {string} channel 
+ * @param {string} channel
  * @returns {void}
  */
 const unsubscribe = channel => {
-  assert(connected, 'Client is not connected.')
+  assert(connected, "Client is not connected.")
   if (!listeners.has(channel)) return
   listeners.delete(channel)
   mqtt.unsubscribe(channel, err => {
@@ -128,13 +127,13 @@ const unsubscribe = channel => {
 }
 
 /**
- * Publish message 
+ * Publish message
  * @param {string} channel - chennale name
  * @param {Object} data - some obj
  */
 const notify = (channel, data) => {
-  assert(connected, 'Client is not connected.')
-  assert(typeof data === 'object', 'Data should be an object.')
+  assert(connected, "Client is not connected.")
+  assert(typeof data === "object", "Data should be an object.")
   const str = JSON.stringify(data)
   mqtt.publish(channel, str)
 }
@@ -149,9 +148,8 @@ const end = () => {
     listeners.clear()
     mqtt.end(true, {}, resolve)
   }
-  
+
   return new Promise(fn)
 }
 
-module.exports = { prepare, subscribe, unsubscribe,
-  notify, end, countChannels, countListeners, isReady }
+module.exports = { prepare, subscribe, unsubscribe, notify, end, countChannels, countListeners, isReady }

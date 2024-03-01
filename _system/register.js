@@ -1,4 +1,4 @@
-'use strict'
+"use strict"
 
 /**
  * Register for running processes
@@ -37,10 +37,8 @@ class Register {
   remove(pid) {
     if (!this.pids.has(pid)) return {}
     let removed
-    this.processes = this.processes
-    .filter(el => {
-      if (el.pid !== pid)
-      return true
+    this.processes = this.processes.filter(el => {
+      if (el.pid !== pid) return true
       removed = el
       return false
     })
@@ -55,8 +53,7 @@ class Register {
   next() {
     const { processes, index } = this
     const process = processes[index]
-    if (index >= processes.length - 1)
-    this.index = 0
+    if (index >= processes.length - 1) this.index = 0
     else this.index++
     return process
   }

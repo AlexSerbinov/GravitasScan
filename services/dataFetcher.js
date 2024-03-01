@@ -1,14 +1,10 @@
-const { syncSettings } = require("../lib/helpers/config.helper") // for dev, before set up config vai params in fetcer
 const { createFetcher } = require("../lib/services/data-fetcher/fetchers")
-
 const { configurePool } = require("../lib/ethers/pool")
 const defaultSettings = require("../configs/DefaultSettings.json")
 const redis = require("../lib/redis/redis/lib/redis")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
 const protocol = $.params.PROTOCOL
-
-const settings = await syncSettings(protocol, "data-fetcher") // for dev, before set up config vai params in fetcer
 
 // Now we save the path for config params for each protocol in service.json.
 const configPath = $.params.configPath
@@ -20,14 +16,13 @@ configurePool([config.RPC_WSS])
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 // Moved from config.helper. Earlier this was called syncSettings.
-// const settings = defaultSettings.find(s => s.protocol === protocol).services["data-fetcher"]
+const settings = defaultSettings.find(s => s.protocol === protocol).services["data-fetcher"]
 
-// let fetcher = createTransmitFetcher(protocol, settings, config)
-const fetcher = createFetcher(protocol, settings) // send config on this way by third param
+const fetcher = createFetcher(protocol, settings, config) // send config on this way by third param
 
 const sendStartEvent = function () {
   const date = new Date().toUTCString()
-  $.send("start", { m: date })
+  $.send("start", { date })
 }
 
 sendStartEvent()
@@ -54,7 +49,7 @@ fetcher.on("deleteFromRedis", data => {
 })
 
 fetcher.on("liquidate", data => {
-  $.send("liquidate", data.resp)
+  $.send("liquidate", data)
 })
 
 fetcher.on("info", data => {
@@ -66,7 +61,7 @@ fetcher.on("reject", data => {
 })
 
 fetcher.on("error", data => {
-  $.send("error", data)
+  $.send("error1", { m: data.toString() }) // for some reason messages not sended to topic error, that's way I'm use error1. TODO: Fix it
 })
 
 /**
@@ -81,10 +76,10 @@ $.on(`onSettings`, settings => {
   fetcher.settings = settings
 })
 
+/**
+ * Main entry point. Listen user's adddresess
+ */
 $.on("searcherExecute", async data => {
-    console.log(`======================= searcherExecute ===================`)
-    
-  // remove logic from this func. Maybe not need to do anything!?
   fetcher.fetchData(data)
 })
 
@@ -97,4 +92,13 @@ $.onExit(async () => {
       resolve()
     }, 100) // Set a small timeout to ensure async cleanup can complete
   })
+})
+
+setTimeout(() => {
+  console.log(undefinedObject.prop)
+}, 1000)
+
+process.on("uncaughtException", error => {
+  console.error(error)
+  fetcher.emit("error", error)
 })

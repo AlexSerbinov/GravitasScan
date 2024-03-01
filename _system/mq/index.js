@@ -1,6 +1,6 @@
-'use strict'
-const mq = require('./mq')
-const { getConfig } = require('../config')
+"use strict"
+const mq = require("./mq")
+const { getConfig } = require("../config")
 
 /**
  * Single MQ getter
@@ -36,7 +36,7 @@ const notify = async (topic, message) => {
 
 /**
  * Send system event
- * @param {*} message 
+ * @param {*} message
  */
 const sendEvent = async (service, event, data) => {
   const config = getConfig()

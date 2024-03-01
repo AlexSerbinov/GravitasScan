@@ -1,7 +1,7 @@
-'use strict'
-const vm = require('node:vm')
-const { readFile } = require('node:fs/promises')
-const { createBridge, send } = require('./bridge')
+"use strict"
+const vm = require("node:vm")
+const { readFile } = require("node:fs/promises")
+const { createBridge, send } = require("./bridge")
 
 /**
  * Service name
@@ -40,38 +40,34 @@ $.on(send, msg => {
  */
 const finalize = async () => {
   await $.finalize()
-  const type = 'stop'
+  const type = "stop"
   process.send({ type })
 }
 
 /**
  * Get messages from cluster
  */
-process.on('message', msg => {
+process.on("message", msg => {
   const { type, message } = msg
-  if (type === 'stop')
-  return finalize()
+  if (type === "stop") return finalize()
   $.emit(type, message)
 })
 
 /**
  * Catch errors
  */
-process.on('uncaughtException', error => {
+process.on("uncaughtException", error => {
   console.error(error)
-  const message = error.message || 'Undefined'
-  const type = 'warn'
+  const message = error.message || "Undefined"
+  const type = "warn"
   process.send({ type, message })
 })
 
 /**
  * Code tenplate to hide system values
  */
-const clean = 'const name = undefined;' +
-  'const params = undefined;' +
-  'const runVm = undefined;' + 
-  'const init = undefined;' + 
-  'const clean = undefined;'
+const clean =
+  "const name = undefined;" + "const params = undefined;" + "const runVm = undefined;" + "const init = undefined;" + "const clean = undefined;"
 
 /**
  * Init and start VM

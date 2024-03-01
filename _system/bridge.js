@@ -1,17 +1,16 @@
-'use strict'
-const { EventEmitter } = require('node:events')
+"use strict"
+const { EventEmitter } = require("node:events")
 
 /**
  * Send event
  */
-const send = Symbol('send')
+const send = Symbol("send")
 
 /**
  * Bridge to make communication bethwen
  * process and virtual machine
  */
 class Bridge extends EventEmitter {
-
   /**
    * @param {string} name - service name
    * @param {*} params - services params
@@ -39,11 +38,11 @@ class Bridge extends EventEmitter {
 
   /**
    * Send warn message
-   * @param {*} message 
+   * @param {*} message
    * @returns {Bridge}
    */
   warn(message) {
-    const type = 'warn'
+    const type = "warn"
     this.emit(send, { type, message })
     return this
   }
@@ -55,14 +54,14 @@ class Bridge extends EventEmitter {
    * @returns {Bridge}
    */
   error(message) {
-    const type = 'error'
+    const type = "error"
     this.emit(send, { type, message })
     return this
   }
 
   /**
    * Set before stop callback
-   * @param {*} callback 
+   * @param {*} callback
    */
   onExit(callback) {
     this.finalize = callback

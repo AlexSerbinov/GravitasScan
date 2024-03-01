@@ -27,7 +27,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:V1"
       },
-      "error": {
+      "error1": {
         "topic": "event:error:data_fetcher:V1"
       },
       "start": {
@@ -76,7 +76,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:V2"
       },
-      "error": {
+      "error1": {
         "topic": "event:error:data_fetcher:V2"
       },
       "start": {
@@ -125,7 +125,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:V3"
       },
-      "error": {
+      "error1": {
         "topic": "event:error:data_fetcher:V3"
       },
       "start": {
@@ -146,7 +146,7 @@
       "configPath": "/configs/Main.json"
     }
   },
-  "compoundDataFetcher": {
+  "CompoundDataFetcher": {
     "forks": 1,
     "script": "services/dataFetcher.js",
     "namespace": "namespace",
@@ -174,7 +174,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:Compound"
       },
-      "error": {
+      "error1": {
         "topic": "event:error:data_fetcher:Compound"
       },
       "start": {

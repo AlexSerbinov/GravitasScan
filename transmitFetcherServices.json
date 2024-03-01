@@ -137,7 +137,7 @@
       "configPath": "/configs/Main.json"
     }
   },
-  "compoundTransmitFetcher": {
+  "CompoundTransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
     "namespace": "namespace",

@@ -94,9 +94,6 @@ $.onExit(async () => {
   })
 })
 
-setTimeout(() => {
-  console.log(undefinedObject.prop)
-}, 1000)
 
 process.on("uncaughtException", error => {
   console.error(error)

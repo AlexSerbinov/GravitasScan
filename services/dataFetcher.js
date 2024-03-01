@@ -61,7 +61,7 @@ fetcher.on("reject", data => {
 })
 
 fetcher.on("error", data => {
-  $.send("error1", { m: data.toString() }) // for some reason messages not sended to topic error, that's way I'm use error1. TODO: Fix it
+  $.send("error", { m: data.toString() }) // for some reason messages not sended to topic error, that's way I'm use error. TODO: Fix it
 })
 
 /**

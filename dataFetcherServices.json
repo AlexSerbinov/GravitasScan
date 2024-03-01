@@ -27,7 +27,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:V1"
       },
-      "error1": {
+      "error": {
         "topic": "event:error:data_fetcher:V1"
       },
       "start": {
@@ -76,7 +76,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:V2"
       },
-      "error1": {
+      "error": {
         "topic": "event:error:data_fetcher:V2"
       },
       "start": {
@@ -125,7 +125,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:V3"
       },
-      "error1": {
+      "error": {
         "topic": "event:error:data_fetcher:V3"
       },
       "start": {
@@ -174,7 +174,7 @@
       "reject": {
         "topic": "event:reject:data_fetcher:Compound"
       },
-      "error1": {
+      "error": {
         "topic": "event:error:data_fetcher:Compound"
       },
       "start": {

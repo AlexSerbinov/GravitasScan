@@ -83,3 +83,8 @@ $.onExit(async () => {
     }, 100) // Set a small timeout to ensure async cleanup can complete
   })
 })
+
+process.on("uncaughtException", error => {
+  console.error(error)
+  fetcher.emit("error", error)
+})

@@ -43,7 +43,7 @@ fetcher.on("reject", data => {
 })
 
 fetcher.on("errorMessage", data => {
-  // we use "errorMessage" instead of "error" because "error" is locke by _service
+  // we use "errorMessage" instead of "error" because "error" is locked by _service
   $.send("errorMessage", { error: data.toString() })
 })
 

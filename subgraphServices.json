@@ -1,0 +1,182 @@
+{
+  "V1Subgraph": {
+    "forks": 1,
+    "script": "services/subgraph.js",
+    "namespace": "namespace",
+    "listen": {
+      "onReservesData": {
+        "topic": "data:reserves:V1",
+        "roundrobing": false
+      },
+      "parseUser": {
+        "topic": "user:subraph:V1",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "re-queuing": {
+        "topic": "event:re-queuing:subgraph:V1"
+      },
+      "drain": {
+        "topic": "event:drain:subgraph:V1"
+      },
+      "sendDataToSearcher": {
+        "topic": "execute:searcher:V1"
+      },
+      "reject": {
+        "topic": "event:reject:subgraph:V1"
+      },
+      "errorMessage": {
+        "topic": "event:error:subgraph:V1"
+      },
+      "start": {
+        "topic": "event:start:subgraph:V1"
+      },
+      "info": {
+        "topic": "event:info:subgraph:V1"
+      },
+      "subgraph_logs": {
+        "topic": "event:subgraph_logs:subgraph:V1"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V1",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V2Subgraph": {
+    "forks": 1,
+    "script": "services/subgraph.js",
+    "namespace": "namespace",
+    "listen": {
+      "onReservesData": {
+        "topic": "data:reserves:V2",
+        "roundrobing": false
+      },
+      "parseUser": {
+        "topic": "user:subraph:V2",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "re-queuing": {
+        "topic": "event:re-queuing:subgraph:V2"
+      },
+      "drain": {
+        "topic": "event:drain:subgraph:V2"
+      },
+      "sendDataToSearcher": {
+        "topic": "execute:searcher:V2"
+      },
+      "reject": {
+        "topic": "event:reject:subgraph:V2"
+      },
+      "errorMessage": {
+        "topic": "event:error:subgraph:V2"
+      },
+      "start": {
+        "topic": "event:start:subgraph:V2"
+      },
+      "info": {
+        "topic": "event:info:subgraph:V2"
+      },
+      "subgraph_logs": {
+        "topic": "event:subgraph_logs:subgraph:V2"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V2",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V3Subgraph": {
+    "forks": 1,
+    "script": "services/subgraph.js",
+    "namespace": "namespace",
+    "listen": {
+      "onReservesData": {
+        "topic": "data:reserves:V3",
+        "roundrobing": false
+      },
+      "parseUser": {
+        "topic": "user:subraph:V3",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "re-queuing": {
+        "topic": "event:re-queuing:subgraph:V3"
+      },
+      "drain": {
+        "topic": "event:drain:subgraph:V3"
+      },
+      "sendDataToSearcher": {
+        "topic": "execute:searcher:V3"
+      },
+      "reject": {
+        "topic": "event:reject:subgraph:V3"
+      },
+      "errorMessage": {
+        "topic": "event:error:subgraph:V3"
+      },
+      "start": {
+        "topic": "event:start:subgraph:V3"
+      },
+      "info": {
+        "topic": "event:info:subgraph:V3"
+      },
+      "subgraph_logs": {
+        "topic": "event:subgraph_logs:subgraph:V3"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V3",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "CompoundSubgraph": {
+    "forks": 1,
+    "script": "services/subgraph.js",
+    "namespace": "namespace",
+    "listen": {
+      "onReservesData": {
+        "topic": "data:reserves:Compound",
+        "roundrobing": false
+      },
+      "parseUser": {
+        "topic": "user:subraph:Compound",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "re-queuing": {
+        "topic": "event:re-queuing:subgraph:Compound"
+      },
+      "drain": {
+        "topic": "event:drain:subgraph:Compound"
+      },
+      "sendDataToSearcher": {
+        "topic": "execute:searcher:Compound"
+      },
+      "reject": {
+        "topic": "event:reject:subgraph:Compound"
+      },
+      "errorMessage": {
+        "topic": "event:error:subgraph:Compound"
+      },
+      "start": {
+        "topic": "event:start:subgraph:Compound"
+      },
+      "info": {
+        "topic": "event:info:subgraph:Compound"
+      },
+      "subgraph_logs": {
+        "topic": "event:subgraph_logs:subgraph:Compound"
+      }
+    },
+    "params": {
+      "PROTOCOL": "Compound",
+      "configPath": "/configs/Main.json"
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
-  "MQTT_HOST": "mqtt://10.10.13.23",
+  "MQTT_HOST1": "mqtt://10.10.13.23",
   "RPC_MODE": "wss",
-  "RPC_WSS": "ws://10.10.12.14:8546",
+  "RPC_WSS": "wss://eth-mainnet.g.alchemy.com/v2/pxHJ_DLdqCcU5vz9ZSNDsmOnYaSuIUUW",
   "RPC_HTTP": ["https://eth-mainnet.g.alchemy.com/v2/VXHsZcGz-ObtzQG1yjh42D9sH5jQ680z"],
   "ARCHIVE_RPC_MODE": "http",
   "ARCHIVE_RPC_WSS": "wss://eth-mainnet.g.alchemy.com/v2/4Cxvupv25LbePLjg1mdIaV_82GS4wrVm",

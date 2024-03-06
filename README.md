@@ -113,12 +113,10 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 
 # Updates
 
-
 ## 2024-02-29
 
 1. Migrated the `dataFetcher` service to a new architecture. The configuration file for launching services is located in `services.json`.
 2. Standartised all js files with prettier and .pretierrc file config was added to git repo.
-
 
 ## 2024-02-27
 

@@ -60,8 +60,9 @@ fetcher.on("reject", data => {
   $.send("reject", data)
 })
 
-fetcher.on("errorMessage", data => { // we use "errorMessage" instead of "error" because "error" is locke by _service
-  $.send("errorMessage", { error: data.toString() }) 
+fetcher.on("errorMessage", data => {
+  // we use "errorMessage" instead of "error" because "error" is locke by _service
+  $.send("errorMessage", { error: data.toString() })
 })
 
 /**

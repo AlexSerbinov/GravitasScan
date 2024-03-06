@@ -1,0 +1,17 @@
+{
+  "name": "@cybridge/mq",
+  "version": "1.0.0",
+  "description": "MQTT client",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "metatests test"
+  },
+  "author": "Sergey Didkovsky <didkovsky.dev@proton.me>",
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "^4.3.7"
+  },
+  "devDependencies": {
+    "metatests": "^0.8.2"
+  }
+}

@@ -42,11 +42,14 @@ fetcher.on("reject", data => {
   $.send("reject", data)
 })
 
-fetcher.on("errorMessage", data => { // we use "errorMessage" instead of "error" because "error" is locke by _service
-  $.send("errorMessage", { error: data.toString() }) 
+fetcher.on("errorMessage", data => {
+  // we use "errorMessage" instead of "error" because "error" is locke by _service
+  $.send("errorMessage", { error: data.toString() })
 })
 
 $.on(`onReservesData`, data => {
+  console.log(`======================= onReservesData ===================`)
+
   fetcher.setGlobalReservesData(data)
 })
 
@@ -62,6 +65,8 @@ const sendStartEvent = function () {
 sendStartEvent()
 
 $.on("transmit", async data => {
+  console.log(`======================= transmitt ===================`)
+
   if (!Object.keys(data.assets).includes(protocol)) {
     return
   }

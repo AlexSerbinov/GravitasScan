@@ -15,7 +15,7 @@ configurePool([config.RPC_WSS])
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 // Moved from config.helper. Earlier this was called syncSettings.
-const settings = defaultSettings.find(s => s.protocol === protocol).services["data-fetcher"]
+const settings = defaultSettings.find(s => s.protocol === protocol).services["searcher"]
 
 let fetcher = createTransmitFetcher(protocol, settings, config)
 
@@ -48,8 +48,6 @@ fetcher.on("errorMessage", data => {
 })
 
 $.on(`onReservesData`, data => {
-  console.log(`======================= onReservesData ===================`)
-
   fetcher.setGlobalReservesData(data)
 })
 
@@ -65,8 +63,6 @@ const sendStartEvent = function () {
 sendStartEvent()
 
 $.on("transmit", async data => {
-  console.log(`======================= transmitt ===================`)
-
   if (!Object.keys(data.assets).includes(protocol)) {
     return
   }

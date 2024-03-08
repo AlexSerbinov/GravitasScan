@@ -8,8 +8,8 @@
         "topic": "data:reserves:V1",
         "roundrobing": false
       },
-      "parseUser": {
-        "topic": "user:subraph:V1",
+      "parseUsers": {
+        "topic": "event:users:subraph:V1",
         "roundrobing": false
       }
     },
@@ -53,8 +53,8 @@
         "topic": "data:reserves:V2",
         "roundrobing": false
       },
-      "parseUser": {
-        "topic": "user:subraph:V2",
+      "parseUsers": {
+        "topic": "event:users:subraph:V2",
         "roundrobing": false
       }
     },
@@ -98,8 +98,8 @@
         "topic": "data:reserves:V3",
         "roundrobing": false
       },
-      "parseUser": {
-        "topic": "user:subraph:V3",
+      "parseUsers": {
+        "topic": "event:users:subraph:V3",
         "roundrobing": false
       }
     },
@@ -139,12 +139,12 @@
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
-      "onReservesData": {
-        "topic": "data:reserves:Compound",
+      "parseUsers": {
+        "topic": "event:users:subraph:Compound",
         "roundrobing": false
       },
-      "parseUser": {
-        "topic": "user:subraph:Compound",
+      "onReservesData": {
+        "topic": "data:reserves:Compound",
         "roundrobing": false
       }
     },

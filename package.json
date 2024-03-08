@@ -6,12 +6,14 @@
   "license": "ISC",
   "scripts": {
     "all": "node _system/start",
-    "transmit": "node _system/start transmitFetcherServices.json",
-    "debugTransmitFetcher": "node _system/debug transmitFetcherServices.json",
-    "dataFetcher": "node _system/start dataFetcherServices.json",
-    "debugDataFetcher": "node _system/debug dataFetcherServices.json",
-    "subgraph": "node _system/start subgraphServices.json",
-    "debugSubgraph": "node _system/debug subgraphServices.json"
+    "transmit": "node _system/start servicesConfig/transmitFetcherServices.json",
+    "debugTransmitFetcher": "node _system/debug servicesConfig/transmitFetcherServices.json",
+    "dataFetcher": "node _system/start servicesConfig/dataFetcherServices.json",
+    "debugDataFetcher": "node _system/debug servicesConfig/dataFetcherServices.json",
+    "subgraph": "node _system/start servicesConfig/subgraphServices.json",
+    "debugSubgraph": "node _system/debug servicesConfig/subgraphServices.json",
+    "proxy": "node _system/start servicesConfig/proxyServices.json",
+    "debugProxy": "node _system/debug servicesConfig/proxyServices.json"
   },
   "dependencies": {
     "@cybridge/providers-pool": "^1.0.0",

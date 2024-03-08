@@ -1,0 +1,118 @@
+{
+  "V1Proxy": {
+    "forks": 1,
+    "script": "services/proxy.js",
+    "namespace": "namespace",
+    "listen": {
+      "drain": {
+        "topic": "event:drain:subgraph:V1",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "sendUsersToSubgraph": {
+        "topic": "event:users:subraph:V1"
+      },
+      "errorMessage": {
+        "topic": "event:error:proxy:V1"
+      },
+      "start": {
+        "topic": "event:start:proxy:V1"
+      },
+      "info": {
+        "topic": "event:info:proxy:V1"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V1",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V2Proxy": {
+    "forks": 1,
+    "script": "services/proxy.js",
+    "namespace": "namespace",
+    "listen": {
+      "drain": {
+        "topic": "event:drain:subgraph:V2",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "sendUsersToSubgraph": {
+        "topic": "event:users:subraph:V2"
+      },
+      "errorMessage": {
+        "topic": "event:error:proxy:V2"
+      },
+      "start": {
+        "topic": "event:start:proxy:V2"
+      },
+      "info": {
+        "topic": "event:info:proxy:V2"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V2",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V3Proxy": {
+    "forks": 1,
+    "script": "services/proxy.js",
+    "namespace": "namespace",
+    "listen": {
+      "drain": {
+        "topic": "event:drain:subgraph:V3",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "sendUsersToSubgraph": {
+        "topic": "event:users:subraph:V3"
+      },
+      "errorMessage": {
+        "topic": "event:error:proxy:V3"
+      },
+      "start": {
+        "topic": "event:start:proxy:V3"
+      },
+      "info": {
+        "topic": "event:info:proxy:V3"
+      }
+    },
+    "params": {
+      "PROTOCOL": "V3",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "CompoundProxy": {
+    "forks": 1,
+    "script": "services/proxy.js",
+    "namespace": "namespace",
+    "listen": {
+      "drain": {
+        "topic": "event:drain:subgraph:Compound",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "sendUsersToSubgraph": {
+        "topic": "event:users:subraph:Compound"
+      },
+      "errorMessage": {
+        "topic": "event:error:proxy:Compound"
+      },
+      "start": {
+        "topic": "event:start:proxy:Compound"
+      },
+      "info": {
+        "topic": "event:info:proxy:Compound"
+      }
+    },
+    "params": {
+      "PROTOCOL": "Compound",
+      "configPath": "/configs/Main.json"
+    }
+  }
+}

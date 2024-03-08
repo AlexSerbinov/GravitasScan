@@ -74,6 +74,8 @@ $.on(`onReservesData`, data => {
 })
 
 $.on(`onSettings`, settings => {
+  console.log(`======================= settings ===================`)
+
   fetcher.settings = settings
 })
 

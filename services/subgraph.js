@@ -17,7 +17,6 @@ const service = "subgraph"
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 
-
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
 /**
@@ -84,10 +83,17 @@ fetcher.once("fetcherReady", data => {
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
-
+let lastBatchTime = null
+let intervals = []
 
 $.on("parseUsers", async data => {
-  console.log(`SUBGRAPH: recieved batch number ${i} oh users from proxy`) // dev
+  const currentTime = Date.now()
+  if (lastBatchTime) {
+    const interval = currentTime - lastBatchTime
+    intervals.push(interval)
+    console.log(`PROXY: Interval between batches of users: ${interval} ms`)
+  }
+  lastBatchTime = currentTime
   processUser(data)
   i++ //dev
 })

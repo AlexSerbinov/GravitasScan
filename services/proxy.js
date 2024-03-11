@@ -35,7 +35,7 @@ fetcher.on("sendUsersToSubgraph", async data => {
 })
 
 $.on("drain", () => {
-  console.log("PROXY: recieved drain event from subgraph")
+  console.log("PROXY: received drain event from subgraph")
   onDrain()
 })
 
@@ -50,21 +50,35 @@ const getUserFromFile = async () => {
 const getNonBlacklistedUsers = async protocol => {
   const allUsers = await getUserFromFile()
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
+
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
-  return allUsers.filter((_, index) => checkBlacklistUsers[index] === 0)
+  const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0)
+  console.log(`PROXY: All users number =     ${usersToCheck.length}`)
+  console.log(`PROXY: Non blacklist number = ${nonBlacklistedUsers.length}`)
+
+  return nonBlacklistedUsers
 }
 
 // Send users in batches.
 const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
   const batchSize = 20
+  const totalBatches = Math.ceil(nonBlacklistedUsers.length / batchSize) // Определяем общее количество пакетов
+
   for (let i = 0; i < nonBlacklistedUsers.length; i += batchSize) {
     const batch = nonBlacklistedUsers.slice(i, i + batchSize)
-    if (i == nonBlacklistedUsers.length -1 )console.log(`PROXY: Sending batch number ${i/batchSize} of ${batch.length} users`)
+    const batchNumber = i / batchSize + 1 // Номер текущего пакета (начинаем с 1)
+
+    // console.log(`PROXY: Sending batch number ${batchNumber} of ${batch.length} users`)
+
+    // Проверяем, является ли текущий пакет последним
+    if (batchNumber === totalBatches) {
+      console.log(`\nPROXY: Sending the last batch ${batchNumber} of users`)
+    }
+
     $.send("sendUsersToSubgraph", batch)
   }
 }
 
-const DRAIN_TIMEOUT_INITIAL = 30 * 1000 // 10 seconds for the first time
 const DRAIN_TIMEOUT_REPEAT = 10 * 60 * 1000 // 10 min for subsequent times
 
 let drainTimer
@@ -73,16 +87,15 @@ let manualTriggerCount = 0
 const setupDrainTimer = () => {
   clearTimeout(drainTimer) // It's safe to call clearTimeout even if drainTimer is undefined
 
-  const timeout = manualTriggerCount === 0 ? DRAIN_TIMEOUT_INITIAL : DRAIN_TIMEOUT_REPEAT
   drainTimer = setTimeout(() => {
-    console.log(`Manually triggering drain after ${manualTriggerCount === 0 ? "10 seconds" : "10 min"} of inactivity.`)
+    console.log("Manually triggering drain after 10 min of inactivity.")
     onDrain()
       .then(() => {
         manualTriggerCount++
         setupDrainTimer() // Reset the timer after successful drain
       })
       .catch(error => console.error("Drain failed:", error))
-  }, timeout)
+  }, DRAIN_TIMEOUT_REPEAT)
 }
 
 const onDrain = async () => {
@@ -90,7 +103,9 @@ const onDrain = async () => {
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
 }
 
-// Start the initial drain timer upon script start
+// Initiate the main functionality immediately upon script start
+onDrain()
+// Start the drain timer
 setupDrainTimer()
 
 $.onExit(async () => {
@@ -98,7 +113,7 @@ $.onExit(async () => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
-      $.send("stop", { date })
+      $.send("stop", { date: new Date() })
       resolve()
     }, 100) // Set a small timeout to ensure async cleanup can complete
   })

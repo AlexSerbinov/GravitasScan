@@ -33,6 +33,8 @@ fetcher.on("sendUsersToSubgraph", async data => {
 
 $.on("drain", () => {
   $.send("proxy_logs", { message: `Received drain event from subgraph` })
+  console.log(`PROXY: ${protocol}: Received drain event from subgraph `)
+
   onDrain()
 })
 

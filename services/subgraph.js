@@ -35,6 +35,7 @@ const { mode, sleep_time } = settings
 
 $.send("start", { message: `Run in ${mode} mode` })
 $.send("start", { message: `${protocol} subgraph started!` })
+console.log(`SUBRAPH: started`)
 
 /**
  * Create fetcher
@@ -47,7 +48,7 @@ queue.on("drain", async () => {
   }
 
   $.send("drain", { message: "Queue is drain, run handling again" })
-  console.log(`SUBGRAPH: recieved ${i} numbers of batch brfore sending drain event to subgraph`) // dev
+  console.log(`SUBGRAPH: ${protocol}: recieved ${i} numbers of batch brfore sending drain event to subgraph`) // dev
   i = 0
   // processUser() // TODO: ASK Serhiy do we need it here or not
 }) //
@@ -74,7 +75,7 @@ $.on("parseUsers", async data => {
   const currentTime = Date.now()
   if (lastBatchTime) {
     const interval = currentTime - lastBatchTime
-    console.log(`PROXY: Interval between batches of users: ${interval} ms`)
+    console.log(`SUBGRAPH: Interval between batches of users: ${interval} ms`)
   }
   lastBatchTime = currentTime
   processUser(data)

@@ -19,11 +19,13 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
+const EXECUTION_TIMEOUT = 100 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
+const DRAIN_TIMEOUT = 150 // Timeout before SUBGRAPH will send the drain event to PROXY. If the number of tasks in the queue increases, increase this timeout.
+
 /**
  * Create queue
  */
-
-const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user))
+const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user), EXECUTION_TIMEOUT, DRAIN_TIMEOUT)
 
 /**
  * sleep_time - wait some time before next run (in milliseconds)
@@ -31,33 +33,24 @@ const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user))
 
 const { mode, sleep_time } = settings
 
-const sendStartEvent = function (message) {
-  console.log("sendStartEvent")
-
-  $.send("start", { message }) // TODO Подивитись як він буде виглядати на виході, щоб не було фігні накшталт data: {message: "mes"}, а щоб було {message: "mes"}. Ну і подивитись як в оригиналі.
-}
-
-sendStartEvent({ message: `Run in ${mode} mode` })
-sendStartEvent({ message: `${protocol} subgraph started!` })
+$.send("start", { message: `Run in ${mode} mode` })
+$.send("start", { message: `${protocol} subgraph started!` })
 
 /**
  * Create fetcher
  */
 const fetcher = getFetcher(protocol, settings, config)
-let i = 0 // dev
-
+let i = 0
 queue.on("drain", async () => {
   if (sleep_time) {
     await sleep(sleep_time)
   }
-  console.log("SUBGRAPH: send drain event to proxy")
 
   $.send("drain", { message: "Queue is drain, run handling again" })
-  console.log(`SUBGRAPH: recieved ${i} numbers of batch brfore sending drain event to subgraf`) // dev
-
+  console.log(`SUBGRAPH: recieved ${i} numbers of batch brfore sending drain event to subgraph`) // dev
   i = 0
-  // processUser() // TODO But need to send smth in params.
-}) // Check that is 100% correct
+  // processUser() // TODO: ASK Serhiy do we need it here or not
+}) //
 
 fetcher.on("fetch", data => {
   $.send("sendDataToSearcher", data)
@@ -65,16 +58,8 @@ fetcher.on("fetch", data => {
   $.send("subgraph_logs", { date, ...data }) // TODO Check and compare with OLD arc
 })
 
-fetcher.on("error", data => {
-  const { user, error } = data
-  $.send("error", data)
-  if (error.includes("timeout")) {
-    // queue.add(user)  //
-  }
-})
-
 fetcher.once("fetcherReady", data => {
-  sendStartEvent({ message: `All data ready, user processing has started` })
+  $.send("start", { message: `All data ready, user processing has started` })
 })
 
 /**
@@ -84,13 +69,11 @@ $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 let lastBatchTime = null
-let intervals = []
 
 $.on("parseUsers", async data => {
   const currentTime = Date.now()
   if (lastBatchTime) {
     const interval = currentTime - lastBatchTime
-    intervals.push(interval)
     console.log(`PROXY: Interval between batches of users: ${interval} ms`)
   }
   lastBatchTime = currentTime
@@ -114,13 +97,14 @@ const processUser = async data => {
     const user = data.user
     queue.add(user)
   } catch (error) {
+    $.send("errorMessage", { message: error })
     console.error("Error reading allUsers.json:", error)
   }
 }
 
 process.on("uncaughtException", error => {
   console.error(error)
-  fetcher.emit("errorMessage", error)
+  $.send("errorMessage", { message: error })
 })
 
 const mqtt = require("mqtt")

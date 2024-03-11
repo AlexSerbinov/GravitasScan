@@ -55,12 +55,7 @@ $.on(`onSettings`, settings => {
   fetcher.settings = settings
 })
 
-const sendStartEvent = function () {
-  const date = new Date().toUTCString()
-  $.send("start", { date })
-}
-
-sendStartEvent()
+$.send("start", { date: new Date().toUTCString() })
 
 $.on("transmit", async data => {
   if (!Object.keys(data.assets).includes(protocol)) {

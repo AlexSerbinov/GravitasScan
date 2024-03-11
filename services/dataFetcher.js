@@ -20,12 +20,7 @@ const settings = defaultSettings.find(s => s.protocol === protocol).services["da
 
 const fetcher = createFetcher(protocol, settings, config) // send config on this way by third param
 
-const sendStartEvent = function () {
-  const date = new Date().toUTCString()
-  $.send("start", { date })
-}
-
-sendStartEvent()
+$.send("start", { date: new Date().toUTCString() })
 
 /**
  * Users for long-time watching
@@ -74,8 +69,6 @@ $.on(`onReservesData`, data => {
 })
 
 $.on(`onSettings`, settings => {
-  console.log(`======================= settings ===================`)
-
   fetcher.settings = settings
 })
 

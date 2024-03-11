@@ -25,6 +25,7 @@
     "node-fetch": "2.6.6",
     "npm": "^9.7.2",
     "pg": "^8.11.3",
+    "pm2": "^5.3.1",
     "sequelize": "^6.26.0"
   },
   "devDependencies": {

@@ -20,7 +20,7 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
 const EXECUTION_TIMEOUT = 100 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
-const DRAIN_TIMEOUT = 150 // Timeout before SUBGRAPH will send the drain event to PROXY. If the number of tasks in the queue increases, increase this timeout.
+const DRAIN_TIMEOUT = 100 + $.forks * 50 || 200 // Timeout before SUBGRAPH will send the drain event to PROXY. If the number of tasks in the queue increases, increase this timeout. The more forks we launch, the higher the value should be.
 
 /**
  * Create queue
@@ -35,7 +35,7 @@ const { mode, sleep_time } = settings
 
 $.send("start", { message: `Run in ${mode} mode` })
 $.send("start", { message: `${protocol} subgraph started!` })
-console.log(`SUBRAPH: started`)
+console.log(`SUBRAPH: started! Drain timeout = ${DRAIN_TIMEOUT}`)
 
 /**
  * Create fetcher
@@ -75,7 +75,7 @@ $.on("parseUsers", async data => {
   const currentTime = Date.now()
   if (lastBatchTime) {
     const interval = currentTime - lastBatchTime
-    console.log(`SUBGRAPH: Interval between batches of users: ${interval} ms`)
+    // console.log(`SUBGRAPH: Interval between batches of users: ${interval} ms`)
   }
   lastBatchTime = currentTime
   processUser(data)

@@ -20,6 +20,7 @@ class Bridge extends EventEmitter {
     this.name = name
     this.__notify = params.notify || {}
     this.params = params.params || {}
+    this.forks = params.forks || {}
     this.finalize = () => {}
   }
 

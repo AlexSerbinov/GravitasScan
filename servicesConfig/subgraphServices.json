@@ -1,6 +1,6 @@
 {
   "V1Subgraph": {
-    "forks": 1,
+    "forks": 10,
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
@@ -10,7 +10,7 @@
       },
       "parseUsers": {
         "topic": "event:users:subraph:V1",
-        "roundrobing": false
+        "roundrobing": true
       }
     },
     "notify": {

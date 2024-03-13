@@ -13,7 +13,7 @@ const fetcher = new EventEmitter()
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-const DRAIN_TIMEOUT_REPEAT = 50 * 60 * 1000 // 5 min ! after this time, send batch of user when drain event not received
+const SEND_WITHOUT_DRAIN_TIMEOUT = 50 * 60 * 1000 // 5 min ! after this time, send batch of user when drain event not received
 
 $.send("start", { message: "proxy started" })
 
@@ -111,7 +111,7 @@ const setupDrainTimer = () => {
         setupDrainTimer() // Reset the timer after successful drain
       })
       .catch(error => console.error("Drain failed:", error))
-  }, DRAIN_TIMEOUT_REPEAT)
+  }, SEND_WITHOUT_DRAIN_TIMEOUT)
 }
 
 // Initiate the main functionality immediately upon script start

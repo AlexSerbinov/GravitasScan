@@ -1,6 +1,6 @@
 {
   "V1Subgraph": {
-    "forks": 10,
+    "forks": 1,
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
@@ -55,7 +55,7 @@
       },
       "parseUsers": {
         "topic": "event:users:subraph:V2",
-        "roundrobing": false
+        "roundrobing": true
       }
     },
     "notify": {
@@ -100,7 +100,7 @@
       },
       "parseUsers": {
         "topic": "event:users:subraph:V3",
-        "roundrobing": false
+        "roundrobing": true
       }
     },
     "notify": {
@@ -141,11 +141,11 @@
     "listen": {
       "parseUsers": {
         "topic": "event:users:subraph:Compound",
-        "roundrobing": false
+        "roundrobing": true
       },
       "onReservesData": {
         "topic": "data:reserves:Compound",
-        "roundrobing": false
+        "roundrobing": true
       }
     },
     "notify": {

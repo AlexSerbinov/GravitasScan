@@ -9,7 +9,7 @@
         "roundrobing": false
       },
       "parseUsers": {
-        "topic": "event:users:subraph:V1",
+        "topic": "event:users:proxy:V1",
         "roundrobing": true
       }
     },
@@ -54,7 +54,7 @@
         "roundrobing": false
       },
       "parseUsers": {
-        "topic": "event:users:subraph:V2",
+        "topic": "event:users:proxy:V2",
         "roundrobing": true
       }
     },
@@ -99,7 +99,7 @@
         "roundrobing": false
       },
       "parseUsers": {
-        "topic": "event:users:subraph:V3",
+        "topic": "event:users:proxy:V3",
         "roundrobing": true
       }
     },
@@ -140,7 +140,7 @@
     "namespace": "namespace",
     "listen": {
       "parseUsers": {
-        "topic": "event:users:subraph:Compound",
+        "topic": "event:users:proxy:Compound",
         "roundrobing": true
       },
       "onReservesData": {
@@ -153,7 +153,7 @@
         "topic": "event:re-queuing:subgraph:Compound"
       },
       "drain": {
-        "topic": "event:drain:subgraph:Compound"
+        "topic": "event:drain:subgraph"
       },
       "sendDataToSearcher": {
         "topic": "execute:searcher:Compound"

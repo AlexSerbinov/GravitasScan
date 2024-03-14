@@ -11,7 +11,7 @@
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:subraph:V1"
+        "topic": "event:users:proxy:V1"
       },
       "errorMessage": {
         "topic": "event:error:proxy:V1"
@@ -40,7 +40,7 @@
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:subraph:V2"
+        "topic": "event:users:proxy:V2"
       },
       "errorMessage": {
         "topic": "event:error:proxy:V2"
@@ -69,7 +69,7 @@
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:subraph:V3"
+        "topic": "event:users:proxy:V3"
       },
       "errorMessage": {
         "topic": "event:error:proxy:V3"
@@ -92,13 +92,13 @@
     "namespace": "namespace",
     "listen": {
       "drain": {
-        "topic": "event:drain:subgraph:Compound",
+        "topic": "event:drain:subgraph",
         "roundrobing": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:subraph:Compound"
+        "topic": "event:users:proxy:Compound"
       },
       "errorMessage": {
         "topic": "event:error:proxy:Compound"

@@ -19,16 +19,13 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
-const EXECUTION_TIMEOUT = 100 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
-// const DRAIN_TIMEOUT = 100 + $.forks * 50 || 200 // Timeout before SUBGRAPH will send the drain event to PROXY. If the number of tasks in the queue increases, increase this timeout. The more forks we launch, the higher the value should be.
-const DRAIN_TIMEOUT = 100 // Timeout before SUBGRAPH will send the drain event to PROXY. If the number of tasks in the queue increases, increase this timeout. The more forks we launch, the higher the value should be.
+const EXECUTION_TIMEOUT = 0 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
 
 const fetcher = getFetcher(protocol, settings, config)
 /**
  * Create queue
  */
-const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user), EXECUTION_TIMEOUT, DRAIN_TIMEOUT)
-// async user => await fetcher.fetchSubgraphUsers(user)
+const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user), EXECUTION_TIMEOUT)
 /**
  * sleep_time - wait some time before next run (in milliseconds)
  */
@@ -37,27 +34,27 @@ const { mode, sleep_time } = settings
 
 $.send("start", { message: `Run in ${mode} mode` })
 $.send("start", { message: `${protocol} subgraph started!` })
-console.log(`SUBRAPH: started! Drain timeout = ${DRAIN_TIMEOUT}`)
+console.log(`SUBRAPH: started!`)
 
 /**
  * Create fetcher
  */
 let i = 0
 queue.on("drain", async () => {
-  console.log(`======================= SUBGRAPH: DRAIN EVENT ===================`)
-
   if (sleep_time) {
     await sleep(sleep_time)
   }
-  $.send("drain", { message: "Queue is drain, run handling again" })  // TODO Turn o this to prod !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  $.send("drain", { message: "Queue is drain, run handling again" })
   console.log(`SUBGRAPH: ${protocol}: DRAIN EVENT: recieved ${i} batch before sending drain`) // dev
   i = 0
-  // processUser() // TODO: ASK Serhiy do we need it here or not // I think not need
-}) //
+}) 
 
 fetcher.on("fetch", data => {
   $.send("sendDataToSearcher", data)
   const date = new Date().toUTCString()
+  console.log(` $.send("sendDataToSearcher"`);
+  console.log({ date, ...data });
+  
   $.send("subgraph_logs", { date, ...data }) // TODO Check and compare with OLD arc
 })
 
@@ -71,20 +68,12 @@ fetcher.once("fetcherReady", data => {
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
-let lastBatchTime = null
-
 $.on("parseUsers", async data => {
-  const currentTime = Date.now()
-  if (lastBatchTime) {
-    const interval = currentTime - lastBatchTime
-    // console.log(`SUBGRAPH: Interval between batches of users: ${interval} ms`)
+  if (i == 350) {
+    console.log(`\n\n\n\n\n\n\nSUBGRAPH: WONG BEHAVIOR!!! ${protocol}: ParseUsers EVENT: recieved ${i} number of batch\n\n\n\n\n\n`) // dev
   }
-  lastBatchTime = currentTime
-  console.log(`SUBGRAPH: ${protocol}: recieved ${i} number of batch`) // dev
-
   data.forEach(userData => {
     processUser(userData)
-    // console.log(`======================= done ${i} ===================`)
   })
 
   i++ //dev
@@ -104,10 +93,6 @@ $.onExit(async () => {
 const processUser = async data => {
   try {
     const user = data.user
-    // console.log(`1----=-----=----=----=----=----=----- length -----=-----=-----=-----=-- 1`)
-    // console.log(queue.length)
-    // console.log(`2----=-----=----=----=----=----=----- length -----=-----=-----=-----=-- 2`)
-
     queue.add(user)
   } catch (error) {
     $.send("errorMessage", { message: error })
@@ -119,5 +104,3 @@ process.on("uncaughtException", error => {
   console.error(error)
   $.send("errorMessage", { message: error })
 })
-
-const mqtt = require("mqtt")

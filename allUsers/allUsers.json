@@ -1,13 +1,6 @@
 [
-  { "user": "0x43d948f932B48f901956D7B7B035cea55D2A3f47", "reserves": {} },
+  { "user": "0x8870230b32D211d41af560f01C303B4c2DacA33E", "reserves": {} },
   { "user": "0x0006e4548AED4502ec8c844567840Ce6eF1013f5", "reserves": {} },
-  { "user": "0xb00ba6778cF84100da676101e011B3d229458270", "reserves": {} },
-  { "user": "0x433829c4C58Cb774c0356D4bC676108aB71d160c", "reserves": {} },
-  { "user": "0x1303b9D1D5FdfB7D822C7e285DE118280a4a17e3", "reserves": {} },
-  { "user": "0xdFf6430B1B8bAA34A36c17a268311A2c5eB3666D", "reserves": {} },
-  { "user": "0xE864166688e95618920e32619753E23175f189ce", "reserves": {} },
-  { "user": "0xEcC996953e976A305ee585A9C7BBbcc85D1C467b", "reserves": {} },
-  { "user": "0xBD9ED130A53CFaFcf81502e4D35329A6c4D53410", "reserves": {} },
-  { "user": "0x22fa8Cc33a42320385Cbd3690eD60a021891Cb32", "reserves": {} },
-  { "user": "0xee2826453A4Fd5AfeB7ceffeEF3fFA2320081268", "reserves": {} }
+  { "user": "0x21c37f69AbB1f179878D8e8fD433F28671382A8C", "reserves": {} },
+  { "user": "0x433829c4C58Cb774c0356D4bC676108aB71d160c", "reserves": {} }
 ]

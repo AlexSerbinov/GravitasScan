@@ -13,12 +13,11 @@ const fetcher = new EventEmitter()
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-const SEND_WITHOUT_DRAIN_TIMEOUT = 50 * 60 * 1000 // 5 min ! after this time, send batch of user when drain event not received
+const SEND_WITHOUT_DRAIN_TIMEOUT = 10 * 60 * 1000 // 10 min ! after this time, send batch of user when drain event not received
 
 $.send("start", { message: "proxy started" })
 
 let isSending = false // Flag to indicate if sending is in progress
-let lastDrainTimestamp = Date.now() // Time of the last drain event
 
 /**
  * Create fetcher
@@ -33,13 +32,14 @@ fetcher.on("sendUsersToSubgraph", async data => {
 /**
  * Create listener
  */
+var startTime // Capture start time
 
 $.on("drain", () => {
-  const currentTime = Date.now()
-  const timeSinceLastDrain = (currentTime - lastDrainTimestamp) / 1000 // Time between drain events in seconds
-  console.log(`PROXY: ${protocol} Received  drain event from subgraph. Time since last drain: ${timeSinceLastDrain} seconds.`)
-  lastDrainTimestamp = currentTime
-
+  startTime = Date.now()
+  console.log(`PROXY: ${protocol} Flag isSending = ${isSending}`)
+  console.log(
+    `PROXY: ${protocol} Received  drain event from subgraph.`
+  )
   if (!isSending) {
     onDrain()
   }
@@ -47,7 +47,7 @@ $.on("drain", () => {
 
 const onDrain = async () => {
   isSending = true
-  const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol) // Ensure protocol is correctly defined or passed
+  const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol) 
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
   isSending = false
 }
@@ -70,9 +70,11 @@ const getNonBlacklistedUsers = async protocol => {
 
 // Send users in batches.
 const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
+
   isSending = true // Set the sending flag to true at the beginning
   const batchSize = 20
   const totalBatches = Math.ceil(nonBlacklistedUsers.length / batchSize)
+  let batchesSent = 0 // Counter for sent batches
 
   for (let i = 0; i < nonBlacklistedUsers.length; i += batchSize) {
     // Use setImmediate for asynchronous sending
@@ -82,24 +84,31 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
 
       // Check if the current batch is the last one
       if (batchNumber === totalBatches) {
-        console.log(`\nPROXY: Sending the last batch number ${batchNumber} of users`)
-        $.send("proxy_logs", { message: `Sending the last batch number ${batchNumber} of users` })
+        console.log(`\nPROXY: sendUsersToSubgraph event :Sent the last batch number ${batchNumber} of users`)
+        $.send("proxy_logs", { message: `Sending the last batch number ${batchNumber} of users ${new Date().toISOString()}` })
       }
-
       $.send("sendUsersToSubgraph", batch)
 
-      if (i + batchSize >= nonBlacklistedUsers.length) {
+      // Increment the counter after each batch is sent
+      batchesSent++
+      // Check if all batches have been sent
+      if (batchesSent === totalBatches) {
         isSending = false // Reset the sending flag after the last iteration
+        const endTime = Date.now() // Capture end time
+        const totalTime = (endTime - startTime) / 1000 // Calculate total time in seconds
+        console.log(`PROXY: ${protocol} All ${batchesSent} batches sent in ${totalTime} seconds.`)
       }
     })
   }
 }
 
+
 let drainTimer
 let manualTriggerCount = 0
 
+// If we do not have drain event for time in SEND_WITHOUT_DRAIN_EVENT_TIMEOUT. We sent event by timeout
 const setupDrainTimer = () => {
-  clearTimeout(drainTimer) // It's safe to call clearTimeout even if drainTimer is undefined
+  clearTimeout(drainTimer) 
 
   drainTimer = setTimeout(() => {
     console.log("Manually triggering drain after 10 min of inactivity.")
@@ -116,7 +125,7 @@ const setupDrainTimer = () => {
 
 // Initiate the main functionality immediately upon script start
 onDrain()
-// Start the drain timer
+// Start the drain timer to send batches if fist drain event nor recieved
 setupDrainTimer()
 
 $.onExit(async () => {

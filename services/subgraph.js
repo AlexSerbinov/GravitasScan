@@ -1,5 +1,3 @@
-const fs = require("fs").promises
-const { SERVICE_STATUS } = require("../lib/constants")
 const defaultSettings = require("../configs/DefaultSettings.json")
 const redis = require("../lib/redis/redis/lib/redis")
 
@@ -19,17 +17,17 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
-const EXECUTION_TIMEOUT = 0 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
+const EXECUTION_TIMEOUT = 100 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
 
-const fetcher = getFetcher(protocol, settings, config)
 /**
- * Create queue
+ * Create fetcher and queue
  */
+const fetcher = getFetcher(protocol, settings, config)
 const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user), EXECUTION_TIMEOUT)
+
 /**
  * sleep_time - wait some time before next run (in milliseconds)
  */
-
 const { mode, sleep_time } = settings
 
 $.send("start", { message: `Run in ${mode} mode` })
@@ -39,26 +37,23 @@ console.log(`SUBRAPH: started!`)
 /**
  * Create fetcher
  */
-let i = 0
 queue.on("drain", async () => {
   if (sleep_time) {
     await sleep(sleep_time)
   }
   $.send("drain", { message: "Queue is drain, run handling again" })
-  console.log(`SUBGRAPH: ${protocol}: DRAIN EVENT: recieved ${i} batch before sending drain`) // dev
-  i = 0
-}) 
+  $.send("subgraph_logs", { message: `send drain event` })
+  console.log(`SUBGRAPH: ${protocol}: send drain event`)
+})
 
+//Output point
 fetcher.on("fetch", data => {
   $.send("sendDataToSearcher", data)
   const date = new Date().toUTCString()
-  console.log(` $.send("sendDataToSearcher"`);
-  console.log({ date, ...data });
-  
-  $.send("subgraph_logs", { date, ...data }) // TODO Check and compare with OLD arc
+  $.send("subgraph_logs", { date, ...data })
 })
 
-fetcher.once("fetcherReady", data => {
+fetcher.once("fetcherReady", () => {
   $.send("start", { message: `All data ready, user processing has started` })
 })
 
@@ -68,15 +63,12 @@ fetcher.once("fetcherReady", data => {
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
-$.on("parseUsers", async data => {
-  if (i == 350) {
-    console.log(`\n\n\n\n\n\n\nSUBGRAPH: WONG BEHAVIOR!!! ${protocol}: ParseUsers EVENT: recieved ${i} number of batch\n\n\n\n\n\n`) // dev
-  }
-  data.forEach(userData => {
-    processUser(userData)
-  })
 
-  i++ //dev
+// Input point from PROXY service
+$.on("handleUsers", async data => {
+  data.forEach(userData => {
+    addUserToQueue(userData)
+  })
 })
 
 $.onExit(async () => {
@@ -90,7 +82,7 @@ $.onExit(async () => {
   })
 })
 
-const processUser = async data => {
+const addUserToQueue = async data => {
   try {
     const user = data.user
     queue.add(user)

@@ -24,7 +24,7 @@ let isSending = false // Flag to indicate if sending is in progress
  */
 
 // Handler for sending users to subgraph in batches.
-fetcher.on("sendUsersToSubgraph", async data => {
+fetcher.on("sendUsersToSubgraph", async () => {
   const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol)
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
 })
@@ -32,14 +32,11 @@ fetcher.on("sendUsersToSubgraph", async data => {
 /**
  * Create listener
  */
-var startTime // Capture start time
 
 $.on("drain", () => {
-  startTime = Date.now()
-  console.log(`PROXY: ${protocol} Flag isSending = ${isSending}`)
-  console.log(
-    `PROXY: ${protocol} Received  drain event from subgraph.`
-  )
+  console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
+  $.send("proxy_logs", { message: `PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}` })
+  clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
   if (!isSending) {
     onDrain()
   }
@@ -47,7 +44,7 @@ $.on("drain", () => {
 
 const onDrain = async () => {
   isSending = true
-  const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol) 
+  const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol)
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
   isSending = false
 }
@@ -70,7 +67,6 @@ const getNonBlacklistedUsers = async protocol => {
 
 // Send users in batches.
 const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
-
   isSending = true // Set the sending flag to true at the beginning
   const batchSize = 20
   const totalBatches = Math.ceil(nonBlacklistedUsers.length / batchSize)
@@ -92,34 +88,32 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
       // Increment the counter after each batch is sent
       batchesSent++
       // Check if all batches have been sent
-      if (batchesSent === totalBatches) {
-        isSending = false // Reset the sending flag after the last iteration
-        const endTime = Date.now() // Capture end time
-        const totalTime = (endTime - startTime) / 1000 // Calculate total time in seconds
-        console.log(`PROXY: ${protocol} All ${batchesSent} batches sent in ${totalTime} seconds.`)
-      }
+      if (batchesSent === totalBatches) isSending = false // Reset the sending flag after the last iteration
     })
   }
 }
-
 
 let drainTimer
 let manualTriggerCount = 0
 
 // If we do not have drain event for time in SEND_WITHOUT_DRAIN_EVENT_TIMEOUT. We sent event by timeout
 const setupDrainTimer = () => {
-  clearTimeout(drainTimer) 
+  clearTimeout(drainTimer)
 
   drainTimer = setTimeout(() => {
-    console.log("Manually triggering drain after 10 min of inactivity.")
     if (manualTriggerCount >= 10)
-      $.send("proxy_logs", { message: `manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event` })
+      $.send("proxy_logs", {
+        message: `manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event. It can be when subgraf not send "drain" event. Or subgraph do not have enough time for user processing`,
+      })
     onDrain()
       .then(() => {
         manualTriggerCount++
         setupDrainTimer() // Reset the timer after successful drain
       })
-      .catch(error => console.error("Drain failed:", error))
+      .catch(error => {
+        $.send("errorMessage", { message: error })
+        console.error("Drain failed:", error)
+      })
   }, SEND_WITHOUT_DRAIN_TIMEOUT)
 }
 
@@ -140,10 +134,10 @@ $.onExit(async () => {
 })
 
 fetcher.on("error", data => {
-  $.send("error", data)
+  $.send("errorMessage", data)
 })
 
 process.on("uncaughtException", error => {
   console.error(error)
-  fetcher.emit("errorMessage", error)
+  $.send("errorMessage", error)
 })

@@ -92,7 +92,7 @@
     "namespace": "namespace",
     "listen": {
       "drain": {
-        "topic": "event:drain:subgraph",
+        "topic": "event:drain:subgraph:Compound",
         "roundrobing": false
       }
     },

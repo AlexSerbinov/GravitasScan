@@ -4,13 +4,21 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
 const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
+// const { createSimulator } = require("../lib/simulator")
 
-const protocol = $.params.PROTOCOL
+const { protocol, privateKey, contractAddress, enso, providers, formatTrace, stateOverrides, selector } = $.params
+// const protocol = PROTOCOL // TODO: do smth with it
 
 const configPath = $.params.configPath
-const config = require(`${process.cwd()}${configPath}`)
-configurePool([config.RPC_WSS])
+const config = require(`${process.cwd()}${configPath}`) // Load the configuration
+
+// Object.assign(config, { selector }) // Add selector to the config object
 const service = "subgraph"
+
+/**
+ * Service initial data
+ */
+configurePool([config.RPC_WSS])
 
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
@@ -20,10 +28,16 @@ const settings = defaultSettings.find(s => s.protocol === protocol).services[ser
 const EXECUTION_TIMEOUT = 100 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
 
 /**
+ * Interface for enso simulator
+ */
+// const simulator = createSimulator(enso, formatTrace, stateOverrides)
+
+/**
  * Create fetcher and queue
  */
-const fetcher = getFetcher(protocol, settings, config)
-const queue = createQueue(async user => await fetcher.fetchSubgraphUsers(user), EXECUTION_TIMEOUT)
+
+const fetcher = getFetcher($.params, settings, config)
+const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
 
 /**
  * sleep_time - wait some time before next run (in milliseconds)
@@ -41,7 +55,7 @@ queue.on("drain", async () => {
   if (sleep_time) {
     await sleep(sleep_time)
   }
-  $.send("drain", { message: "Queue is drain, run handling again" })
+  // $.send("drain", { message: "Queue is drain, run handling again" }) // TODO uncoment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   $.send("subgraph_logs", { message: `send drain event` })
   console.log(`SUBGRAPH: ${protocol}: send drain event`)
 })
@@ -64,11 +78,14 @@ $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 
-// Input point from PROXY service
-$.on("handleUsers", async data => {
-  data.forEach(userData => {
-    addUserToQueue(userData)
-  })
+/**
+ * Input point from PROXY service
+ * Add arrays of users to the queue for processing.
+ * Because, in the simulator, we send a batch of users by time.
+ * @param {Array} users - Array of users
+ */
+$.on("handleUsers", async users => {
+  queue.add(users)
 })
 
 $.onExit(async () => {
@@ -81,16 +98,6 @@ $.onExit(async () => {
     }, 100) // Set a small timeout to ensure async cleanup can complete
   })
 })
-
-const addUserToQueue = async data => {
-  try {
-    const user = data.user
-    queue.add(user)
-  } catch (error) {
-    $.send("errorMessage", { message: error })
-    console.error("Error reading allUsers.json:", error)
-  }
-}
 
 process.on("uncaughtException", error => {
   console.error(error)

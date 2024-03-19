@@ -1,1 +1,0 @@
-mqtt pub -t 'settings:data-fetcher:V2' -h '10.10.13.23' '{"minHfDel": "0.0001", "minHfLiq": "0.3", "maxHfDel": "10", "maxHfLiq": "2", "minBorrow": "0.0001", "minCollateral": "0.0001"}'

@@ -51,9 +51,13 @@ const onDrain = async () => {
 
 // Utility function to read and parse the user file.
 const getUserFromFile = async () => {
-  const filePath = path.join(__dirname, "allUsers", "allUsersL.json")
+  const filePath = path.join(__dirname, "allUsers", "allUsersM.json")
   const items = await fs.readFile(filePath, "utf8")
-  return JSON.parse(items)
+  const parsedItems = JSON.parse(items)
+  // Map over parsedItems to extract only the 'user' field from each object
+  const usersOnly = parsedItems.map(item => item.user)
+
+  return usersOnly
 }
 
 // New utility function to get non-blacklisted users.

@@ -2,6 +2,7 @@ const fs = require("fs").promises
 const EventEmitter = require("node:events")
 const path = require("path")
 const redis = require("../lib/redis/redis/lib/redis")
+const filePath = path.join(__dirname, "allUsers", "allUsers20.json")
 
 const protocol = $.params.PROTOCOL
 
@@ -51,7 +52,6 @@ const onDrain = async () => {
 
 // Utility function to read and parse the user file.
 const getUserFromFile = async () => {
-  const filePath = path.join(__dirname, "allUsers", "allUsersM.json")
   const items = await fs.readFile(filePath, "utf8")
   const parsedItems = JSON.parse(items)
   // Map over parsedItems to extract only the 'user' field from each object

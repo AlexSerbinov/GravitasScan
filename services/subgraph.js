@@ -6,8 +6,7 @@ const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
 
-const { protocol, privateKey, contractAddress, enso, providers, formatTrace, stateOverrides, selector } = $.params
-// const protocol = PROTOCOL // TODO: do smth with it
+const { protocol, formatTrace, stateOverrides } = $.params
 
 const configPath = $.params.configPath
 const config = require(`${process.cwd()}${configPath}`) // Load the configuration

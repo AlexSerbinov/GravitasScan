@@ -4,7 +4,7 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
 const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
-// const { createSimulator } = require("../lib/simulator")
+const { createSimulator } = require("../lib/simulator")
 
 const { protocol, privateKey, contractAddress, enso, providers, formatTrace, stateOverrides, selector } = $.params
 // const protocol = PROTOCOL // TODO: do smth with it
@@ -25,18 +25,18 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
-const EXECUTION_TIMEOUT = 100 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
+const EXECUTION_TIMEOUT = 10000 //  This is the time limit for each task's execution within the queue. If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
 
 /**
  * Interface for enso simulator
  */
-// const simulator = createSimulator(enso, formatTrace, stateOverrides)
+const simulator = createSimulator(config.ENSO_URL, formatTrace, stateOverrides)
 
 /**
  * Create fetcher and queue
  */
 
-const fetcher = getFetcher($.params, settings, config)
+const fetcher = getFetcher($.params, settings, config, simulator)
 const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
 
 /**
@@ -55,7 +55,7 @@ queue.on("drain", async () => {
   if (sleep_time) {
     await sleep(sleep_time)
   }
-  // $.send("drain", { message: "Queue is drain, run handling again" }) // TODO uncoment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  $.send("drain", { message: "Queue is drain, run handling again" }) // TODO uncoment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   $.send("subgraph_logs", { message: `send drain event` })
   console.log(`SUBGRAPH: ${protocol}: send drain event`)
 })

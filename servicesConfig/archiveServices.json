@@ -26,7 +26,7 @@
       }
     },
     "params": {
-      "PROTOCOL": "V1",
+      "protocol": "V1",
       "configPath": "/configs/Main.json"
     }
   },
@@ -57,7 +57,7 @@
       }
     },
     "params": {
-      "PROTOCOL": "V2",
+      "protocol": "V2",
       "configPath": "/configs/Main.json"
     }
   },
@@ -88,7 +88,7 @@
       }
     },
     "params": {
-      "PROTOCOL": "V3",
+      "protocol": "V3",
       "configPath": "/configs/Main.json"
     }
   },
@@ -119,7 +119,7 @@
       }
     },
     "params": {
-      "PROTOCOL": "Compound",
+      "protocol": "Compound",
       "configPath": "/configs/Main.json"
     }
   }

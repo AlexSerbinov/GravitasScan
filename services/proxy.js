@@ -20,6 +20,35 @@ $.send("start", { message: "proxy started" })
 
 let isSending = false // Flag to indicate if sending is in progress
 
+////////////////////////////// dev block //////////////
+const db = require("../lib/db")
+const connectionChecker = require("../lib/services/connections")
+
+async function init() {
+  const checkDBConnection = await connectionChecker.checkDBConnection()
+  const checkDBArchive = await connectionChecker.checkDBArchive(protocol)
+  if (!dbActive || !nodeActive || !archiveActive) {
+    sendErrorEvent({ message: `${protocol} subgraph can't start!` })
+    setImmediate(() => {
+      process.exit(1)
+    })
+    return
+  }
+}
+
+init().catch(e => {
+  console.error(e)
+  db.sequelize.close().then(() => process.exit(1))
+})
+
+const getArchiveOrSubgraphUsers = async protocol => {
+  const { archive_users, listener_users } = await db.UserArchive.findOne({ where: { protocol } })
+
+  const allUsers = [...Object.values(archive_users).flat(), ...Object.values(listener_users).flat()]
+  return allUsers
+}
+////////////////////////////// dev block //////////////
+
 /**
  * Create fetcher
  */
@@ -62,7 +91,9 @@ const getUserFromFile = async () => {
 
 // New utility function to get non-blacklisted users.
 const getNonBlacklistedUsers = async protocol => {
-  const allUsers = await getUserFromFile()
+  // const allUsersFile = await getUserFromFile() // dev
+  const allUsers = await getArchiveOrSubgraphUsers(protocol)
+
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
 
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)

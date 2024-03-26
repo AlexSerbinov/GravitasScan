@@ -1,121 +1,84 @@
-const defaultSettings = require("../configs/DefaultSettings.json")
-
-const { onBlock, sendFetchedUsersEvent, sendStartEvent } = require("../lib/mq")
 const { getFetcher } = require("../lib/services/archive/fetcher")
 const { getLatestDbBlock, saveUsersToArchive } = require("../lib/services/archive/utils")
 const { configurePool } = require("../lib/ethers/pool")
 
+// Retrieve configuration settings
 const { protocol } = $.params
-
-const { startArchive } = require("../lib/services/archive")
-const connectionChecker = require("../lib/services/connections") // TODO maybe also remove this if we decide not to use db
-const db = require("../lib/db") // TODO maybe also remove this if we decide not to use db
-const { SERVICE_STATUS } = require("../lib/constants")
-const { sendErrorEvent, sendStartEvent } = require("../lib/services/archive/mq") // TODO remove this
-
 const configPath = $.params.configPath
 const config = require(`${process.cwd()}${configPath}`) // Load the configuration
+Object.assign(process.env, config) // While we use DB it's a simplest method to export config to other modules. After switching to redis we can remove this line
 
-const service = "subgraph"
+// Service and database initialization
+const connectionChecker = require("../lib/services/connections")
+const db = require("../lib/db")
+const { SERVICE_STATUS } = require("../lib/constants")
 
 /**
- * Service initial data
+ * Configure the Ethereum connection pool
  */
 configurePool([config.RPC_WSS])
 
-// We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-
-const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
-
+/**
+ * Initialize fetcher instance
+ */
 const fetcher = getFetcher(protocol)
 
-async function start() {
-  console.log("started")
-  $.send("start", { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` })
+// Start the archive process
+console.log("started")
+$.send("start", { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` })
 
-  const [dbActive, dbSynced, nodeActive] = await Promise.all([
-    await connectionChecker.checkDBConnection(),
-    await connectionChecker.syncDBArchive(),
-    await connectionChecker.checkNodeConnection(),
-  ])
+// Check database and node connections asynchronously
+const [dbActive, dbSynced, nodeActive] = await Promise.all([
+  connectionChecker.checkDBConnection(),
+  connectionChecker.syncDBArchive(),
+  connectionChecker.checkNodeConnection(),
+])
 
-  if (!dbActive || !nodeActive) {
-    sendErrorEvent({ message: `${protocol} archive terminating` })
-    setImmediate(() => {
-      process.exit(1)
-    })
-  }
-
-  startArchive(protocol)
+// Handle inactive database or node
+if (!dbActive || !nodeActive) {
+  fetcher.emit("error", { message: `${protocol} archive terminating` })
+  setImmediate(() => {
+    process.exit(1)
+  })
 }
 
 /**
- * Init
+ * Initialize the archive process
  */
-const startArchive = async protocol => {
-  const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
+const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
 
-  /**
-   * Create fetcher instance by protocol
-   */
-  const fetcher = getFetcher(protocol)
+// Get the latest archive block
+let latestArchiveBlock = await getLatestDbBlock(protocol)
 
-  $.send("start", { message: `Run fetching -archive_users-, For listen users connect to mqtt channel -event:archive_users:archive:${protocol}-` })
-
-  /**
-   * Get latest archive block
-   */
-  let latestArchiveBlock = await getLatestDbBlock(protocol)
-
-  /**
-   * Listen latest db block from network
-   */
-  onBlock(data => {
-    const { number } = data
-    /**
-     * Start fetching
-     */
-    if (!fetcher.inProgress && number - latestArchiveBlock > archiveBlockDiff) {
-      fetcher.start(latestArchiveBlock, number)
-      sendStartEvent({
-        message: `${protocol} archive start fetching users from ${latestArchiveBlock} to ${number} block`,
-      })
-    }
-  })
-
-  /**
-   * Handle events from fetcher
-   */
-  fetcher.on("fetch", async data => {
-    const { users, toBlock } = data
-    await saveUsersToArchive(protocol, toBlock, users, "archive_users")
-    $.send("sendFetchedUsersEvent", users)
-  })
-
-
-
-  fetcher.on("finished", data => {
-    const { latestBlock } = data
-    latestArchiveBlock = latestBlock
-  })
-}
-
-start(a => {
-  console.log(`======================= started ===================`)
-}).catch(e => {
-  sendErrorEvent({ message: `${protocol} archive error`, error: e })
-  db.sequelize.close().then(() => process.exit(1))
+/**
+ * Listen for new blocks and trigger fetching
+ */
+fetcher.on("onBlock", data => {
+  const { number } = data
+  // Start fetching if conditions are met
+  if (!fetcher.inProgress && number - latestArchiveBlock > archiveBlockDiff) {
+    fetcher.start(latestArchiveBlock, number)
+    $.send("start", { message: `Run fetching -archive_users-, For listen users connect to mqtt channel -event:archive_users:archive:${protocol}-` })
+  }
 })
 
-gracefulShutdown(async () => {
-  await db.setServiceStatus("archive", [protocol], [SERVICE_STATUS.OFF])
+/**
+ * Handle events from fetcher
+ */
+fetcher.on("fetch", async data => {
+  const { users, toBlock } = data
+  await saveUsersToArchive(protocol, toBlock, users, "archive_users")
+  $.send("sendFetchedUsersEvent", users)
 })
 
-$.send("start", { message: `Run in ${mode} mode` })
-$.send("start", { message: `${protocol} subgraph started!` })
-console.log(`SUBRAPH: started!`)
+fetcher.on("finished", data => {
+  latestArchiveBlock = data.latestBlock
+})
 
-//Output point
+$.send("start", { message: `${protocol} archive started!` })
+console.log(`ARCHIVE: started!`)
+
+// Output point for fetcher data
 fetcher.on("fetch", data => {
   $.send("sendDataToSearcher", data)
   const date = new Date().toUTCString()
@@ -123,12 +86,15 @@ fetcher.on("fetch", data => {
 })
 
 /**
- * Listeners
+ * Set global reserves data listener
  */
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 
+/**
+ * Handle process exit
+ */
 $.onExit(async () => {
   await db.setServiceStatus("archive", [protocol], [SERVICE_STATUS.OFF])
   return new Promise(resolve => {
@@ -137,10 +103,11 @@ $.onExit(async () => {
       console.log(pid, "Ready to exit.")
       $.send("stop", { date })
       resolve()
-    }, 100) // Set a small timeout to ensure async cleanup can complete
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
+// Handle uncaught exceptions
 process.on("uncaughtException", error => {
   console.error(error)
   $.send("errorMessage", { message: error })

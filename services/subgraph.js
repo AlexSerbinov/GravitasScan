@@ -9,6 +9,8 @@ const { createSimulator } = require("../lib/simulator")
 const { protocol, formatTrace, stateOverrides } = $.params
 
 const configPath = $.params.configPath
+const forks = $.forks
+
 const config = require(`${process.cwd()}${configPath}`) // Load the configuration
 
 // Object.assign(config, { selector }) // Add selector to the config object
@@ -54,7 +56,7 @@ queue.on("drain", async () => {
   if (sleep_time) {
     await sleep(sleep_time)
   }
-  $.send("drain", { message: "Queue is drain, run handling again" }) // TODO uncoment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  $.send("drain", { forks })
   $.send("subgraph_logs", { message: `send drain event` })
   console.log(`SUBGRAPH: ${protocol}: send drain event`)
 })
@@ -83,7 +85,7 @@ $.on(`onReservesData`, data => {
  * Because, in the simulator, we send a batch of users by time.
  * @param {Array} users - Array of users
  */
-$.on("handleUsers", async users => {
+$.on("handleUser", async users => {
   queue.add(users)
 })
 

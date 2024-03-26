@@ -2,19 +2,20 @@ const fs = require("fs").promises
 const EventEmitter = require("node:events")
 const path = require("path")
 const redis = require("../lib/redis/redis/lib/redis")
-const filePath = path.join(__dirname, "allUsers", "allUsers210.json")
+const filePath = path.join(__dirname, "allUsers", "allUsers40.json")
 
 const protocol = $.params.PROTOCOL
 
 const configPath = $.params.configPath
 const config = require(`${process.cwd()}${configPath}`)
 const fetcher = new EventEmitter()
+Object.assign(process.env, config) // While we use DB it's a simplest method to export config to other modules. After switching to redis we can remove this line
 
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-const SEND_WITHOUT_DRAIN_TIMEOUT = 10 * 60 * 1000 // 10 min ! after this time, send batch of user when drain event not received
+const SEND_WITHOUT_DRAIN_TIMEOUT = 60 * 60 * 1000 // 60 min ! after this time, send batch of user when drain event not received
 
 $.send("start", { message: "proxy started" })
 
@@ -27,13 +28,6 @@ const connectionChecker = require("../lib/services/connections")
 async function init() {
   const checkDBConnection = await connectionChecker.checkDBConnection()
   const checkDBArchive = await connectionChecker.checkDBArchive(protocol)
-  if (!dbActive || !nodeActive || !archiveActive) {
-    sendErrorEvent({ message: `${protocol} subgraph can't start!` })
-    setImmediate(() => {
-      process.exit(1)
-    })
-    return
-  }
 }
 
 init().catch(e => {
@@ -63,12 +57,28 @@ fetcher.on("sendUsersToSubgraph", async () => {
  * Create listener
  */
 
-$.on("drain", () => {
-  console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
-  $.send("proxy_logs", { message: `PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}` })
-  clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
+let lastDrainTime = Date.now() // Initialize lastDrainTime to the current time
+let drainEventCount = 0 // Counter for drain events
+
+$.on("drain", data => {
+  console.log(`drain called`)
   if (!isSending) {
-    onDrain()
+    drainEventCount++
+    console.log(`drainEventCount = ${drainEventCount}`)
+    if (drainEventCount === data.forks) {
+      const currentTime = Date.now()
+      lastDrainTime = currentTime // Update lastDrainTime
+      const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
+      console.log(`Received expected number of drain events: ${data.forks}`)
+      drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
+      console.log(
+        `PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`
+      )
+      console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
+      $.send("proxy_logs", { message: `PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}` })
+      clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
+      onDrain()
+    }
   }
 })
 
@@ -92,12 +102,18 @@ const getUserFromFile = async () => {
 // New utility function to get non-blacklisted users.
 const getNonBlacklistedUsers = async protocol => {
   // const allUsersFile = await getUserFromFile() // dev
+  // console.log(allUsersFile)
   const allUsers = await getArchiveOrSubgraphUsers(protocol)
 
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
-
+  console.log(`all users length = ${usersToCheck.length}`)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
-  return allUsers.filter((_, index) => checkBlacklistUsers[index] === 0)
+
+  const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0).map(userInfo => userInfo.user) // Mapping to get only user addresses
+  console.log(`nonBlacklistedUsers users length = ${nonBlacklistedUsers.length}`)
+
+  // console.log(nonBlacklistedUsers)
+  return nonBlacklistedUsers
 }
 
 // Send users in batches.

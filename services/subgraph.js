@@ -22,7 +22,7 @@ const service = "subgraph"
 configurePool([config.RPC_WSS])
 
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) 
 
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 

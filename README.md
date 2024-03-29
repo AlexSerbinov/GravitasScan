@@ -113,6 +113,28 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 
 # Updates
 
+## 2024-03-29
+
+1.  Migrated the Archive service from using a database to Redis.
+
+## 2024-03-26
+
+1.  Transitioned Archive to a new architecture.
+
+## 2024-03-22
+
+1.  Switched the simulator to use a transaction simulator instead of a node.
+2.  Changed the queue mechanism to process users in batches of 20, instead of one by one.
+
+## 2024-03-15
+
+1.  Upgraded Subgraph to a new architecture. Set up message reception from the Proxy service.
+2.  Configured round-robin operation correctly.
+
+## 2024-03-08
+
+1.  Developed the Proxy service. The Proxy service now forwards users to the Subgraph service.
+
 ## 2024-02-29
 
 1. Migrated the `dataFetcher` service to a new architecture. The configuration file for launching services is located in `services.json`.
@@ -158,7 +180,7 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 1. Added a new service, DataFetcher (similar to searcher).
 2. Added functions to the Redis module to work with the new services, DataFetcher and TransmitFetcher. (DataFetcher handles writing/deleting, while TransmitFetcher handles reading).
 3. Important notice! Old searcher runs only: Liquity, Maker_DAO. New service DataFetcher runs: V1, V2, V3, Compound
-4. Fix archive for running on prod (getLatestDbBlock: let latestArchiveBlock = 0)
+4. Fix archive for running on prod (getLatestRedisBlock: let latestArchiveBlock = 0)
 
 ## 2023-10-31
 

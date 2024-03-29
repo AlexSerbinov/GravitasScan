@@ -1,41 +1,37 @@
 const { getFetcher } = require("../lib/services/archive/fetcher")
-const { getLatestDbBlock, saveUsersToArchive } = require("../lib/services/archive/utils")
+const { getLatestRedisBlock, saveUsersToArchive } = require("../lib/services/archive/utils")
 const { configurePool } = require("../lib/ethers/pool")
+const redis = require("../lib/redis/redis/lib/redis")
 
-// Retrieve configuration settings
 const { protocol } = $.params
 const configPath = $.params.configPath
-const config = require(`${process.cwd()}${configPath}`) // Load the configuration
-Object.assign(process.env, config) // While we use DB it's a simplest method to export config to other modules. After switching to redis we can remove this line
+const config = require(`${process.cwd()}${configPath}`)
 
-// Service and database initialization
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
+
+// Service initialization
 const connectionChecker = require("../lib/services/connections")
-const db = require("../lib/db")
 const { SERVICE_STATUS } = require("../lib/constants")
 
 /**
  * Configure the Ethereum connection pool
  */
 configurePool([config.RPC_WSS])
+const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
+let latestArchiveBlock = await getLatestRedisBlock(protocol)
 
 /**
  * Initialize fetcher instance
  */
 const fetcher = getFetcher(protocol)
 
-// Start the archive process
-console.log("started")
 $.send("start", { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` })
 
-// Check database and node connections asynchronously
-const [dbActive, dbSynced, nodeActive] = await Promise.all([
-  connectionChecker.checkDBConnection(),
-  connectionChecker.syncDBArchive(),
-  connectionChecker.checkNodeConnection(),
-])
-
-// Handle inactive database or node
-if (!dbActive || !nodeActive) {
+/**
+ * Handle status of node
+ */
+const nodeActive = await connectionChecker.checkNodeConnection()
+if (!nodeActive) {
   fetcher.emit("error", { message: `${protocol} archive terminating` })
   setImmediate(() => {
     process.exit(1)
@@ -43,20 +39,13 @@ if (!dbActive || !nodeActive) {
 }
 
 /**
- * Initialize the archive process
- */
-const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
-
-// Get the latest archive block
-let latestArchiveBlock = await getLatestDbBlock(protocol)
-
-/**
  * Listen for new blocks and trigger fetching
  */
-fetcher.on("onBlock", data => {
+
+$.on("onBlock", data => {
   const { number } = data
   // Start fetching if conditions are met
-  if (!fetcher.inProgress && number - latestArchiveBlock > archiveBlockDiff) {
+  if (!fetcher.inProgress && latestArchiveBlock && number - latestArchiveBlock > archiveBlockDiff) {
     fetcher.start(latestArchiveBlock, number)
     $.send("start", { message: `Run fetching -archive_users-, For listen users connect to mqtt channel -event:archive_users:archive:${protocol}-` })
   }
@@ -69,18 +58,6 @@ fetcher.on("fetch", async data => {
   const { users, toBlock } = data
   await saveUsersToArchive(protocol, toBlock, users, "archive_users")
   $.send("sendFetchedUsersEvent", users)
-})
-
-fetcher.on("finished", data => {
-  latestArchiveBlock = data.latestBlock
-})
-
-$.send("start", { message: `${protocol} archive started!` })
-console.log(`ARCHIVE: started!`)
-
-// Output point for fetcher data
-fetcher.on("fetch", data => {
-  $.send("sendDataToSearcher", data)
   const date = new Date().toUTCString()
   $.send("subgraph_logs", { date, ...data })
 })
@@ -91,6 +68,12 @@ fetcher.on("fetch", data => {
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
+
+fetcher.on("finished", data => {
+  latestArchiveBlock = data.latestBlock
+})
+
+$.send("start", { message: `${protocol} archive started!` })
 
 /**
  * Handle process exit

@@ -44,7 +44,8 @@ fetcher.on("deleteFromRedis", data => {
 })
 
 fetcher.on("liquidate", data => {
-  $.send("liquidate", data)
+  $.send("liquidateCommand", data)
+  $.send("liquidateEvent", data)
 })
 
 fetcher.on("info", data => {

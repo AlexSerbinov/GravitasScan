@@ -27,7 +27,8 @@ fetcher.on("response", async data => {
 })
 
 fetcher.on("liquidate", data => {
-  $.send("liquidate", data.resp)
+  $.send("liquidateCommand", data.resp)
+  $.send("liquidateEvent", data.resp)
 })
 
 fetcher.on("info", data => {

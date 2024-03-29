@@ -33,8 +33,11 @@
       "stop": {
         "topic": "event:stop:transmit_fetcher:V1"
       },
-      "liquidate": {
+      "liquidateEvent": {
         "topic": "event:liquidate:transmit_fetcher:V1"
+      },
+      "liquidateCommand": {
+        "topic": "execute:liquidator:V1"
       },
       "info": {
         "topic": "event:info:transmit_fetcher:V1"
@@ -79,8 +82,11 @@
       "stop": {
         "topic": "event:stop:transmit_fetcher:V2"
       },
-      "liquidate": {
+      "liquidateEvent": {
         "topic": "event:liquidate:transmit_fetcher:V2"
+      },
+      "liquidateCommand": {
+        "topic": "execute:liquidator:V2"
       },
       "info": {
         "topic": "event:info:transmit_fetcher:V2"
@@ -125,8 +131,11 @@
       "stop": {
         "topic": "event:stop:transmit_fetcher:V3"
       },
-      "liquidate": {
+      "liquidateEvent": {
         "topic": "event:liquidate:transmit_fetcher:V3"
+      },
+      "liquidateCommand": {
+        "topic": "execute:liquidator:V3"
       },
       "info": {
         "topic": "event:info:transmit_fetcher:V3"
@@ -171,8 +180,11 @@
       "stop": {
         "topic": "event:stop:transmit_fetcher:Compound"
       },
-      "liquidate": {
+      "liquidateEvent": {
         "topic": "event:liquidate:transmit_fetcher:Compound"
+      },
+      "liquidateCommand": {
+        "topic": "execute:liquidator:Compound"
       },
       "info": {
         "topic": "event:info:transmit_fetcher:Compound"

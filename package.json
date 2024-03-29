@@ -13,7 +13,9 @@
     "subgraph": "node _system/start servicesConfig/subgraphServices.json",
     "debugSubgraph": "node _system/debug servicesConfig/subgraphServices.json",
     "proxy": "node _system/start servicesConfig/proxyServices.json",
-    "debugProxy": "node _system/debug servicesConfig/proxyServices.json"
+    "debugProxy": "node _system/debug servicesConfig/proxyServices.json",
+    "archive": "node _system/start servicesConfig/archiveServices.json",
+    "debugArchive": "node _system/debug servicesConfig/archiveServices.json"
   },
   "dependencies": {
     "@cybridge/providers-pool": "^1.0.0",

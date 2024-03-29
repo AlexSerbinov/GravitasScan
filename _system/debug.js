@@ -1,4 +1,5 @@
 "use strict"
+Error.stackTraceLimit = 100 // When debug is on - show 100 lines of error stack trace instead of default 10
 const { getConfig } = require("./config")
 
 /**

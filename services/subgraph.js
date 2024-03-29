@@ -6,10 +6,11 @@ const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
 
-const { protocol, privateKey, contractAddress, enso, providers, formatTrace, stateOverrides, selector } = $.params
-// const protocol = PROTOCOL // TODO: do smth with it
+const { protocol, formatTrace, stateOverrides } = $.params
 
 const configPath = $.params.configPath
+const forks = $.forks
+
 const config = require(`${process.cwd()}${configPath}`) // Load the configuration
 
 // Object.assign(config, { selector }) // Add selector to the config object
@@ -21,7 +22,7 @@ const service = "subgraph"
 configurePool([config.RPC_WSS])
 
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) 
 
 const settings = defaultSettings.find(s => s.protocol === protocol).services[service]
 
@@ -55,7 +56,7 @@ queue.on("drain", async () => {
   if (sleep_time) {
     await sleep(sleep_time)
   }
-  $.send("drain", { message: "Queue is drain, run handling again" }) // TODO uncoment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  $.send("drain", { forks })
   $.send("subgraph_logs", { message: `send drain event` })
   console.log(`SUBGRAPH: ${protocol}: send drain event`)
 })
@@ -84,7 +85,7 @@ $.on(`onReservesData`, data => {
  * Because, in the simulator, we send a batch of users by time.
  * @param {Array} users - Array of users
  */
-$.on("handleUsers", async users => {
+$.on("handleUser", async users => {
   queue.add(users)
 })
 

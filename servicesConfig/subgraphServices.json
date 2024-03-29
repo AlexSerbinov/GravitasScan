@@ -1,6 +1,6 @@
 {
   "V1Subgraph": {
-    "forks": 1,
+    "forks": 2,
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
@@ -8,7 +8,7 @@
         "topic": "data:reserves:V1",
         "roundrobing": false
       },
-      "handleUsers": {
+      "handleUser": {
         "topic": "event:users:proxy:V1",
         "roundrobing": true
       }
@@ -55,7 +55,7 @@
     }
   },
   "V2Subgraph": {
-    "forks": 1,
+    "forks": 10,
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
@@ -63,7 +63,7 @@
         "topic": "data:reserves:V2",
         "roundrobing": false
       },
-      "handleUsers": {
+      "handleUser": {
         "topic": "event:users:proxy:V2",
         "roundrobing": true
       }
@@ -110,7 +110,7 @@
     }
   },
   "V3Subgraph": {
-    "forks": 1,
+    "forks": 10,
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
@@ -118,7 +118,7 @@
         "topic": "data:reserves:V3",
         "roundrobing": false
       },
-      "handleUsers": {
+      "handleUser": {
         "topic": "event:users:proxy:V3",
         "roundrobing": true
       }
@@ -169,7 +169,7 @@
     "script": "services/subgraph.js",
     "namespace": "namespace",
     "listen": {
-      "handleUsers": {
+      "handleUser": {
         "topic": "event:users:proxy:Compound",
         "roundrobing": true
       },

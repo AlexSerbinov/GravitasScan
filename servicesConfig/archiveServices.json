@@ -1,0 +1,188 @@
+{
+  "V1Archive": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "namespace",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "event:archive_users:archive:V1"
+      },
+      "sendMonitoringUsersEvent": {
+        "topic": "event:listener_users:archive:V1"
+      },
+
+      "start": {
+        "topic": "event:start:archive:V1"
+      },
+      "info": {
+        "topic": "event:info:archive:V1"
+      }
+    },
+    "params": {
+      "protocol": "V1",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V2Archive": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "namespace",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "event:archive_users:archive:V2"
+      },
+      "sendMonitoringUsersEvent": {
+        "topic": "event:listener_users:archive:V2"
+      },
+
+      "start": {
+        "topic": "event:start:archive:V2"
+      },
+      "info": {
+        "topic": "event:info:archive:V2"
+      }
+    },
+    "params": {
+      "protocol": "V2",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V3Archive": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "namespace",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "event:archive_users:archive:V3"
+      },
+      "sendMonitoringUsersEvent": {
+        "topic": "event:listener_users:archive:V3"
+      },
+
+      "start": {
+        "topic": "event:start:archive:V3"
+      },
+      "info": {
+        "topic": "event:info:archive:V3"
+      }
+    },
+    "params": {
+      "protocol": "V3",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "CompoundArchive": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "namespace",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "event:archive_users:archive:Compound"
+      },
+      "sendMonitoringUsersEvent": {
+        "topic": "event:listener_users:archive:Compound"
+      },
+
+      "start": {
+        "topic": "event:start:archive:Compound"
+      },
+      "info": {
+        "topic": "event:info:archive:Compound"
+      }
+    },
+    "params": {
+      "protocol": "Compound",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "MakerDAOArchive": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "namespace",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "event:archive_users:archive:MakerDAO_CDP"
+      },
+      "sendMonitoringUsersEvent": {
+        "topic": "event:listener_users:archive:MakerDAO_CDP"
+      },
+
+      "start": {
+        "topic": "event:start:archive:MakerDAO_CDP"
+      },
+      "info": {
+        "topic": "event:info:archive:MakerDAO_CDP"
+      }
+    },
+    "params": {
+      "protocol": "MakerDAO_CDP",
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "LiquityArchive": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "namespace",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "event:archive_users:archive:Liquity"
+      },
+      "sendMonitoringUsersEvent": {
+        "topic": "event:listener_users:archive:Liquity"
+      },
+
+      "start": {
+        "topic": "event:start:archive:Liquity"
+      },
+      "info": {
+        "topic": "event:info:archive:Liquity"
+      }
+    },
+    "params": {
+      "protocol": "Liquity",
+      "configPath": "/configs/Main.json"
+    }
+  }
+}

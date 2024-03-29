@@ -2,7 +2,8 @@ const fs = require("fs").promises
 const EventEmitter = require("node:events")
 const path = require("path")
 const redis = require("../lib/redis/redis/lib/redis")
-const filePath = path.join(__dirname, "allUsers", "allUsers210.json")
+const filePath = path.join(__dirname, "allUsers", "allUsers40.json")
+const { getArchiveData } = require("../lib/redis/index")
 
 const protocol = $.params.PROTOCOL
 
@@ -14,35 +15,54 @@ const fetcher = new EventEmitter()
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-const SEND_WITHOUT_DRAIN_TIMEOUT = 10 * 60 * 1000 // 10 min ! after this time, send batch of user when drain event not received
+const SEND_WITHOUT_DRAIN_TIMEOUT = 60 * 60 * 1000 // 60 min ! after this time, send batch of user when drain event not received
 
 $.send("start", { message: "proxy started" })
 
 let isSending = false // Flag to indicate if sending is in progress
 
 /**
- * Create fetcher
+ * Handles the 'sendUsersToSubgraph' event by fetching non-blacklisted users
+ * and sending them to the subgraph in batches.
  */
-
-// Handler for sending users to subgraph in batches.
 fetcher.on("sendUsersToSubgraph", async () => {
   const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol)
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
 })
 
 /**
- * Create listener
+ * Listener for 'drain' events to manage sending users to the subgraph.
+ * It keeps track of the time and count of drain events to ensure timely processing.
  */
+let lastDrainTime = Date.now() // Initialize lastDrainTime to the current time
+let drainEventCount = 0 // Counter for drain events
 
-$.on("drain", () => {
-  console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
-  $.send("proxy_logs", { message: `PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}` })
-  clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
+$.on("drain", data => {
+  console.log(`drain called`)
   if (!isSending) {
-    onDrain()
+    drainEventCount++
+    console.log(`drainEventCount = ${drainEventCount}`)
+    if (drainEventCount === data.forks) {
+      const currentTime = Date.now()
+      lastDrainTime = currentTime // Update lastDrainTime
+      const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
+      console.log(`Received expected number of drain events: ${data.forks}`)
+      drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
+      console.log(
+        `PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`
+      )
+      console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
+      $.send("proxy_logs", { message: `PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}` })
+      clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
+      onDrain()
+    }
   }
 })
 
+/**
+ * Triggered upon receiving a drain event, this function fetches non-blacklisted users
+ * and sends them to the subgraph in batches.
+ */
 const onDrain = async () => {
   isSending = true
   const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol)
@@ -50,31 +70,45 @@ const onDrain = async () => {
   isSending = false
 }
 
-// Utility function to read and parse the user file.
-const getUserFromFile = async () => {
-  const items = await fs.readFile(filePath, "utf8")
-  const parsedItems = JSON.parse(items)
-  // Map over parsedItems to extract only the 'user' field from each object
-  const usersOnly = parsedItems.map(item => item.user)
-
-  return usersOnly
-}
-
-// New utility function to get non-blacklisted users.
+/**
+ * Retrieves non-blacklisted users for the given protocol.
+ * @param {string} protocol - The protocol identifier.
+ * @returns {Promise<Array<string>>} An array of non-blacklisted user addresses.
+ */
 const getNonBlacklistedUsers = async protocol => {
-  const allUsers = await getUserFromFile()
-  const usersToCheck = allUsers.map(userInfo => userInfo.user)
+  const allUsers = await getArchiveOrSubgraphUsers(protocol)
 
+  const usersToCheck = allUsers.map(userInfo => userInfo.user)
+  console.log(`all users length = ${usersToCheck.length}`)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
-  return allUsers.filter((_, index) => checkBlacklistUsers[index] === 0)
+
+  const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0).map(userInfo => userInfo.user) // Mapping to get only user addresses
+  console.log(`nonBlacklistedUsers users length = ${nonBlacklistedUsers.length}`)
+
+  return nonBlacklistedUsers
 }
 
-// Send users in batches.
+/**
+ * Fetches users from the archive or subgraph for the given protocol.
+ * @param {string} protocol - The protocol identifier.
+ * @returns {Promise<Array<string>>} An array of user addresses.
+ */
+const getArchiveOrSubgraphUsers = async protocol => {
+  const allUsers = await getArchiveData(protocol, "archive_users")
+  // Extract the arrays and flatten them into a single array
+  const users = Object.values(allUsers).flat()
+  return users
+}
+
+/**
+ * Sends the non-blacklisted users to the subgraph in batches.
+ * @param {Array<string>} nonBlacklistedUsers - An array of non-blacklisted user addresses.
+ */
 const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
   isSending = true // Set the sending flag to true at the beginning
   const batchSize = 20
   const totalBatches = Math.ceil(nonBlacklistedUsers.length / batchSize)
-  let batchesSent = 0 // Counter for sent batches
+  let batchesSent = 0
 
   for (let i = 0; i < nonBlacklistedUsers.length; i += batchSize) {
     // Use setImmediate for asynchronous sending
@@ -89,7 +123,6 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
       }
       $.send("sendUsersToSubgraph", batch)
 
-      // Increment the counter after each batch is sent
       batchesSent++
       // Check if all batches have been sent
       if (batchesSent === totalBatches) isSending = false // Reset the sending flag after the last iteration
@@ -97,10 +130,11 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
   }
 }
 
+/**
+ * Sets up a timer to trigger the drain event manually if not received within a specified timeout.
+ */
 let drainTimer
 let manualTriggerCount = 0
-
-// If we do not have drain event for time in SEND_WITHOUT_DRAIN_EVENT_TIMEOUT. We sent event by timeout
 const setupDrainTimer = () => {
   clearTimeout(drainTimer)
 

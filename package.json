@@ -5,17 +5,23 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "all": "node _system/start",
-    "transmit": "node _system/start servicesConfig/transmitFetcherServices.json",
+    "all": "npm run archive && npm run subgraph && npm run proxy && npm run dataFetcher && npm run transmitFetcher",
+    "killAll": "npm run killArchive && npm run killSubgraph && npm run killProxy && npm run killDataFetcher && npm run killTransmitFetcher",
+    "transmitFetcher": "node _system/start servicesConfig/transmitFetcherServices.json",
     "debugTransmitFetcher": "node _system/debug servicesConfig/transmitFetcherServices.json",
+    "killTransmitFetcher": "pm2 delete V1TransmitFetcher V2TransmitFetcher V3TransmitFetcher CompoundTransmitFetcher",
     "dataFetcher": "node _system/start servicesConfig/dataFetcherServices.json",
     "debugDataFetcher": "node _system/debug servicesConfig/dataFetcherServices.json",
+    "killDataFetcher": "pm2 delete V1DataFetcher V2DataFetcher V3DataFetcher CompoundDataFetcher",
     "subgraph": "node _system/start servicesConfig/subgraphServices.json",
     "debugSubgraph": "node _system/debug servicesConfig/subgraphServices.json",
+    "killSubgraph": "pm2 delete V1Subgraph V2Subgraph V3Subgraph CompoundSubgraph",
     "proxy": "node _system/start servicesConfig/proxyServices.json",
     "debugProxy": "node _system/debug servicesConfig/proxyServices.json",
+    "killProxy": "pm2 delete V1Proxy V2Proxy V3Proxy CompoundProxy",
     "archive": "node _system/start servicesConfig/archiveServices.json",
-    "debugArchive": "node _system/debug servicesConfig/archiveServices.json"
+    "debugArchive": "node _system/debug servicesConfig/archiveServices.json",
+    "killArchive": "pm2 delete V1Archive V2Archive V3Archive CompoundArchive"
   },
   "dependencies": {
     "@cybridge/providers-pool": "^1.0.0",

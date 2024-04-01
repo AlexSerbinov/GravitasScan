@@ -15,7 +15,7 @@ const fetcher = new EventEmitter()
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-const SEND_WITHOUT_DRAIN_TIMEOUT = 60 * 60 * 1000 // 60 min ! after this time, send batch of user when drain event not received
+const SEND_WITHOUT_DRAIN_TIMEOUT = 60 * 60 * 1000 // 60 min ! after this time, send batch of user when drain event not received //TODO @AlexSerbinov move to params
 
 $.send("start", { message: "proxy started" })
 
@@ -76,7 +76,7 @@ const onDrain = async () => {
  * @returns {Promise<Array<string>>} An array of non-blacklisted user addresses.
  */
 const getNonBlacklistedUsers = async protocol => {
-  const allUsers = await getArchiveOrSubgraphUsers(protocol)
+  const allUsers = await getArchiveUsers(protocol)
 
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
   console.log(`all users length = ${usersToCheck.length}`)
@@ -93,7 +93,7 @@ const getNonBlacklistedUsers = async protocol => {
  * @param {string} protocol - The protocol identifier.
  * @returns {Promise<Array<string>>} An array of user addresses.
  */
-const getArchiveOrSubgraphUsers = async protocol => {
+const getArchiveUsers = async protocol => {
   const allUsers = await getArchiveData(protocol, "archive_users")
   // Extract the arrays and flatten them into a single array
   const users = Object.values(allUsers).flat()
@@ -106,7 +106,7 @@ const getArchiveOrSubgraphUsers = async protocol => {
  */
 const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
   isSending = true // Set the sending flag to true at the beginning
-  const batchSize = 20
+  const batchSize = 20 //TODO @AlexSerbinov  move to params
   const totalBatches = Math.ceil(nonBlacklistedUsers.length / batchSize)
   let batchesSent = 0
 
@@ -118,7 +118,6 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
 
       // Check if the current batch is the last one
       if (batchNumber === totalBatches) {
-        console.log(`\nPROXY: sendUsersToSubgraph event :Sent the last batch number ${batchNumber} of users`)
         $.send("proxy_logs", { message: `Sending the last batch number ${batchNumber} of users ${new Date().toISOString()}` })
       }
       $.send("sendUsersToSubgraph", batch)

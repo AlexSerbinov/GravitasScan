@@ -1,6 +1,6 @@
 const { createFetcher } = require("../lib/services/data-fetcher/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
-const defaultSettings = require("../configs/DefaultSettings.json")
+const defaultSettings = require("../configs/DefaultSettings.json") // TODO @AlexSerbinov -- move from defaultSett.. to configs/wokers/subgraphSer
 const redis = require("../lib/redis/redis/lib/redis")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
@@ -34,6 +34,7 @@ fetcher.on("pushToRedis", data => {
 })
 /**
  * When user deletes
+ * Delete even if there is no uses - prevent double checking and time consuption
  */
 fetcher.on("deleteFromRedis", data => {
   const { user, assets } = data
@@ -57,7 +58,7 @@ fetcher.on("reject", data => {
 })
 
 fetcher.on("errorMessage", data => {
-  // we use "errorMessage" instead of "error" because "error" is locke by _service
+  // we use "errorMessage" instead of "error" because "error" is locked by _service
   $.send("errorMessage", { error: data.toString() })
 })
 
@@ -67,10 +68,6 @@ fetcher.on("errorMessage", data => {
 
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
-})
-
-$.on(`onSettings`, settings => {
-  fetcher.settings = settings
 })
 
 /**

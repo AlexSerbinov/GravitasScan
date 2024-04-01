@@ -2,48 +2,44 @@
   "V1DataFetcher": {
     "forks": 1,
     "script": "services/dataFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
-        "topic": "execute:searcher:V1",
+        "topic": "execute/dataFetcher/V1",
         "roundrobing": true
       },
       "onReservesData": {
         "topic": "data:reserves:V1",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:V1",
-        "roundrobing": false
       }
     },
     "notify": {
       "pushToRedis": {
-        "topic": "event:pushToRedis:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "deleteFromRedis": {
-        "topic": "event:deleteFromRedis:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "reject": {
-        "topic": "event:reject:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "errorMessage": {
-        "topic": "event:error:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "start": {
-        "topic": "event:start:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "stop": {
-        "topic": "event:stop:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:V1"
+        "topic": "execute/liquidator/V1"
       },
       "info": {
-        "topic": "event:info:data_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       }
     },
     "params": {
@@ -54,48 +50,44 @@
   "V2DataFetcher": {
     "forks": 1,
     "script": "services/dataFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
-        "topic": "execute:searcher:V2",
+        "topic": "execute/dataFetcher/V2",
         "roundrobing": true
       },
       "onReservesData": {
         "topic": "data:reserves:V2",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:V2",
-        "roundrobing": false
       }
     },
     "notify": {
       "pushToRedis": {
-        "topic": "event:pushToRedis:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "deleteFromRedis": {
-        "topic": "event:deleteFromRedis:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "reject": {
-        "topic": "event:reject:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "errorMessage": {
-        "topic": "event:error:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "start": {
-        "topic": "event:start:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "stop": {
-        "topic": "event:stop:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:V2"
+        "topic": "execute/liquidator/V2"
       },
       "info": {
-        "topic": "event:info:data_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
@@ -106,48 +98,44 @@
   "V3DataFetcher": {
     "forks": 1,
     "script": "services/dataFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
-        "topic": "execute:searcher:V3",
+        "topic": "execute/dataFetcher/V3",
         "roundrobing": true
       },
       "onReservesData": {
         "topic": "data:reserves:V3",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:V3",
-        "roundrobing": false
       }
     },
     "notify": {
       "pushToRedis": {
-        "topic": "event:pushToRedis:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "deleteFromRedis": {
-        "topic": "event:deleteFromRedis:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "reject": {
-        "topic": "event:reject:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "errorMessage": {
-        "topic": "event:error:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "start": {
-        "topic": "event:start:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "stop": {
-        "topic": "event:stop:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:V3"
+        "topic": "execute/liquidator/V3"
       },
       "info": {
-        "topic": "event:info:data_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
@@ -158,48 +146,44 @@
   "CompoundDataFetcher": {
     "forks": 1,
     "script": "services/dataFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
-        "topic": "execute:searcher:Compound",
+        "topic": "execute/dataFetcher/Compound",
         "roundrobing": true
       },
       "onReservesData": {
         "topic": "data:reserves:Compound",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:Compound",
-        "roundrobing": false
       }
     },
     "notify": {
       "pushToRedis": {
-        "topic": "event:pushToRedis:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "deleteFromRedis": {
-        "topic": "event:deleteFromRedis:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "reject": {
-        "topic": "event:reject:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "errorMessage": {
-        "topic": "event:error:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "start": {
-        "topic": "event:start:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "stop": {
-        "topic": "event:stop:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:Compound"
+        "topic": "execute/liquidator/Compound"
       },
       "info": {
-        "topic": "event:info:data_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {

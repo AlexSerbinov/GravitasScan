@@ -2,25 +2,25 @@
   "V1Proxy": {
     "forks": 1,
     "script": "services/proxy.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
-        "topic": "event:drain:subgraph:V1",
+        "topic": "event/drain/subgraph/V1",
         "roundrobing": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:proxy:V1"
+        "topic": "event/users/proxy/V1"
       },
       "errorMessage": {
-        "topic": "event:error:proxy:V1"
+        "topic": "logger/liquidator/V1"
       },
       "start": {
-        "topic": "event:start:proxy:V1"
+        "topic": "logger/liquidator/V1"
       },
       "info": {
-        "topic": "event:info:proxy:V1"
+        "topic": "logger/liquidator/V1"
       }
     },
     "params": {
@@ -31,25 +31,25 @@
   "V2Proxy": {
     "forks": 1,
     "script": "services/proxy.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
-        "topic": "event:drain:subgraph:V2",
+        "topic": "event/drain/subgraph/V2",
         "roundrobing": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:proxy:V2"
+        "topic": "event/users/proxy/V2"
       },
       "errorMessage": {
-        "topic": "event:error:proxy:V2"
+        "topic": "logger/liquidator/V2"
       },
       "start": {
-        "topic": "event:start:proxy:V2"
+        "topic": "logger/liquidator/V2"
       },
       "info": {
-        "topic": "event:info:proxy:V2"
+        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
@@ -60,25 +60,25 @@
   "V3Proxy": {
     "forks": 1,
     "script": "services/proxy.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
-        "topic": "event:drain:subgraph:V3",
+        "topic": "event/drain/subgraph/V3",
         "roundrobing": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:proxy:V3"
+        "topic": "event/users/proxy/V3"
       },
       "errorMessage": {
-        "topic": "event:error:proxy:V3"
+        "topic": "logger/liquidator/V3"
       },
       "start": {
-        "topic": "event:start:proxy:V3"
+        "topic": "logger/liquidator/V3"
       },
       "info": {
-        "topic": "event:info:proxy:V3"
+        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
@@ -89,25 +89,25 @@
   "CompoundProxy": {
     "forks": 1,
     "script": "services/proxy.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
-        "topic": "event:drain:subgraph:Compound",
+        "topic": "event/drain/subgraph/Compound",
         "roundrobing": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
-        "topic": "event:users:proxy:Compound"
+        "topic": "event/users/proxy/Compound"
       },
       "errorMessage": {
-        "topic": "event:error:proxy:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "start": {
-        "topic": "event:start:proxy:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "info": {
-        "topic": "event:info:proxy:Compound"
+        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {

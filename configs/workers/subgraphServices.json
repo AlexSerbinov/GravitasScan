@@ -2,42 +2,45 @@
   "V1Subgraph": {
     "forks": 2,
     "script": "services/subgraph.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V1",
         "roundrobing": false
       },
       "handleUser": {
-        "topic": "event:users:proxy:V1",
+        "topic": "event/users/proxy/V1",
         "roundrobing": true
       }
     },
     "notify": {
-      "re-queuing": {
-        "topic": "event:re-queuing:subgraph:V1"
-      },
       "drain": {
-        "topic": "event:drain:subgraph:V1"
+        "topic": "event/drain/subgraph/V1"
       },
-      "sendDataToSearcher": {
-        "topic": "execute:searcher:V1"
+      "sendDataToDataFetcher": {
+        "topic": "execute/dataFetcher/V1"
       },
       "reject": {
-        "topic": "event:reject:subgraph:V1"
+        "topic": "logger/liquidator/V1"
       },
       "errorMessage": {
-        "topic": "event:error:subgraph:V1"
+        "topic": "logger/liquidator/V1"
       },
       "start": {
-        "topic": "event:start:subgraph:V1"
+        "topic": "logger/liquidator/V1"
       },
       "info": {
-        "topic": "event:info:subgraph:V1"
+        "topic": "logger/liquidator/V1"
       },
       "subgraph_logs": {
-        "topic": "event:subgraph_logs:subgraph:V1"
+        "topic": "logger/liquidator/V1"
       }
+    },
+    "filters":{
+      "min_collateral_amount": 0.2,
+      "min_borrow_amount": 0.4,
+      "min_health_factor": 0.79,
+      "max_health_factor": 1.1
     },
     "params": {
       "protocol": "V1",
@@ -57,14 +60,14 @@
   "V2Subgraph": {
     "forks": 10,
     "script": "services/subgraph.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V2",
         "roundrobing": false
       },
       "handleUser": {
-        "topic": "event:users:proxy:V2",
+        "topic": "event/users/proxy/V2",
         "roundrobing": true
       }
     },
@@ -73,25 +76,25 @@
         "topic": "event:re-queuing:subgraph:V2"
       },
       "drain": {
-        "topic": "event:drain:subgraph:V2"
+        "topic": "event/drain/subgraph/V2"
       },
-      "sendDataToSearcher": {
-        "topic": "execute:searcher:V2"
+      "sendDataToDataFetcher": {
+        "topic": "execute/dataFetcher/V2"
       },
       "reject": {
-        "topic": "event:reject:subgraph:V2"
+        "topic": "logger/liquidator/V2"
       },
       "errorMessage": {
-        "topic": "event:error:subgraph:V2"
+        "topic": "logger/liquidator/V2"
       },
       "start": {
-        "topic": "event:start:subgraph:V2"
+        "topic": "logger/liquidator/V2"
       },
       "info": {
-        "topic": "event:info:subgraph:V2"
+        "topic": "logger/liquidator/V2"
       },
       "subgraph_logs": {
-        "topic": "event:subgraph_logs:subgraph:V2"
+        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
@@ -112,14 +115,14 @@
   "V3Subgraph": {
     "forks": 10,
     "script": "services/subgraph.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V3",
         "roundrobing": false
       },
       "handleUser": {
-        "topic": "event:users:proxy:V3",
+        "topic": "event/users/proxy/V3",
         "roundrobing": true
       }
     },
@@ -128,25 +131,25 @@
         "topic": "event:re-queuing:subgraph:V3"
       },
       "drain": {
-        "topic": "event:drain:subgraph:V3"
+        "topic": "event/drain/subgraph/V3"
       },
-      "sendDataToSearcher": {
-        "topic": "execute:searcher:V3"
+      "sendDataToDataFetcher": {
+        "topic": "execute/dataFetcher/V3"
       },
       "reject": {
-        "topic": "event:reject:subgraph:V3"
+        "topic": "logger/liquidator/V3"
       },
       "errorMessage": {
-        "topic": "event:error:subgraph:V3"
+        "topic": "logger/liquidator/V3"
       },
       "start": {
-        "topic": "event:start:subgraph:V3"
+        "topic": "logger/liquidator/V3"
       },
       "info": {
-        "topic": "event:info:subgraph:V3"
+        "topic": "logger/liquidator/V3"
       },
       "subgraph_logs": {
-        "topic": "event:subgraph_logs:subgraph:V3"
+        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
@@ -167,10 +170,10 @@
   "CompoundSubgraph": {
     "forks": 1,
     "script": "services/subgraph.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "handleUser": {
-        "topic": "event:users:proxy:Compound",
+        "topic": "event/users/proxy/Compound",
         "roundrobing": true
       },
       "onReservesData": {
@@ -183,25 +186,25 @@
         "topic": "event:re-queuing:subgraph:Compound"
       },
       "drain": {
-        "topic": "event:drain:subgraph:Compound"
+        "topic": "event/drain/subgraph/Compound"
       },
-      "sendDataToSearcher": {
-        "topic": "execute:searcher:Compound"
+      "sendDataToDataFetcher": {
+        "topic": "execute/dataFetcher/Compound"
       },
       "reject": {
-        "topic": "event:reject:subgraph:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "errorMessage": {
-        "topic": "event:error:subgraph:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "start": {
-        "topic": "event:start:subgraph:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "info": {
-        "topic": "event:info:subgraph:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "subgraph_logs": {
-        "topic": "event:subgraph_logs:subgraph:Compound"
+        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {

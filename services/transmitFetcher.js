@@ -1,6 +1,6 @@
 const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
-const defaultSettings = require("../configs/DefaultSettings.json")
+const defaultSettings = require("../configs/DefaultSettings.json") // TODO @AlexSerbinov -- move from defaultSett.. to configs/wokers/subgraphSer
 const redis = require("../lib/redis/redis/lib/redis")
 
 const protocol = $.params.PROTOCOL
@@ -50,10 +50,6 @@ fetcher.on("errorMessage", data => {
 
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
-})
-
-$.on(`onSettings`, settings => {
-  fetcher.settings = settings
 })
 
 $.send("start", { date: new Date().toUTCString() })

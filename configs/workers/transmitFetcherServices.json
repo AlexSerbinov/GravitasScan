@@ -2,7 +2,7 @@
   "V1TransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -11,36 +11,32 @@
       "onReservesData": {
         "topic": "data:reserves:V1",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:V1",
-        "roundrobing": false
       }
     },
     "notify": {
       "delete": {
-        "topic": "event:delete:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "reject": {
-        "topic": "event:reject:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "errorMessage": {
-        "topic": "event:error:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "start": {
-        "topic": "event:start:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "stop": {
-        "topic": "event:stop:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:V1"
+        "topic": "execute/liquidator/V1"
       },
       "info": {
-        "topic": "event:info:transmit_fetcher:V1"
+        "topic": "logger/liquidator/V1"
       }
     },
     "params": {
@@ -51,7 +47,7 @@
   "V2TransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -60,36 +56,32 @@
       "onReservesData": {
         "topic": "data:reserves:V2",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:V2",
-        "roundrobing": false
       }
     },
     "notify": {
       "delete": {
-        "topic": "event:delete:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "reject": {
-        "topic": "event:reject:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "errorMessage": {
-        "topic": "event:error:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "start": {
-        "topic": "event:start:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "stop": {
-        "topic": "event:stop:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:V2"
+        "topic": "execute/liquidator/V2"
       },
       "info": {
-        "topic": "event:info:transmit_fetcher:V2"
+        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
@@ -100,7 +92,7 @@
   "V3TransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -109,36 +101,32 @@
       "onReservesData": {
         "topic": "data:reserves:V3",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:V3",
-        "roundrobing": false
       }
     },
     "notify": {
       "delete": {
-        "topic": "event:delete:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "reject": {
-        "topic": "event:reject:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "errorMessage": {
-        "topic": "event:error:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "start": {
-        "topic": "event:start:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "stop": {
-        "topic": "event:stop:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:V3"
+        "topic": "execute/liquidator/V3"
       },
       "info": {
-        "topic": "event:info:transmit_fetcher:V3"
+        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
@@ -149,7 +137,7 @@
   "CompoundTransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -158,36 +146,32 @@
       "onReservesData": {
         "topic": "data:reserves:Compound",
         "roundrobing": false
-      },
-      "onSettings": {
-        "topic": "settings:searcher:Compound",
-        "roundrobing": false
       }
     },
     "notify": {
       "delete": {
-        "topic": "event:delete:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "reject": {
-        "topic": "event:reject:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "errorMessage": {
-        "topic": "event:error:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "start": {
-        "topic": "event:start:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "stop": {
-        "topic": "event:stop:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "liquidateEvent": {
-        "topic": "event:liquidate:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "liquidateCommand": {
-        "topic": "execute:liquidator:Compound"
+        "topic": "execute/liquidator/Compound"
       },
       "info": {
-        "topic": "event:info:transmit_fetcher:Compound"
+        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {

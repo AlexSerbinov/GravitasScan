@@ -2,7 +2,7 @@
   "V1Archive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -12,17 +12,13 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "event:archive_users:archive:V1"
+        "topic": "logger/liquidator/V1"
       },
-      "sendMonitoringUsersEvent": {
-        "topic": "event:listener_users:archive:V1"
-      },
-
       "start": {
-        "topic": "event:start:archive:V1"
+        "topic": "logger/liquidator/V1"
       },
       "info": {
-        "topic": "event:info:archive:V1"
+        "topic": "logger/liquidator/V1"
       }
     },
     "params": {
@@ -33,7 +29,7 @@
   "V2Archive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -43,17 +39,13 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "event:archive_users:archive:V2"
+        "topic": "logger/liquidator/V2"
       },
-      "sendMonitoringUsersEvent": {
-        "topic": "event:listener_users:archive:V2"
-      },
-
       "start": {
-        "topic": "event:start:archive:V2"
+        "topic": "logger/liquidator/V2"
       },
       "info": {
-        "topic": "event:info:archive:V2"
+        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
@@ -64,7 +56,7 @@
   "V3Archive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -74,17 +66,13 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "event:archive_users:archive:V3"
+        "topic": "logger/liquidator/V3"
       },
-      "sendMonitoringUsersEvent": {
-        "topic": "event:listener_users:archive:V3"
-      },
-
       "start": {
-        "topic": "event:start:archive:V3"
+        "topic": "logger/liquidator/V3"
       },
       "info": {
-        "topic": "event:info:archive:V3"
+        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
@@ -95,7 +83,7 @@
   "CompoundArchive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "namespace",
+    "namespace": "LiqRegistry",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -105,17 +93,13 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "event:archive_users:archive:Compound"
+        "topic": "logger/liquidator/Compound"
       },
-      "sendMonitoringUsersEvent": {
-        "topic": "event:listener_users:archive:Compound"
-      },
-
       "start": {
-        "topic": "event:start:archive:Compound"
+        "topic": "logger/liquidator/Compound"
       },
       "info": {
-        "topic": "event:info:archive:Compound"
+        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {

@@ -10,9 +10,7 @@ const config = require(`${process.cwd()}${configPath}`)
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 // Service initialization
-const connectionChecker = require("../lib/services/connections") //TODO @AlexSerbinov - fix
-const { SERVICE_STATUS } = require("../lib/constants") //TODO @AlexSerbinov - remove
-
+const connectionChecker = require("../lib/utils/connections")
 /**
  * Configure the Ethereum connection pool
  * @param {number} archiveBlockDiff - time buffer to proccess block logs efficiently
@@ -26,14 +24,24 @@ let latestArchiveBlock = await getLatestRedisBlock(protocol)
  */
 const fetcher = getFetcher(protocol)
 
-$.send("start", { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` })
+$.send("start", {
+  service: "archive",
+  protocol,
+  ev: "start",
+  data: { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` },
+})
 
 /**
  * Handle status of node
  */
-const nodeActive = await connectionChecker.checkNodeConnection() 
+const nodeActive = await connectionChecker.checkNodeConnection()
 if (!nodeActive) {
-  fetcher.emit("error", { message: `${protocol} archive terminating` })
+  $.send("errorMessage", {
+    service: "archive",
+    protocol,
+    ev: "errorMessage",
+    data: `archive terminating`,
+  })
   setImmediate(() => {
     process.exit(1)
   })
@@ -44,11 +52,17 @@ if (!nodeActive) {
  * If we're still parsing previous blocks, parsing for the new ones won't begin.
  * @param {*} number - latestBlock from the provider (fetched by events.js)
  */
+
 $.on("onBlock", data => {
   const { number } = data
   if (!fetcher.inProgress && latestArchiveBlock && number - latestArchiveBlock > archiveBlockDiff) {
     fetcher.start(latestArchiveBlock, number)
-    $.send("start", { message: `Run fetching , For listen users connect to mqtt channel -logger/liquidator/${protocol}-` }) //TODO @AlexSerbinov change to real mqtt channel from the params
+    $.send("start", {
+      service: "archive",
+      protocol,
+      ev: "start",
+      data: `Run fetching , For listen users connect to mqtt channel ${$.__notify.start.topic}`, // look workers/archiveServices.json start event
+    })
   }
 })
 
@@ -59,8 +73,18 @@ fetcher.on("fetch", async data => {
   const { users, toBlock } = data
   await saveUsersToArchive(protocol, toBlock, users, "archive_users")
   $.send("sendFetchedUsersEvent", users)
-  const date = new Date().toUTCString()
-  $.send("archive_logs", { date, ...data })  
+  $.send("infsendFetchedUsersEvento", {
+    service: "archive",
+    protocol,
+    ev: "sendFetchedUsersEvent",
+    data: users,
+  })
+  $.send("info", {
+    service: "archive",
+    protocol,
+    ev: "info",
+    data: data,
+  })
 })
 
 /**
@@ -74,29 +98,32 @@ fetcher.on("finished", data => {
   latestArchiveBlock = data.latestBlock
 })
 
-$.send("start", { message: `${protocol} archive started!` })
-
 /**
  * Handle process exit
  */
 $.onExit(async () => {
-  await db.setServiceStatus("archive", [protocol], [SERVICE_STATUS.OFF]) ////TODO @AlexSerbinov fix
   return new Promise(resolve => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
-      $.send("stop", { date })
+      const date = new Date().toUTCString()
+      $.send("stop", {
+        service: "archive",
+        protocol,
+        ev: "stop",
+        data: date,
+      })
       resolve()
-    }, 100) //TODO @AlexSerbinov move to configs // Small timeout to ensure async cleanup completes
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
 // Handle uncaught exceptions
 process.on("uncaughtException", error => {
   $.send("errorMessage", {
-    service: name, //TODO @AlexSerbinov add name
-    protocol: 'all',   //TODO @AlexSerbinov add protocol
-    ev: 'errorMessage', 
-    data: error //this is your message
-    })
+    service: "archive",
+    protocol,
+    ev: "errorMessage",
+    data: error,
+  })
 })

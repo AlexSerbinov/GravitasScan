@@ -22,7 +22,11 @@
       }
     },
     "params": {
+      "serviceName": "archive",
       "protocol": "V1",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   },
@@ -49,7 +53,11 @@
       }
     },
     "params": {
+      "serviceName": "archive",
       "protocol": "V2",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   },
@@ -76,7 +84,11 @@
       }
     },
     "params": {
+      "serviceName": "archive",
       "protocol": "V3",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   },
@@ -103,7 +115,11 @@
       }
     },
     "params": {
+      "serviceName": "archive",
       "protocol": "Compound",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   }

@@ -1,17 +1,38 @@
-const defaultSettings = require("../configs/DefaultSettings.json") // TODO @AlexSerbinov -- move from defaultSett.. to configs/wokers/subgraphServices.json and delete defaults (no need to double it)
 const redis = require("../lib/redis/redis/lib/redis")
 const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
 const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
-const { protocol, formatTrace, stateOverrides } = $.params
+/**
+ * @param {number} EXECUTION_TIMEOUT - The time limit for each task's execution within the queue. (ms),
+ * If a task exceeds this duration, the queue will attempt to move on to the next task,
+ * preventing the system from being stalled by tasks that take too long to complete.
+ * Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
+ *
+ * @param {*} settings - The settings object containing the following properties:
+ *  - mode: The mode of operation (e.g. "fetch")
+ *  - min_collateral_amount: The minimum collateral amount
+ *  - min_borrow_amount: The minimum borrow amount
+ *  - min_health_factor: The minimum health factor
+ *  - max_health_factor: The maximum health factor
+ *  - update_time: The update time in seconds
+ *
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+ *
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ *
+ * @param {Function} formatTrace - A function used in the simulator to format the trace log. It displays every
+ * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
+ *
+ * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
+ * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
+ */
+const { protocol, formatTrace, stateOverrides, configPath, settings, EXECUTION_TIMEOUT } = $.params
 
-const configPath = $.params.configPath
-const forks = $.forks
+const forks = $.forks // Number of running instances of the service
 
 const config = require(`${process.cwd()}${configPath}`) // Load the configuration
-
-const service = "subgraph" 
 
 /**
  * Service initial data
@@ -19,16 +40,7 @@ const service = "subgraph"
 configurePool([config.RPC_WSS])
 
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) 
-
-const settings = defaultSettings.find(s => s.protocol === protocol).services[service] // TODO @AlexSerbinov -- move from .. see above in 1st line ^
-
-/**
- * This is the time limit for each task's execution within the queue. (ms)
- * If a task exceeds this duration, the queue will attempt to move on to the next task, preventing the system from being stalled by tasks that take too long to complete. 
- * Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
- */
-const EXECUTION_TIMEOUT = 10000 // TODO @AlexSerbinov -- move to configs
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 /**
  * Interface for enso simulator
@@ -42,35 +54,51 @@ const simulator = createSimulator(config.ENSO_URL, formatTrace, stateOverrides)
 const fetcher = getFetcher($.params, settings, config, simulator)
 const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
 
-/**
- * sleep_time - wait some time before next run (in milliseconds)
- */
-const { mode, sleep_time } = settings // TODO @AlexSerbinov -- remove mode && add sleep_time to params
+const { mode } = settings
 
-$.send("start", { message: `Run in ${mode} mode` })
-$.send("start", { message: `${protocol} subgraph started!` })
+$.send("start", {
+  service: "subgraph",
+  protocol,
+  ev: "start",
+  data: `${protocol} subgraph started in ${mode} mode`,
+})
 
 /**
  * Create fetcher
  * Proccess all users and then drain queues inbetween proxy<>subgraph and assign some sleep time
  */
 queue.on("drain", async () => {
-  if (sleep_time) {
-    await sleep(sleep_time)
-  }
   $.send("drain", { forks })
-  $.send("subgraph_logs", { message: `send drain event` })
+  const date = new Date().toUTCString()
+  $.send("info", {
+    service: "subgraph",
+    protocol,
+    ev: "info",
+    data: `send drain event ${date}`,
+  })
 })
 
-//Output point
+/**
+ * Output point
+ */
 fetcher.on("fetch", data => {
   $.send("sendDataToDataFetcher", data)
   const date = new Date().toUTCString()
-  $.send("subgraph_logs", { date, ...data })
+  $.send("info", {
+    service: "subgraph",
+    protocol,
+    ev: "info",
+    data: { date, ...data },
+  })
 })
 
 fetcher.once("fetcherReady", () => {
-  $.send("start", { message: `All data ready, user processing has started` })
+  $.send("start", {
+    service: "subgraph",
+    protocol,
+    ev: "start",
+    data: `All data ready, user processing has started`,
+  })
 })
 
 /**
@@ -90,18 +118,32 @@ $.on("handleUser", async users => {
   queue.add(users)
 })
 
+/**
+ * Handle process exit
+ */
 $.onExit(async () => {
   return new Promise(resolve => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
-      $.send("stop", { date })
+      const date = new Date().toUTCString()
+      $.send("stop", {
+        service: "subgraph",
+        protocol,
+        ev: "stop",
+        data: date,
+      })
       resolve()
-    }, 100) // Set a small timeout to ensure async cleanup can complete
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
+// Handle uncaught exceptions
 process.on("uncaughtException", error => {
-  console.error(error)
-  $.send("errorMessage", { message: error })
+  $.send("errorMessage", {
+    service: "subgraph",
+    protocol,
+    ev: "errorMessage",
+    data: error,
+  })
 })

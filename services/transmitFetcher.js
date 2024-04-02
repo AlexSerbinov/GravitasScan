@@ -1,12 +1,25 @@
 const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
-const defaultSettings = require("../configs/DefaultSettings.json") // TODO @AlexSerbinov -- move from defaultSett.. to configs/wokers/subgraphSer
 const redis = require("../lib/redis/redis/lib/redis")
 
-const protocol = $.params.PROTOCOL
+/**
+ * @param {*} settings - The settings object containing the following properties:
+ *  - mode: The mode of operation (e.g. "fetch")
+ *  - min_collateral_amount: The minimum collateral amount
+ *  - min_borrow_amount: The minimum borrow amount
+ *  - min_health_factor: The minimum health factor
+ *  - max_health_factor: The maximum health factor
+ *  - update_time: The update time in seconds
+ *
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+ *
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ */
+const { protocol, configPath, settings } = $.params
 
 // Now we save the path for config params for each protocol in service.json.
-const configPath = $.params.configPath
+
 const config = require(`${process.cwd()}${configPath}`)
 
 configurePool([config.RPC_WSS])
@@ -15,9 +28,8 @@ configurePool([config.RPC_WSS])
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 // Moved from config.helper. Earlier this was called syncSettings.
-const settings = defaultSettings.find(s => s.protocol === protocol).services["searcher"]
 
-let fetcher = createTransmitFetcher(protocol, settings, config)
+const fetcher = createTransmitFetcher(protocol, settings, config)
 
 fetcher.on("response", async data => {
   if (data.simulateData.length == 0) return
@@ -27,6 +39,7 @@ fetcher.on("response", async data => {
 })
 
 fetcher.on("liquidate", data => {
+  
   $.send("liquidateCommand", data.resp)
   $.send("liquidateEvent", data.resp)
 })

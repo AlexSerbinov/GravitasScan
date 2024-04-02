@@ -1,13 +1,26 @@
 const { createFetcher } = require("../lib/services/data-fetcher/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
-const defaultSettings = require("../configs/DefaultSettings.json") // TODO @AlexSerbinov -- move from defaultSett.. to configs/wokers/subgraphSer
 const redis = require("../lib/redis/redis/lib/redis")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
-const protocol = $.params.PROTOCOL
+/**
+ * @param {*} settings - The settings object containing the following properties:
+ *  - mode: The mode of operation (e.g. "fetch")
+ *  - min_collateral_amount: The minimum collateral amount
+ *  - min_borrow_amount: The minimum borrow amount
+ *  - min_health_factor: The minimum health factor
+ *  - max_health_factor: The maximum health factor
+ *  - update_time: The update time in seconds
+ *
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+ *
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ */
 
-// Now we save the path for config params for each protocol in service.json.
-const configPath = $.params.configPath
+const { protocol, configPath, settings } = $.params
+
+// Main.json
 const config = require(`${process.cwd()}${configPath}`)
 
 configurePool([config.RPC_WSS])
@@ -15,10 +28,7 @@ configurePool([config.RPC_WSS])
 // We prepare redis here because only in this place we have config params. And we don't want to use global variables.
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
-// Moved from config.helper. Earlier this was called syncSettings.
-const settings = defaultSettings.find(s => s.protocol === protocol).services["data-fetcher"]
-
-const fetcher = createFetcher(protocol, settings, config) // send config on this way by third param
+const fetcher = createFetcher(protocol, settings, config)
 
 $.send("start", { date: new Date().toUTCString() })
 
@@ -45,6 +55,11 @@ fetcher.on("deleteFromRedis", data => {
 })
 
 fetcher.on("liquidate", data => {
+  console.log(`======================= liq ===================`)
+  console.log(`1----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 1`)
+  console.log(data);
+  console.log(`2----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 2`)
+  
   $.send("liquidateCommand", data)
   $.send("liquidateEvent", data)
 })

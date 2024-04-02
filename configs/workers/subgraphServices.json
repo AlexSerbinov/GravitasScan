@@ -36,7 +36,7 @@
         "topic": "logger/liquidator/V1"
       }
     },
-    "filters":{
+    "filters": {
       "min_collateral_amount": 0.2,
       "min_borrow_amount": 0.4,
       "min_health_factor": 0.79,
@@ -44,6 +44,15 @@
     },
     "params": {
       "protocol": "V1",
+      "EXECUTION_TIMEOUT": 10000,
+      "settings": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
       "configPath": "/configs/Main.json",
       "privateKey": "",
 
@@ -98,7 +107,16 @@
       }
     },
     "params": {
+      "EXECUTION_TIMEOUT": 10000,
       "protocol": "V2",
+      "settings": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
       "configPath": "/configs/Main.json",
       "privateKey": "",
 
@@ -153,7 +171,16 @@
       }
     },
     "params": {
+      "EXECUTION_TIMEOUT": 10000,
       "protocol": "V3",
+      "settings": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
       "configPath": "/configs/Main.json",
       "privateKey": "",
 
@@ -208,7 +235,16 @@
       }
     },
     "params": {
+      "EXECUTION_TIMEOUT": 10000,
       "protocol": "Compound",
+      "settings": {
+        "mode": "fetch",
+        "min_collateral_amount": 0.2,
+        "min_borrow_amount": 0.4,
+        "min_health_factor": 0.79,
+        "max_health_factor": 1.1,
+        "update_time": 5
+      },
       "configPath": "/configs/Main.json",
       "privateKey": "",
 

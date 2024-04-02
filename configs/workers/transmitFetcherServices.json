@@ -40,7 +40,15 @@
       }
     },
     "params": {
-      "PROTOCOL": "V1",
+      "protocol": "V1",
+      "settings": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
       "configPath": "/configs/Main.json"
     }
   },
@@ -85,7 +93,15 @@
       }
     },
     "params": {
-      "PROTOCOL": "V2",
+      "protocol": "V2",
+      "settings": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
       "configPath": "/configs/Main.json"
     }
   },
@@ -130,7 +146,15 @@
       }
     },
     "params": {
-      "PROTOCOL": "V3",
+      "protocol": "V3",
+      "settings": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
       "configPath": "/configs/Main.json"
     }
   },
@@ -175,7 +199,15 @@
       }
     },
     "params": {
-      "PROTOCOL": "Compound",
+      "protocol": "Compound",
+      "settings": {
+        "minHfDel": "0.1",
+        "maxHfDel": "10",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
       "configPath": "/configs/Main.json"
     }
   }

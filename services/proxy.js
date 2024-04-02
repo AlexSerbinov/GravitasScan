@@ -1,13 +1,21 @@
-const fs = require("fs").promises
 const EventEmitter = require("node:events")
-const path = require("path")
 const redis = require("../lib/redis/redis/lib/redis")
-const filePath = path.join(__dirname, "allUsers", "allUsers40.json")
 const { getArchiveData } = require("../lib/redis/index")
 
-const protocol = $.params.PROTOCOL
-
-const configPath = $.params.configPath
+/**
+ * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
+ * sent to the subgraph in each operation, affecting the throughput and efficiency of the data processing.
+ *
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+ *
+ * @param {string} configPath - Path to the configuration file that contains necessary settings and parameters for the service.
+ * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ *
+ * @param {number} SEND_WITHOUT_DRAIN_TIMEOUT - The maximum amount of time (in milliseconds) to wait before forcibly sending a
+ * batch of users if no 'drain' event is received. This timeout ensures that data continues to flow, preventing potential
+ * deadlocks or stalls in data processing.
+ */
+const { batchSize, protocol, configPath, SEND_WITHOUT_DRAIN_TIMEOUT } = $.params
 const config = require(`${process.cwd()}${configPath}`)
 const fetcher = new EventEmitter()
 
@@ -15,9 +23,12 @@ const fetcher = new EventEmitter()
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-const SEND_WITHOUT_DRAIN_TIMEOUT = 60 * 60 * 1000 // 60 min ! after this time, send batch of user when drain event not received //TODO @AlexSerbinov move to params
-
-$.send("start", { message: "proxy started" })
+$.send("start", {
+  service: "proxy",
+  protocol,
+  ev: "start",
+  data: `proxy started`,
+})
 
 let isSending = false // Flag to indicate if sending is in progress
 
@@ -52,7 +63,13 @@ $.on("drain", data => {
         `PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`
       )
       console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
-      $.send("proxy_logs", { message: `PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}` })
+      $.send("info", {
+        service: "proxy",
+        protocol,
+        ev: "info",
+        data: `${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`,
+      })
+
       clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
       onDrain()
     }
@@ -106,7 +123,6 @@ const getArchiveUsers = async protocol => {
  */
 const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
   isSending = true // Set the sending flag to true at the beginning
-  const batchSize = 20 //TODO @AlexSerbinov  move to params
   const totalBatches = Math.ceil(nonBlacklistedUsers.length / batchSize)
   let batchesSent = 0
 
@@ -118,7 +134,12 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
 
       // Check if the current batch is the last one
       if (batchNumber === totalBatches) {
-        $.send("proxy_logs", { message: `Sending the last batch number ${batchNumber} of users ${new Date().toISOString()}` })
+        $.send("info", {
+          service: "proxy",
+          protocol,
+          ev: "info",
+          data: `Sending the last batch number ${batchNumber} of users ${new Date().toISOString()}`,
+        })
       }
       $.send("sendUsersToSubgraph", batch)
 
@@ -139,16 +160,26 @@ const setupDrainTimer = () => {
 
   drainTimer = setTimeout(() => {
     if (manualTriggerCount >= 10)
-      $.send("proxy_logs", {
-        message: `manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event. It can be when subgraf not send "drain" event. Or subgraph do not have enough time for user processing`,
+      $.send("info", {
+        service: "proxy",
+        protocol,
+        ev: "info",
+        data: `Bad behavior. manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event. It can be when subgraf not send "drain" event. Or subgraph do not have enough time for user processing`,
       })
+
     onDrain()
       .then(() => {
         manualTriggerCount++
         setupDrainTimer() // Reset the timer after successful drain
       })
       .catch(error => {
-        $.send("errorMessage", { message: error })
+        $.send("errorMessage", {
+          service: "proxy",
+          protocol,
+          ev: "errorMessage",
+          data: error,
+        })
+
         console.error("Drain failed:", error)
       })
   }, SEND_WITHOUT_DRAIN_TIMEOUT)
@@ -159,22 +190,41 @@ onDrain()
 // Start the drain timer to send batches if fist drain event nor recieved
 setupDrainTimer()
 
+fetcher.on("error", data => {
+  $.send("errorMessage", {
+    service: "proxy",
+    protocol,
+    ev: "errorMessage",
+    data,
+  })
+})
+
+/**
+ * Handle process exit
+ */
 $.onExit(async () => {
   return new Promise(resolve => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
-      $.send("stop", { date: new Date() })
+      const date = new Date().toUTCString()
+      $.send("stop", {
+        service: "archive",
+        protocol,
+        ev: "stop",
+        data: date,
+      })
       resolve()
-    }, 100) // Set a small timeout to ensure async cleanup can complete
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
-fetcher.on("error", data => {
-  $.send("errorMessage", data)
-})
-
+// Handle uncaught exceptions
 process.on("uncaughtException", error => {
-  console.error(error)
-  $.send("errorMessage", error)
+  $.send("errorMessage", {
+    service: "archive",
+    protocol,
+    ev: "errorMessage",
+    data: error,
+  })
 })

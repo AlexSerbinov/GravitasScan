@@ -113,6 +113,16 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 
 # Updates
 
+## 2024-04-03
+
+1. Code review was conducted by noizyman and AlexSerbinov.
+2. In the proxy stage (after the blacklist), all user addresses are converted to toLowerCase().
+3. Events have been modified to comply with the new logger. Unused events have been removed.
+4. Unused parameters have been removed from main.json.
+5. Configurations from defaultSettings have been migrated to the parameters of each individual service.
+6. Many parameters have been moved to [serviceName]Services.json.
+7. Many new comments have been added to the code.
+
 ## 2024-03-29
 
 1.  Migrated the Archive service from using a database to Redis.

@@ -27,19 +27,33 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
+ * 
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
  */
-const { protocol, formatTrace, stateOverrides, configPath, settings, EXECUTION_TIMEOUT } = $.params
+const { protocol, formatTrace, stateOverrides, configPath, settings, service, EXECUTION_TIMEOUT } = $.params
 
-const forks = $.forks // Number of running instances of the service
 
-const config = require(`${process.cwd()}${configPath}`) // Load the configuration
+/**
+ * Number of running instances of the service
+ */
+const forks = $.forks 
+
+
+/**
+ *  Load the configuration from Main.json
+ */
+const config = require(`${process.cwd()}${configPath}`)
+
 
 /**
  * Service initial data
  */
 configurePool([config.RPC_WSS])
 
-// We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+
+/**
+* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+*/
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 /**
@@ -57,7 +71,7 @@ const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users)
 const { mode } = settings
 
 $.send("start", {
-  service: "subgraph",
+  service,
   protocol,
   ev: "start",
   data: `${protocol} subgraph started in ${mode} mode`,
@@ -71,7 +85,7 @@ queue.on("drain", async () => {
   $.send("drain", { forks })
   const date = new Date().toUTCString()
   $.send("info", {
-    service: "subgraph",
+    service,
     protocol,
     ev: "info",
     data: `send drain event ${date}`,
@@ -85,7 +99,7 @@ fetcher.on("fetch", data => {
   $.send("sendDataToDataFetcher", data)
   const date = new Date().toUTCString()
   $.send("info", {
-    service: "subgraph",
+    service,
     protocol,
     ev: "info",
     data: { date, ...data },
@@ -94,7 +108,7 @@ fetcher.on("fetch", data => {
 
 fetcher.once("fetcherReady", () => {
   $.send("start", {
-    service: "subgraph",
+    service,
     protocol,
     ev: "start",
     data: `All data ready, user processing has started`,
@@ -128,7 +142,7 @@ $.onExit(async () => {
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
       $.send("stop", {
-        service: "subgraph",
+        service,
         protocol,
         ev: "stop",
         data: date,
@@ -141,7 +155,7 @@ $.onExit(async () => {
 // Handle uncaught exceptions
 process.on("uncaughtException", error => {
   $.send("errorMessage", {
-    service: "subgraph",
+    service,
     protocol,
     ev: "errorMessage",
     data: error,

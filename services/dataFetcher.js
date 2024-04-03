@@ -16,6 +16,9 @@ const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../
  *
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ * 
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * 
  */
 
 const { protocol, configPath, settings } = $.params
@@ -25,12 +28,19 @@ const config = require(`${process.cwd()}${configPath}`)
 
 configurePool([config.RPC_WSS])
 
-// We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+/**
+* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+*/
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 const fetcher = createFetcher(protocol, settings, config)
 
-$.send("start", { date: new Date().toUTCString() })
+$.send("start", {
+  service,
+  protocol,
+  ev: "start",
+  data: { date: new Date().toUTCString() }
+})
 
 /**
  * Users for long-time watching
@@ -40,7 +50,13 @@ fetcher.on("pushToRedis", data => {
   for (let index = 0; index < assets.length; index++) {
     addUsersToDataFetcherSet([user], protocol, assets[index])
   }
-  $.send("pushToRedis", data)
+  $.send("pushToRedis", {
+    service,
+    protocol,
+    ev: "pushToRedis",
+    data,
+  })
+  
 })
 /**
  * When user deletes
@@ -51,30 +67,53 @@ fetcher.on("deleteFromRedis", data => {
   for (let index = 0; index < assets.length; index++) {
     removeUsersFromDataFetcherSet([user], protocol, assets[index])
   }
-  $.send("deleteFromRedis", data)
+  $.send("deleteFromRedis", {
+    service,
+    protocol,
+    ev: "deleteFromRedis",
+    data,
+  })
 })
 
 fetcher.on("liquidate", data => {
-  console.log(`======================= liq ===================`)
-  console.log(`1----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 1`)
-  console.log(data);
-  console.log(`2----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 2`)
   
   $.send("liquidateCommand", data)
-  $.send("liquidateEvent", data)
+  $.send("liquidateEvent", {
+    service,
+    protocol,
+    ev: "liquidateEvent",
+    data,
+  })
+  
 })
 
 fetcher.on("info", data => {
-  $.send("info", data)
+  $.send("info", {
+    service,
+    protocol,
+    ev: "info",
+    data,
+  })
+
 })
 
 fetcher.on("reject", data => {
-  $.send("reject", data)
+  $.send("reject", {
+    service,
+    protocol,
+    ev: "reject",
+    data,
+  })
 })
 
 fetcher.on("errorMessage", data => {
-  // we use "errorMessage" instead of "error" because "error" is locked by _service
-  $.send("errorMessage", { error: data.toString() })
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: "errorMessage",
+    data: data.toString()
+  })
+  
 })
 
 /**
@@ -92,18 +131,32 @@ $.on("searcherExecute", async data => {
   fetcher.fetchData(data)
 })
 
+/**
+ * Handle process exit
+ */
 $.onExit(async () => {
   return new Promise(resolve => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
-      $.send("stop", { date })
+      const date = new Date().toUTCString()
+      $.send("stop", {
+        service: "subgraph",
+        protocol,
+        ev: "stop",
+        data: date,
+      })
       resolve()
-    }, 100) // Set a small timeout to ensure async cleanup can complete
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
+// Handle uncaught exceptions
 process.on("uncaughtException", error => {
-  console.error(error)
-  fetcher.emit("errorMessage", error)
+  $.send("errorMessage", {
+    service: "subgraph",
+    protocol,
+    ev: "errorMessage",
+    data: error,
+  })
 })

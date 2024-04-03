@@ -14,12 +14,6 @@
       }
     },
     "notify": {
-      "delete": {
-        "topic": "logger/liquidator/V1"
-      },
-      "reject": {
-        "topic": "logger/liquidator/V1"
-      },
       "errorMessage": {
         "topic": "logger/liquidator/V1"
       },
@@ -40,7 +34,8 @@
       }
     },
     "params": {
-      "protocol": "V1",
+      "service": "transmitFetcher",
+      "protocol":  "V1",
       "settings": {
         "minHfDel": "0.2",
         "maxHfDel": "1.1",
@@ -67,12 +62,6 @@
       }
     },
     "notify": {
-      "delete": {
-        "topic": "logger/liquidator/V2"
-      },
-      "reject": {
-        "topic": "logger/liquidator/V2"
-      },
       "errorMessage": {
         "topic": "logger/liquidator/V2"
       },
@@ -93,7 +82,8 @@
       }
     },
     "params": {
-      "protocol": "V2",
+      "service": "transmitFetcher",
+      "protocol":  "V2",
       "settings": {
         "minHfDel": "0.2",
         "maxHfDel": "1.1",
@@ -120,12 +110,6 @@
       }
     },
     "notify": {
-      "delete": {
-        "topic": "logger/liquidator/V3"
-      },
-      "reject": {
-        "topic": "logger/liquidator/V3"
-      },
       "errorMessage": {
         "topic": "logger/liquidator/V3"
       },
@@ -146,7 +130,8 @@
       }
     },
     "params": {
-      "protocol": "V3",
+      "service": "transmitFetcher",
+      "protocol":  "V3",
       "settings": {
         "minHfDel": "0.2",
         "maxHfDel": "1.1",
@@ -173,12 +158,7 @@
       }
     },
     "notify": {
-      "delete": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "reject": {
-        "topic": "logger/liquidator/Compound"
-      },
+
       "errorMessage": {
         "topic": "logger/liquidator/Compound"
       },
@@ -199,7 +179,8 @@
       }
     },
     "params": {
-      "protocol": "Compound",
+      "service": "transmitFetcher",
+      "protocol":  "Compound",
       "settings": {
         "minHfDel": "0.1",
         "maxHfDel": "10",

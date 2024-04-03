@@ -20,20 +20,17 @@
       "sendDataToDataFetcher": {
         "topic": "execute/dataFetcher/V1"
       },
-      "reject": {
-        "topic": "logger/liquidator/V1"
-      },
       "errorMessage": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "subgraph_logs": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       }
     },
     "filters": {
@@ -43,7 +40,8 @@
       "max_health_factor": 1.1
     },
     "params": {
-      "protocol": "V1",
+      "service": "subgraph",
+      "protocol":  "V1",
       "EXECUTION_TIMEOUT": 10000,
       "settings": {
         "mode": "fetch",
@@ -67,7 +65,7 @@
     }
   },
   "V2Subgraph": {
-    "forks": 10,
+    "forks": 2,
     "script": "services/subgraph.js",
     "namespace": "LiqRegistry",
     "listen": {
@@ -90,25 +88,23 @@
       "sendDataToDataFetcher": {
         "topic": "execute/dataFetcher/V2"
       },
-      "reject": {
-        "topic": "logger/liquidator/V2"
-      },
       "errorMessage": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "subgraph_logs": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
       "EXECUTION_TIMEOUT": 10000,
-      "protocol": "V2",
+      "service": "subgraph",
+      "protocol":  "V2",
       "settings": {
         "mode": "fetch",
         "min_collateral_amount": 0.2,
@@ -131,7 +127,7 @@
     }
   },
   "V3Subgraph": {
-    "forks": 10,
+    "forks": 2,
     "script": "services/subgraph.js",
     "namespace": "LiqRegistry",
     "listen": {
@@ -154,25 +150,23 @@
       "sendDataToDataFetcher": {
         "topic": "execute/dataFetcher/V3"
       },
-      "reject": {
-        "topic": "logger/liquidator/V3"
-      },
       "errorMessage": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "subgraph_logs": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
       "EXECUTION_TIMEOUT": 10000,
-      "protocol": "V3",
+      "service": "subgraph",
+      "protocol":  "V3",
       "settings": {
         "mode": "fetch",
         "min_collateral_amount": 0.2,
@@ -195,7 +189,7 @@
     }
   },
   "CompoundSubgraph": {
-    "forks": 1,
+    "forks": 2,
     "script": "services/subgraph.js",
     "namespace": "LiqRegistry",
     "listen": {
@@ -218,25 +212,23 @@
       "sendDataToDataFetcher": {
         "topic": "execute/dataFetcher/Compound"
       },
-      "reject": {
-        "topic": "logger/liquidator/Compound"
-      },
       "errorMessage": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "subgraph_logs": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
       "EXECUTION_TIMEOUT": 10000,
-      "protocol": "Compound",
+      "service": "subgraph",
+      "protocol":  "Compound",
       "settings": {
         "mode": "fetch",
         "min_collateral_amount": 0.2,

@@ -24,7 +24,8 @@
       }
     },
     "params": {
-      "protocol": "V1",
+      "service": "proxy",
+      "protocol":  "V1",
       "batchSize": 20,
       "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
       "configPath": "/configs/Main.json"
@@ -55,7 +56,8 @@
       }
     },
     "params": {
-      "protocol": "V2",
+      "service": "proxy",
+      "protocol":  "V2",
       "batchSize": 20,
       "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
       "configPath": "/configs/Main.json"
@@ -86,7 +88,8 @@
       }
     },
     "params": {
-      "protocol": "V3",
+      "service": "proxy",
+      "protocol":  "V3",
       "batchSize": 20,
       "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
       "configPath": "/configs/Main.json"
@@ -117,7 +120,8 @@
       }
     },
     "params": {
-      "protocol": "Compound",
+      "service": "proxy",
+      "protocol":  "Compound",
       "batchSize": 20,
       "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
       "configPath": "/configs/Main.json"

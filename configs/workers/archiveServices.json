@@ -2,7 +2,7 @@
   "V1Archive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Archive",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -12,24 +12,28 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
+      "service": "archive",
       "protocol": "V1",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   },
   "V2Archive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Archive",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -39,24 +43,28 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
+      "service": "archive",
       "protocol": "V2",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   },
   "V3Archive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Archive",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -66,24 +74,28 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
+      "service": "archive",
       "protocol": "V3",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   },
   "CompoundArchive": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Archive",
     "listen": {
       "onBlock": {
         "topic": "data:block",
@@ -93,17 +105,21 @@
 
     "notify": {
       "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
+      "service": "archive",
       "protocol": "Compound",
+      "settings": {
+        "mode": "node"
+      },
       "configPath": "/configs/Main.json"
     }
   }

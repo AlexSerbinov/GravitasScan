@@ -2,16 +2,34 @@ const { getFetcher } = require("../lib/services/archive/fetcher")
 const { getLatestRedisBlock, saveUsersToArchive } = require("../lib/services/archive/utils")
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
+const { PROTOCOLS_CONFIG } = require("../lib/constants/index")
+const connectionChecker = require("../lib/utils/connections")
 
-const { protocol } = $.params
-const configPath = $.params.configPath
+
+/**
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+*
+* @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+* This file includes configurations such as database connections, service endpoints, and other operational parameters.
+* 
+* @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+* 
+*/
+const { protocol, service, configPath  } = $.params
+
+
+/**
+ * @param {number} CREATED_AT_BLOCK - The block number at which the protocol was created. 
+ * This is used for scanning users from the latest block back to the block when the protocol was created.
+ */
+const CREATED_AT_BLOCK = PROTOCOLS_CONFIG[protocol].CREATED_AT_BLOCK
+
 const config = require(`${process.cwd()}${configPath}`)
 
+/**
+ * Service initialization
+ */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
-
-// Service initialization
-const connectionChecker = require("../lib/services/connections") //TODO @AlexSerbinov - fix
-const { SERVICE_STATUS } = require("../lib/constants") //TODO @AlexSerbinov - remove
 
 /**
  * Configure the Ethereum connection pool
@@ -19,25 +37,39 @@ const { SERVICE_STATUS } = require("../lib/constants") //TODO @AlexSerbinov - re
  */
 configurePool([config.RPC_WSS])
 const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
-let latestArchiveBlock = await getLatestRedisBlock(protocol)
+let latestArchiveBlock = await getLatestRedisBlock(protocol) || CREATED_AT_BLOCK
+console.log(`latest block stored to archive: ${latestArchiveBlock}`);
+
 
 /**
  * Initialize fetcher instance
  */
 const fetcher = getFetcher(protocol)
 
-$.send("start", { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` })
+$.send("start", {
+  service,
+  protocol,
+  ev: "start",
+  data: { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` },
+})
+
 
 /**
  * Handle status of node
  */
-const nodeActive = await connectionChecker.checkNodeConnection() 
+const nodeActive = await connectionChecker.checkNodeConnection()
 if (!nodeActive) {
-  fetcher.emit("error", { message: `${protocol} archive terminating` })
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: "errorMessage",
+    data: `archive terminating`,
+  })
   setImmediate(() => {
     process.exit(1)
   })
 }
+
 
 /**
  * Listen for new blocks and trigger fetching.
@@ -48,9 +80,15 @@ $.on("onBlock", data => {
   const { number } = data
   if (!fetcher.inProgress && latestArchiveBlock && number - latestArchiveBlock > archiveBlockDiff) {
     fetcher.start(latestArchiveBlock, number)
-    $.send("start", { message: `Run fetching , For listen users connect to mqtt channel -logger/liquidator/${protocol}-` }) //TODO @AlexSerbinov change to real mqtt channel from the params
+    $.send("start", {
+      service,
+      protocol,
+      ev: "start",
+      data: `Run fetching , For listen users connect to mqtt channel ${$.__notify.start.topic}`, // look workers/archiveServices.json start event
+    })
   }
 })
+
 
 /**
  * Handle events from fetcher
@@ -58,10 +96,14 @@ $.on("onBlock", data => {
 fetcher.on("fetch", async data => {
   const { users, toBlock } = data
   await saveUsersToArchive(protocol, toBlock, users, "archive_users")
-  $.send("sendFetchedUsersEvent", users)
-  const date = new Date().toUTCString()
-  $.send("archive_logs", { date, ...data })  
+  $.send("sendFetchedUsersEvent", {
+    service,
+    protocol,
+    ev: "sendFetchedUsersEvent",
+    data: users
+  })
 })
+
 
 /**
  * Set global reserves data listener
@@ -70,33 +112,41 @@ $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 
+
+/**
+ * Set the last archive block, called when process of scanning in particular protocol is finished 
+ */
 fetcher.on("finished", data => {
   latestArchiveBlock = data.latestBlock
 })
 
-$.send("start", { message: `${protocol} archive started!` })
 
 /**
  * Handle process exit
  */
 $.onExit(async () => {
-  await db.setServiceStatus("archive", [protocol], [SERVICE_STATUS.OFF]) ////TODO @AlexSerbinov fix
   return new Promise(resolve => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
-      $.send("stop", { date })
+      const date = new Date().toUTCString()
+      $.send("stop", {
+        service,
+        protocol,
+        ev: "stop",
+        data: date,
+      })
       resolve()
-    }, 100) //TODO @AlexSerbinov move to configs // Small timeout to ensure async cleanup completes
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
 // Handle uncaught exceptions
 process.on("uncaughtException", error => {
   $.send("errorMessage", {
-    service: name, //TODO @AlexSerbinov add name
-    protocol: 'all',   //TODO @AlexSerbinov add protocol
-    ev: 'errorMessage', 
-    data: error //this is your message
-    })
+    service,
+    protocol,
+    ev: "errorMessage",
+    data: error,
+  })
 })

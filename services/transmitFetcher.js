@@ -1,23 +1,63 @@
 const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
-const defaultSettings = require("../configs/DefaultSettings.json") // TODO @AlexSerbinov -- move from defaultSett.. to configs/wokers/subgraphSer
 const redis = require("../lib/redis/redis/lib/redis")
+const { createSimulator } = require("../lib/simulator")
 
-const protocol = $.params.PROTOCOL
 
-// Now we save the path for config params for each protocol in service.json.
-const configPath = $.params.configPath
+/**
+ * @param {*} settings - The settings object containing the following properties:
+ *  - mode: The mode of operation (e.g. "fetch")
+ *  - min_collateral_amount: The minimum collateral amount
+ *  - min_borrow_amount: The minimum borrow amount
+ *  - min_health_factor: The minimum health factor
+ *  - max_health_factor: The maximum health factor
+ *  - update_time: The update time in seconds
+ *
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+ *
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ * 
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * 
+ * @param {Function} formatTrace - A function used in the simulator to format the trace log. It displays every
+ * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
+ *
+ * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
+ * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
+ * 
+ */
+const { protocol, configPath, settings, service, formatTrace, stateOverrides } = $.params
+
+
+/**
+* Now we save the path for config params for each protocol in [serviceName]service.json file.
+*/
 const config = require(`${process.cwd()}${configPath}`)
 
 configurePool([config.RPC_WSS])
 
-// We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+
+
+/**
+* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+*/
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
-// Moved from config.helper. Earlier this was called syncSettings.
-const settings = defaultSettings.find(s => s.protocol === protocol).services["searcher"]
+/**
+ * Interface for enso simulator
+ */
+const simulator = createSimulator(config.ENSO_URL, formatTrace, stateOverrides)
 
-let fetcher = createTransmitFetcher(protocol, settings, config)
+
+const fetcher = createTransmitFetcher(protocol, settings, config, simulator)
+
+$.send("start", {
+  service,
+  protocol,
+  ev: "start",
+  data: { date: new Date().toUTCString() },
+})
 
 fetcher.on("response", async data => {
   if (data.simulateData.length == 0) return
@@ -28,34 +68,39 @@ fetcher.on("response", async data => {
 
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data.resp)
-  $.send("liquidateEvent", data.resp)
+  $.send("liquidateEvent", {
+    service,
+    protocol,
+    ev: "liquidateEvent",
+    data: data.resp.toString(),
+  })
+  
 })
 
 fetcher.on("info", data => {
-  $.send("info", data)
-})
-
-fetcher.on("delete", data => {
-  $.send("delete", data)
-})
-
-fetcher.on("reject", data => {
-  $.send("reject", data)
+  $.send("info", {
+    service,
+    protocol,
+    ev: "info",
+    data: data.toString(),
+  })
 })
 
 fetcher.on("errorMessage", data => {
-  // we use "errorMessage" instead of "error" because "error" is locked by _service
-  $.send("errorMessage", { error: data.toString() })
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: "errorMessage",
+    data: { error: data.toString() },
+  })
 })
 
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 
-$.send("start", { date: new Date().toUTCString() })
-
 $.on("transmit", async data => {
-  if (!Object.keys(data.assets).includes(protocol)) {
+  if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
     return
   }
   const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
@@ -65,19 +110,32 @@ $.on("transmit", async data => {
   })
 })
 
+/**
+ * Handle process exit
+ */
 $.onExit(async () => {
   return new Promise(resolve => {
     setTimeout(() => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
-      $.send("stop", { date })
+      $.send("stop", {
+        service,
+        protocol,
+        ev: "stop",
+        data: date,
+      })
       resolve()
-    }, 100) // Set a small timeout to ensure async cleanup can complete
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })
 
+// Handle uncaught exceptions
 process.on("uncaughtException", error => {
-  console.error(error)
-  fetcher.emit("errorMessage", error)
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: "errorMessage",
+    data: error,
+  })
 })

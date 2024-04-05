@@ -2,7 +2,7 @@
   "V1Subgraph": {
     "forks": 2,
     "script": "services/subgraph.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Subgraph",
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V1",
@@ -67,7 +67,7 @@
   "V2Subgraph": {
     "forks": 2,
     "script": "services/subgraph.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Subgraph",
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V2",
@@ -129,7 +129,7 @@
   "V3Subgraph": {
     "forks": 2,
     "script": "services/subgraph.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Subgraph",
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V3",
@@ -189,9 +189,9 @@
     }
   },
   "CompoundSubgraph": {
-    "forks": 2,
+    "forks": 20,
     "script": "services/subgraph.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Subgraph",
     "listen": {
       "handleUser": {
         "topic": "event/users/proxy/Compound",
@@ -231,9 +231,9 @@
       "protocol":  "Compound",
       "settings": {
         "mode": "fetch",
-        "min_collateral_amount": 0.2,
-        "min_borrow_amount": 0.4,
-        "min_health_factor": 0.79,
+        "min_collateral_amount": 0.01,
+        "min_borrow_amount": 0.01,
+        "min_health_factor": 0.01,
         "max_health_factor": 1.1,
         "update_time": 5
       },

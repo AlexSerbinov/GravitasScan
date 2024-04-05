@@ -3,7 +3,6 @@ const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 
-
 /**
  * @param {*} settings - The settings object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -17,38 +16,34 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
- * 
+ *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
- * 
+ *
  * @param {Function} formatTrace - A function used in the simulator to format the trace log. It displays every
  * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
  *
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
- * 
+ *
  */
 const { protocol, configPath, settings, service, formatTrace, stateOverrides } = $.params
 
-
 /**
-* Now we save the path for config params for each protocol in [serviceName]service.json file.
-*/
+ * Now we save the path for config params for each protocol in [serviceName]service.json file.
+ */
 const config = require(`${process.cwd()}${configPath}`)
 
 configurePool([config.RPC_WSS])
 
-
-
 /**
-* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-*/
+ * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 /**
  * Interface for enso simulator
  */
 const simulator = createSimulator(config.ENSO_URL, formatTrace, stateOverrides)
-
 
 const fetcher = createTransmitFetcher(protocol, settings, config, simulator)
 
@@ -74,7 +69,6 @@ fetcher.on("liquidate", data => {
     ev: "liquidateEvent",
     data: data.resp.toString(),
   })
-  
 })
 
 fetcher.on("info", data => {
@@ -103,6 +97,7 @@ $.on("transmit", async data => {
   if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
     return
   }
+
   const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
   if (usersByAssets.length == 0) return
   usersByAssets.forEach((user, index) => {

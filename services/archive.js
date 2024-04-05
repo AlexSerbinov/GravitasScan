@@ -5,21 +5,19 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { PROTOCOLS_CONFIG } = require("../lib/constants/index")
 const connectionChecker = require("../lib/utils/connections")
 
-
 /**
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
-*
-* @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
-* This file includes configurations such as database connections, service endpoints, and other operational parameters.
-* 
-* @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
-* 
-*/
-const { protocol, service, configPath  } = $.params
-
+ *
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * This file includes configurations such as database connections, service endpoints, and other operational parameters.
+ *
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ *
+ */
+const { protocol, service, configPath } = $.params
 
 /**
- * @param {number} CREATED_AT_BLOCK - The block number at which the protocol was created. 
+ * @param {number} CREATED_AT_BLOCK - The block number at which the protocol was created.
  * This is used for scanning users from the latest block back to the block when the protocol was created.
  */
 const CREATED_AT_BLOCK = PROTOCOLS_CONFIG[protocol].CREATED_AT_BLOCK
@@ -37,9 +35,14 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
  */
 configurePool([config.RPC_WSS])
 const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
-let latestArchiveBlock = await getLatestRedisBlock(protocol) || CREATED_AT_BLOCK
-console.log(`latest block stored to archive: ${latestArchiveBlock}`);
-
+let latestArchiveBlock = (await getLatestRedisBlock(protocol)) || CREATED_AT_BLOCK
+console.log(`latest block stored to archive: ${latestArchiveBlock}`)
+$.send("info", {
+  service,
+  protocol,
+  ev: "info",
+  data: `latest block stored to archive: ${latestArchiveBlock}`, // look workers/archiveServices.json start event
+})
 
 /**
  * Initialize fetcher instance
@@ -52,7 +55,6 @@ $.send("start", {
   ev: "start",
   data: { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` },
 })
-
 
 /**
  * Handle status of node
@@ -69,7 +71,6 @@ if (!nodeActive) {
     process.exit(1)
   })
 }
-
 
 /**
  * Listen for new blocks and trigger fetching.
@@ -89,7 +90,6 @@ $.on("onBlock", data => {
   }
 })
 
-
 /**
  * Handle events from fetcher
  */
@@ -100,10 +100,9 @@ fetcher.on("fetch", async data => {
     service,
     protocol,
     ev: "sendFetchedUsersEvent",
-    data: users
+    data: users,
   })
 })
-
 
 /**
  * Set global reserves data listener
@@ -112,14 +111,12 @@ $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 
-
 /**
- * Set the last archive block, called when process of scanning in particular protocol is finished 
+ * Set the last archive block, called when process of scanning in particular protocol is finished
  */
 fetcher.on("finished", data => {
   latestArchiveBlock = data.latestBlock
 })
-
 
 /**
  * Handle process exit

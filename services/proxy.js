@@ -107,7 +107,7 @@ const onDrain = async () => {
  */
 const getNonBlacklistedUsers = async protocol => {
   const allUsers = await getArchiveUsers(protocol)
-
+  
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
   console.log(`${protocol} all users count: ${usersToCheck.length}`)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)

@@ -27,33 +27,29 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
- * 
+ *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
  */
 const { protocol, formatTrace, stateOverrides, configPath, settings, service, EXECUTION_TIMEOUT } = $.params
 
-
 /**
  * Number of running instances of the service
  */
-const forks = $.forks 
-
+const forks = $.forks
 
 /**
  *  Load the configuration from Main.json
  */
 const config = require(`${process.cwd()}${configPath}`)
 
-
 /**
  * Service initial data
  */
 configurePool([config.RPC_WSS])
 
-
 /**
-* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-*/
+ * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 /**
@@ -103,6 +99,27 @@ fetcher.on("fetch", data => {
     protocol,
     ev: "info",
     data: { date, ...data },
+  })
+})
+
+/**
+ * Used for sending logs from other parths of protocol
+ */
+fetcher.on("info", data => {
+  $.send("info", {
+    service,
+    protocol,
+    ev: "info",
+    data: { data },
+  })
+})
+
+fetcher.on("errorMessage", data => {
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: "errorMessage",
+    data: data.toString(),
   })
 })
 

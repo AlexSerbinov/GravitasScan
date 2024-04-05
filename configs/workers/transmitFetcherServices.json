@@ -2,7 +2,7 @@
   "V1TransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Transmit",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -15,34 +15,34 @@
     },
     "notify": {
       "errorMessage": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "stop": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "liquidateEvent": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       },
       "liquidateCommand": {
-        "topic": "execute/liquidator/V1"
+        "topic": "execute/liquidatorForTest"
       },
       "info": {
-        "topic": "logger/liquidator/V1"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
       "service": "transmitFetcher",
       "protocol":  "V1",
       "settings": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
+        "minHfDel": "0.01",
+        "maxHfDel": "10",
+        "minHfLiq": "0.1",
+        "maxHfLiq": "10",
+        "minBorrow": "0.001",
+        "minCollateral": "0.001"
       },
       "configPath": "/configs/Main.json"
     }
@@ -50,7 +50,7 @@
   "V2TransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Transmit",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -63,34 +63,34 @@
     },
     "notify": {
       "errorMessage": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "stop": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "liquidateEvent": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       },
       "liquidateCommand": {
         "topic": "execute/liquidator/V2"
       },
       "info": {
-        "topic": "logger/liquidator/V2"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
       "service": "transmitFetcher",
       "protocol":  "V2",
       "settings": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
+        "minHfDel": "0.01",
+        "maxHfDel": "10",
+        "minHfLiq": "0.1",
+        "maxHfLiq": "10",
+        "minBorrow": "0.001",
+        "minCollateral": "0.001"
       },
       "configPath": "/configs/Main.json"
     }
@@ -98,7 +98,7 @@
   "V3TransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Transmit",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -111,34 +111,34 @@
     },
     "notify": {
       "errorMessage": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "stop": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "liquidateEvent": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       },
       "liquidateCommand": {
         "topic": "execute/liquidator/V3"
       },
       "info": {
-        "topic": "logger/liquidator/V3"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
       "service": "transmitFetcher",
       "protocol":  "V3",
       "settings": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
+        "minHfDel": "0.01",
+        "maxHfDel": "10",
+        "minHfLiq": "0.1",
+        "maxHfLiq": "10",
+        "minBorrow": "0.001",
+        "minCollateral": "0.001"
       },
       "configPath": "/configs/Main.json"
     }
@@ -146,7 +146,7 @@
   "CompoundTransmitFetcher": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Transmit",
     "listen": {
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
@@ -160,22 +160,22 @@
     "notify": {
 
       "errorMessage": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "start": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "stop": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "liquidateEvent": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       },
       "liquidateCommand": {
         "topic": "execute/liquidator/Compound"
       },
       "info": {
-        "topic": "logger/liquidator/Compound"
+        "topic": "logger/liquidator"
       }
     },
     "params": {
@@ -184,10 +184,10 @@
       "settings": {
         "minHfDel": "0.1",
         "maxHfDel": "10",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
+        "minHfLiq": "0.1",
+        "maxHfLiq": "10",
+        "minBorrow": "0.001",
+        "minCollateral": "0.001"
       },
       "configPath": "/configs/Main.json"
     }

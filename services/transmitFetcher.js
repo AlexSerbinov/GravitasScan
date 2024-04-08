@@ -4,7 +4,7 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 
 /**
- * @param {*} settings - The settings object containing the following properties:
+ * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
  *  - min_collateral_amount: The minimum collateral amount
  *  - min_borrow_amount: The minimum borrow amount
@@ -14,7 +14,7 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
  *
- * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
@@ -25,8 +25,9 @@ const { createSimulator } = require("../lib/simulator")
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
  *
+ * @param {string} enso_url - The url to enso simulator
  */
-const { protocol, configPath, settings, service, formatTrace, stateOverrides } = $.params
+const { protocol, configPath, filters, service, formatTrace, stateOverrides, enso_url } = $.params
 
 /**
  * Now we save the path for config params for each protocol in [serviceName]service.json file.
@@ -43,9 +44,9 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 /**
  * Interface for enso simulator
  */
-const simulator = createSimulator(config.ENSO_URL, formatTrace, stateOverrides)
+const simulator = createSimulator(enso_url, formatTrace, stateOverrides)
 
-const fetcher = createTransmitFetcher(protocol, settings, config, simulator)
+const fetcher = createTransmitFetcher(protocol, filters, config, simulator)
 
 $.send("start", {
   service,
@@ -53,6 +54,7 @@ $.send("start", {
   ev: "start",
   data: { date: new Date().toUTCString() },
 })
+console.log("TransmitFetcher started")
 
 fetcher.on("response", async data => {
   if (data.simulateData.length == 0) return
@@ -67,7 +69,7 @@ fetcher.on("liquidate", data => {
     service,
     protocol,
     ev: "liquidateEvent",
-    data: data.resp.toString(),
+    data: JSON.stringify(data.resp),
   })
 })
 
@@ -76,7 +78,7 @@ fetcher.on("info", data => {
     service,
     protocol,
     ev: "info",
-    data: data.toString(),
+    data: JSON.stringify(data),
   })
 })
 
@@ -85,7 +87,7 @@ fetcher.on("errorMessage", data => {
     service,
     protocol,
     ev: "errorMessage",
-    data: { error: data.toString() },
+    data: { error: JSON.stringify(data) },
   })
 })
 

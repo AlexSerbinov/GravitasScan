@@ -4,7 +4,7 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
 /**
- * @param {*} settings - The settings object containing the following properties:
+ * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
  *  - min_collateral_amount: The minimum collateral amount
  *  - min_borrow_amount: The minimum borrow amount
@@ -14,14 +14,14 @@ const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../
  *
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
  *
- * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
  *
  */
 
-const { protocol, configPath, settings, service } = $.params
+const { protocol, configPath, filters, service } = $.params
 
 // Main.json
 const config = require(`${process.cwd()}${configPath}`)
@@ -33,7 +33,7 @@ configurePool([config.RPC_WSS])
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
-const fetcher = createFetcher(protocol, settings, config)
+const fetcher = createFetcher(protocol, filters, config)
 
 $.send("start", {
   service,
@@ -50,12 +50,12 @@ fetcher.on("pushToRedis", data => {
   for (let index = 0; index < assets.length; index++) {
     addUsersToDataFetcherSet([user], protocol, assets[index])
   }
-  $.send("pushToRedis", {
-    service,
-    protocol,
-    ev: "pushToRedis",
-    data,
-  })
+  // $.send("pushToRedis", {
+  //   service,
+  //   protocol,
+  //   ev: "pushToRedis",
+  //   data,
+  // })
 })
 /**
  * When user deletes
@@ -73,8 +73,11 @@ fetcher.on("deleteFromRedis", data => {
     data,
   })
 })
+console.log("dataFetcher started")
 
 fetcher.on("liquidate", data => {
+  console.log(`send liquidate Command`)
+
   $.send("liquidateCommand", data)
   $.send("liquidateEvent", {
     service,
@@ -107,7 +110,7 @@ fetcher.on("errorMessage", data => {
     service,
     protocol,
     ev: "errorMessage",
-    data: data.toString(),
+    data: JSON.stringify(data),
   })
 })
 

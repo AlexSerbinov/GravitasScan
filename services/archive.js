@@ -81,11 +81,11 @@ $.on("onBlock", data => {
   const { number } = data
   if (!fetcher.inProgress && latestArchiveBlock && number - latestArchiveBlock > archiveBlockDiff) {
     fetcher.start(latestArchiveBlock, number)
-    $.send("start", {
+    $.send("info", {
       service,
       protocol,
-      ev: "start",
-      data: `Run fetching , For listen users connect to mqtt channel ${$.__notify.start.topic}`, // look workers/archiveServices.json start event
+      ev: "info",
+      data: `New block ${JSON.stringify(number)} recived`, // look workers/archiveServices.json start event
     })
   }
 })

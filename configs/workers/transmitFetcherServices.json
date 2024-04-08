@@ -1,5 +1,5 @@
 {
-  "V1TransmitFetcher": {
+  "DefaultSettings": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
     "namespace": "Transmit",
@@ -7,189 +7,103 @@
       "transmit": {
         "topic": "data/eth/pending/transmit_assets",
         "roundrobing": true
+      }
+    },
+    "notify": {
+      "errorMessage": {
+        "topic": "logger/liquidator"
       },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "stop": {
+        "topic": "logger/liquidator"
+      },
+      "liquidateEvent": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "filters": {
+        "minHfDel": "0.01",
+        "maxHfDel": "0.99",
+        "minHfLiq": "0.1",
+        "maxHfLiq": "1",
+        "minBorrow": "0.001",
+        "minCollateral": "0.001"
+      },
+      "service": "transmitFetcher",
+      "configPath": "/configs/Main.json",
+      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle"
+    }
+  },
+
+  "V1TransmitFetcher": {
+    "listen": {
       "onReservesData": {
         "topic": "data:reserves:V1",
         "roundrobing": false
       }
     },
     "notify": {
-      "errorMessage": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "stop": {
-        "topic": "logger/liquidator"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator"
-      },
       "liquidateCommand": {
-        "topic": "execute/liquidatorForTest"
-      },
-      "info": {
-        "topic": "logger/liquidator"
+        "topic": "execute/liquidator/V1"
       }
     },
     "params": {
-      "service": "transmitFetcher",
-      "protocol":  "V1",
-      "settings": {
-        "minHfDel": "0.01",
-        "maxHfDel": "10",
-        "minHfLiq": "0.1",
-        "maxHfLiq": "10",
-        "minBorrow": "0.001",
-        "minCollateral": "0.001"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V1"
     }
   },
+
   "V2TransmitFetcher": {
-    "forks": 1,
-    "script": "services/transmitFetcher.js",
-    "namespace": "Transmit",
     "listen": {
-      "transmit": {
-        "topic": "data/eth/pending/transmit_assets",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data:reserves:V2",
         "roundrobing": false
       }
     },
-    "notify": {
-      "errorMessage": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "stop": {
-        "topic": "logger/liquidator"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator"
-      },
-      "liquidateCommand": {
-        "topic": "execute/liquidator/V2"
-      },
-      "info": {
-        "topic": "logger/liquidator"
-      }
+    "liquidateCommand": {
+      "topic": "execute/liquidator/V2"
     },
     "params": {
-      "service": "transmitFetcher",
-      "protocol":  "V2",
-      "settings": {
-        "minHfDel": "0.01",
-        "maxHfDel": "10",
-        "minHfLiq": "0.1",
-        "maxHfLiq": "10",
-        "minBorrow": "0.001",
-        "minCollateral": "0.001"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V2"
     }
   },
+
   "V3TransmitFetcher": {
-    "forks": 1,
-    "script": "services/transmitFetcher.js",
-    "namespace": "Transmit",
     "listen": {
-      "transmit": {
-        "topic": "data/eth/pending/transmit_assets",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data:reserves:V3",
         "roundrobing": false
       }
     },
     "notify": {
-      "errorMessage": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "stop": {
-        "topic": "logger/liquidator"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator"
-      },
       "liquidateCommand": {
         "topic": "execute/liquidator/V3"
-      },
-      "info": {
-        "topic": "logger/liquidator"
       }
     },
     "params": {
-      "service": "transmitFetcher",
-      "protocol":  "V3",
-      "settings": {
-        "minHfDel": "0.01",
-        "maxHfDel": "10",
-        "minHfLiq": "0.1",
-        "maxHfLiq": "10",
-        "minBorrow": "0.001",
-        "minCollateral": "0.001"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V3"
     }
   },
+
   "CompoundTransmitFetcher": {
-    "forks": 1,
-    "script": "services/transmitFetcher.js",
-    "namespace": "Transmit",
     "listen": {
-      "transmit": {
-        "topic": "data/eth/pending/transmit_assets",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data:reserves:Compound",
         "roundrobing": false
       }
     },
     "notify": {
-
-      "errorMessage": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "stop": {
-        "topic": "logger/liquidator"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator"
-      },
       "liquidateCommand": {
         "topic": "execute/liquidator/Compound"
-      },
-      "info": {
-        "topic": "logger/liquidator"
       }
     },
     "params": {
-      "service": "transmitFetcher",
-      "protocol":  "Compound",
-      "settings": {
-        "minHfDel": "0.1",
-        "maxHfDel": "10",
-        "minHfLiq": "0.1",
-        "maxHfLiq": "10",
-        "minBorrow": "0.001",
-        "minCollateral": "0.001"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "Compound"
     }
   }
 }

@@ -29,7 +29,7 @@
         "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator/events"
+        "topic": "logger/liquidator"
       },
       "errorMessage": {
         "topic": "logger/liquidator"

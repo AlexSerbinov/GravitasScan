@@ -29,14 +29,15 @@
         "topic": "logger/liquidator"
       },
       "info": {
-        "topic": "logger/liquidator"
+        "topic": "logger/liquidator/events"
       },
       "errorMessage": {
         "topic": "logger/liquidator"
       }
     },
     "params": {
-      "WATCHER_INTERVAL": 10,
+      "mode": "http",
+      "GET_BLOCK_NUMBER_HTTP_INTERVAL": 10,
       "WATCHER_RESERVES_INTERVAL": 500,
       "configPath": "/configs/Main.json"
     }

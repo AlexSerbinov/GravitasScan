@@ -5,7 +5,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "all": "npm run archive && npm run subgraph && npm run proxy && npm run dataFetcher && npm run transmitFetcher",
+    "all": "npm run events && npm run archive && npm run subgraph && npm run proxy && npm run dataFetcher && npm run transmitFetcher",
     "transmitFetcher": "node _system/start configs/workers/transmitFetcherServices.json",
     "debugTransmitFetcher": "node _system/debug configs/workers/transmitFetcherServices.json",
     "dataFetcher": "node _system/start configs/workers/dataFetcherServices.json",

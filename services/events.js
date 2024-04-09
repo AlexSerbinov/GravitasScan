@@ -18,14 +18,20 @@ const { EventEmitter } = require("node:events")
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ *
+ * @param {string} mode - The protocol used for network communication: 'http', 'https', 'ws', or 'wss'.
+ * This defines how the service will connect to provider for getting new block
+ *
+ * @param {number} GET_BLOCK_NUMBER_HTTP_INTERVAL - The general polling interval (in milliseconds) for the provider.getBlockNumber().
+ * NOTE: used only when mode http or https
+ *
+ * @param {number} WATCHER_RESERVES_INTERVAL - The time interval (in milliseconds) for the reserves watcher to trigger.
+ * It defines how frequently the service should check or update reserves related data.
  */
-const { protocol, configPath, service, WATCHER_RESERVES_INTERVAL, WATCHER_INTERVAL } = $.params
+const { protocol, configPath, service, WATCHER_RESERVES_INTERVAL, GET_BLOCK_NUMBER_HTTP_INTERVAL, mode } = $.params
 
-/**
- * Now we save the path for config params for each protocol in [serviceName]service.json file.
- */
 const config = require(`${process.cwd()}${configPath}`)
-
+Object.assign(process.env, config)
 configurePool([config.RPC_WSS])
 
 /**
@@ -34,47 +40,54 @@ configurePool([config.RPC_WSS])
 const blockWatcher = createBlockWatcher()
   .onBlock(number => {
     $.send("sendBlock", { number, chain: "eth" })
+    sendInfoEvent("sendBlock", number, "ALL")
   })
   .onError(e => sendErrorEvent(e))
 
 /**
  * Reserves watcher
  */
-// const reservesV1 = createWatcherV1()
-//   .onReserves(data => {
-//     $.send("sendGlobalReservesV1", data)
-//   })
-//   .onError(e => sendErrorEvent(e, "V1"))
+const reservesV1 = createWatcherV1(config)
+  .onReserves(data => {
+    $.send("sendGlobalReservesV1", data)
+    sendInfoEvent("sendGlobalReserves", {}, "V1")
+  })
+  .onError(e => sendErrorEvent(e, "V1"))
 
-// const reservesV2 = createWatcherV2()
-//   .onReserves(data => {
-//     $.send("sendGlobalReservesV2", data)
-//   })
-//   .onError(e => sendErrorEvent(e, "V2"))
+const reservesV2 = createWatcherV2(config)
+  .onReserves(data => {
+    $.send("sendGlobalReservesV2", data)
+    sendInfoEvent("sendGlobalReserves", {}, "V2")
+  })
+  .onError(e => sendErrorEvent(e, "V2"))
 
-// const reservesV3 = createWatcherV3()
-//   .onReserves(data => {
-//     $.send("sendGlobalReservesV3", data)
-//   })
-//   .onError(e => sendErrorEvent(e, "V3"))
+const reservesV3 = createWatcherV3(config)
+  .onReserves(data => {
+    $.send("sendGlobalReservesV3", data)
+    sendInfoEvent("sendGlobalReserves", {}, "V3")
+  })
+  .onError(e => sendErrorEvent(e, "V3"))
 
-// const reservesCompound = createWatcherCompound()
-//   .onReserves(data => {
-//     $.send("sendGlobalReservesCompound", data)
-//   })
-//   .onError(e => sendErrorEvent(e, "Compound"))
+const reservesCompound = createWatcherCompound(config)
+  .onReserves(data => {
+    $.send("sendGlobalReservesCompound", data)
+    sendInfoEvent("sendGlobalReserves", {}, "Compound")
+  })
+  .onError(e => sendErrorEvent(e, "Compound"))
 
-// const watcherLiquity = createWatcherLiquity()
-//   .onReserves(data => {
-//     $.send("sendGlobalReservesLiquity", data)
-//   })
-//   .onError(e => sendErrorEvent(e, "Liquity"))
+const watcherLiquity = createWatcherLiquity(config)
+  .onReserves(data => {
+    $.send("sendGlobalReservesLiquity", data)
+    sendInfoEvent("sendGlobalReserves", {}, "Liquity")
+  })
+  .onError(e => sendErrorEvent(e, "Liquity"))
 
-// const watcherMakerDao = createWatcherMakerDao()
-//   .onReserves(data => {
-//     $.send("sendGlobalReservesMakerDAO_CDP", data)
-//   })
-//   .onError(e => sendErrorEvent(e, "MakerDAO_CDP"))
+const watcherMakerDao = createWatcherMakerDao(config)
+  .onReserves(data => {
+    $.send("sendGlobalReservesMakerDAO_CDP", data)
+    sendInfoEvent("sendGlobalReserves", {}, "MakerDAO_CDP")
+  })
+  .onError(e => sendErrorEvent(e, "MakerDAO_CDP"))
 
 /**
  * Reserves watcher trigger
@@ -84,7 +97,7 @@ const reservesTrigger = new EventEmitter()
 /**
  * Start app
  */
-const start = async () => {
+const start = async mode => {
   /**
    * Emit 'update' event to reserves trigger by interval
    */
@@ -95,25 +108,25 @@ const start = async () => {
   /**
    * Start block watcher
    */
-  blockWatcher.start(WATCHER_INTERVAL)
+  blockWatcher.start(mode, GET_BLOCK_NUMBER_HTTP_INTERVAL)
 
   /**
    * Start reserves watchers
    */
-//   reservesV1.start(reservesTrigger)
-//   reservesV2.start(reservesTrigger)
-//   reservesV3.start(reservesTrigger)
-//   reservesCompound.start(reservesTrigger)
-//   watcherLiquity.start(reservesTrigger)
-//   watcherMakerDao.start(reservesTrigger)
-//   $.send("start", {
-//     service,
-//     protocol: "All",
-//     ev: "start",
-//     data: "All event watchers started",
-//   })
+  reservesV1.start(reservesTrigger)
+  reservesV2.start(reservesTrigger)
+  reservesV3.start(reservesTrigger)
+  reservesCompound.start(reservesTrigger)
+  watcherLiquity.start(reservesTrigger)
+  watcherMakerDao.start(reservesTrigger)
+  $.send("start", {
+    service,
+    protocol: "All",
+    ev: "start",
+    data: "All event watchers started",
+  })
 }
-start()
+start(mode)
 
 /**
  * Stop app
@@ -161,6 +174,15 @@ const sendErrorEvent = (error, protocol) => {
     protocol,
     ev: "errorMessage",
     data: error,
+  })
+}
+
+const sendInfoEvent = (ev, info, protocol) => {
+  $.send("info", {
+    service,
+    protocol,
+    ev,
+    data: info,
   })
 }
 // Handle uncaught exceptions

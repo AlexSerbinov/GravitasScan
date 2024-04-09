@@ -15,7 +15,9 @@
     "proxy": "node _system/start configs/workers/proxyServices.json",
     "debugProxy": "node _system/debug configs/workers/proxyServices.json",
     "archive": "node _system/start configs/workers/archiveServices.json",
-    "debugArchive": "node _system/debug configs/workers/archiveServices.json"
+    "debugArchive": "node _system/debug configs/workers/archiveServices.json",
+    "events": "node _system/start configs/workers/eventsServices.json",
+    "debugEvents": "node _system/debug configs/workers/eventsServices.json"
   },
   "dependencies": {
     "@cybridge/providers-pool": "^1.0.0",

@@ -25,7 +25,7 @@
     "params": {
       "service": "subgraph",
       "EXECUTION_TIMEOUT": 10000,
-      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.13.7:7778/api/v1/simulate-bundle",
       "configPath": "/configs/Main.json",
       "filters": {
         "mode": "fetch",

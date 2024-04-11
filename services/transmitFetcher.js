@@ -54,7 +54,7 @@ $.send("start", {
   ev: "start",
   data: { date: new Date().toUTCString() },
 })
-console.log("TransmitFetcher started")
+console.log(`TransmitFetcher started ${protocol}`)
 
 fetcher.on("response", async data => {
   if (data.simulateData.length == 0) return
@@ -73,11 +73,13 @@ fetcher.on("liquidate", data => {
   })
 })
 
-fetcher.on("info", data => {
+fetcher.on("info", (data, ev = "info") => {
+  console.log(`info event called, event = ${ev}`)
+  console.log(data)
   $.send("info", {
     service,
     protocol,
-    ev: "info",
+    ev,
     data: JSON.stringify(data),
   })
 })
@@ -96,6 +98,7 @@ $.on(`onReservesData`, data => {
 })
 
 $.on("transmit", async data => {
+  fetcher.emit("info", data, "input transmit")
   if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
     return
   }

@@ -36,7 +36,7 @@
       }
     },
     "params": {
-      "mode": "http",
+      "mode": "ws",
       "GET_BLOCK_NUMBER_HTTP_INTERVAL": 10,
       "WATCHER_RESERVES_INTERVAL": 500,
       "configPath": "/configs/Main.json"

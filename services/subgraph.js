@@ -69,6 +69,7 @@ const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users)
 
 const { mode } = filters
 
+console.log("subgraph started")
 $.send("start", {
   service,
   protocol,

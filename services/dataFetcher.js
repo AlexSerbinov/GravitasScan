@@ -35,6 +35,7 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 const fetcher = createFetcher(protocol, filters, config)
 
+console.log(`dataFetcher started ${protocol}`)
 $.send("start", {
   service,
   protocol,
@@ -73,7 +74,6 @@ fetcher.on("deleteFromRedis", data => {
     data,
   })
 })
-console.log("dataFetcher started")
 
 fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`)
@@ -126,6 +126,13 @@ $.on(`onReservesData`, data => {
  * Main entry point. Listen user's adddresess
  */
 $.on("searcherExecute", async data => {
+  console.log(`dataFetcher ${protocol} Recieved input address ${data}`)
+  $.send("info", {
+    service,
+    protocol,
+    ev: "Recieved input address",
+    data,
+  })
   fetcher.fetchData(data)
 })
 

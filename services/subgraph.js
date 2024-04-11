@@ -97,23 +97,20 @@ queue.on("drain", async () => {
  */
 fetcher.on("fetch", data => {
   $.send("sendDataToDataFetcher", data)
-  $.send("info", {
-    service,
-    protocol,
-    ev: "info",
-    data: JSON.stringify(data),
-  })
+  fetcher.emit("info", data, "sendUserToDataFetcher")
 })
 
 /**
  * Used for sending logs from other parths of protocol
  */
-fetcher.on("info", data => {
+fetcher.on("info", (data, ev = "info") => {
+  console.log(`\nevent = ${ev}`)
+  console.log(data, `\n`)
   $.send("info", {
     service,
     protocol,
-    ev: "info",
-    data: { data },
+    ev,
+    data: JSON.stringify(data),
   })
 })
 

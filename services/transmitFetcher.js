@@ -74,7 +74,7 @@ fetcher.on("liquidate", data => {
 })
 
 fetcher.on("info", (data, ev = "info") => {
-  console.log(`info event called, event = ${ev}`)
+  console.log(`\n event = ${ev}`)
   console.log(data)
   $.send("info", {
     service,

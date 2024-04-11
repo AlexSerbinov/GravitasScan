@@ -25,7 +25,7 @@
     "params": {
       "service": "subgraph",
       "EXECUTION_TIMEOUT": 10000,
-      "enso_url": "http://10.10.13.7:7778/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle",
       "configPath": "/configs/Main.json",
       "filters": {
         "mode": "fetch",
@@ -47,7 +47,7 @@
   },
 
   "V1Subgraph": {
-    "forks": 2,
+    "forks": 9,
 
     "listen": {
       "onReservesData": {
@@ -69,7 +69,8 @@
     },
     "params": {
       "protocol": "V1",
-      "selector": "0xc3096a60"
+      "selector": "0xc3096a60",
+      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle"
     }
   },
 
@@ -98,7 +99,8 @@
     },
     "params": {
       "protocol": "V2",
-      "selector": "0xfa428ceb"
+      "selector": "0xfa428ceb",
+      "enso_url": "http://10.10.100.82:9991/api/v1/simulate-bundle"
     }
   },
 
@@ -127,7 +129,8 @@
     },
     "params": {
       "protocol": "V3",
-      "selector": "0xcac570cc"
+      "selector": "0xcac570cc",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
     }
   },
 
@@ -156,7 +159,8 @@
     },
     "params": {
       "protocol": "Compound",
-      "selector": "0x1a2214af"
+      "selector": "0x1a2214af",
+      "enso_url": "http://10.10.100.82:9993/api/v1/simulate-bundle"
     }
   }
 }

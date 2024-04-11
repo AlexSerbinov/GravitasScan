@@ -76,8 +76,7 @@ fetcher.on("deleteFromRedis", data => {
 })
 
 fetcher.on("liquidate", data => {
-  console.log(`send liquidate Command`)
-
+  console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
   $.send("liquidateEvent", {
     service,

@@ -16,7 +16,7 @@
     },
     "params": {
       "service": "proxy",
-      "batchSize": 35,
+      "batchSize": 30,
       "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
       "configPath": "/configs/Main.json"
     }

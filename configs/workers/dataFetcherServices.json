@@ -17,12 +17,12 @@
     "params": {
       "service": "dataFetcher",
       "filters": {
-        "minHfDel": "0.01",
-        "maxHfDel": "10",
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
         "minHfLiq": "0.9",
         "maxHfLiq": "1",
-        "minBorrow": "0.01",
-        "minCollateral": "0.01"
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
       },
       "configPath": "/configs/Main.json"
     }

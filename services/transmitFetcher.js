@@ -19,7 +19,7 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
  *
- * @param {Function} formatTrace - A function used in the simulator to format the trace log. It displays every
+ * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
  * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
  *
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
@@ -27,7 +27,7 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} enso_url - The url to enso simulator
  */
-const { protocol, configPath, filters, service, formatTrace, stateOverrides, enso_url } = $.params
+const { protocol, configPath, filters, service, formattedTrace, stateOverrides, enso_url } = $.params
 
 /**
  * Now we save the path for config params for each protocol in [serviceName]service.json file.
@@ -44,7 +44,7 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 /**
  * Interface for enso simulator
  */
-const simulator = createSimulator(enso_url, formatTrace, stateOverrides)
+const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 const fetcher = createTransmitFetcher(protocol, filters, config, simulator)
 

@@ -51,11 +51,11 @@ fetcher.on("pushToRedis", data => {
   for (let index = 0; index < assets.length; index++) {
     addUsersToDataFetcherSet([user], protocol, assets[index])
   }
-  // $.send("pushToRedis", {
+  // $.send("info", {
   //   service,
   //   protocol,
   //   ev: "pushToRedis",
-  //   data,
+  //   data: JSON.stringify(data),
   // })
 })
 /**
@@ -78,19 +78,14 @@ fetcher.on("deleteFromRedis", data => {
 fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
-  $.send("liquidateEvent", {
-    service,
-    protocol,
-    ev: "liquidateEvent",
-    data,
-  })
+ fetcher.emit("info", data, "liquidate_event")
 })
 
-fetcher.on("info", data => {
+fetcher.on("info", (data, ev = "info") => {
   $.send("info", {
     service,
     protocol,
-    ev: "info",
+    ev,
     data,
   })
 })
@@ -125,12 +120,12 @@ $.on(`onReservesData`, data => {
  * Main entry point. Listen user's adddresess
  */
 $.on("searcherExecute", async data => {
-  console.log(`dataFetcher ${protocol} Recieved input address ${data}`)
+  console.log(`dataFetcher ${protocol} Recieved input address ${JSON.stringify(data)}`)
   $.send("info", {
     service,
     protocol,
     ev: "Recieved input address",
-    data,
+    data: JSON.stringify(data)
   })
   fetcher.fetchData(data)
 })

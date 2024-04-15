@@ -146,7 +146,7 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
           service,
           protocol,
           ev: "info",
-          data: `Sending the last batch number ${batchNumber} of users ${new Date().toISOString()}`,
+          data: `Sent all ${batchNumber} batches. Each batch contain ${batchSize} of users`,
         })
       }
       $.send("sendUsersToSubgraph", batch)

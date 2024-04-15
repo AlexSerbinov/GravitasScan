@@ -113,6 +113,11 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 
 # Updates
 
+## 2024-04-12
+
+1. Duplicated console.log's to mqqt logger 
+
+
 ## 2024-04-09
 
 1. The events service was transitioned to a new architecture.

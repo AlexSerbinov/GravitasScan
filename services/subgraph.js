@@ -1,4 +1,3 @@
-const redis = require("../lib/redis/redis/lib/redis")
 const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
 const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
@@ -22,7 +21,7 @@ const { createSimulator } = require("../lib/simulator")
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {Function} formatTrace - A function used in the simulator to format the trace log. It displays every
+ * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
  * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
  *
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
@@ -33,7 +32,7 @@ const { createSimulator } = require("../lib/simulator")
  * @param {string} enso_url - The url to enso simulator
  */
 
-const { protocol, formatTrace, stateOverrides, configPath, filters, service, enso_url, EXECUTION_TIMEOUT } = $.params
+const { protocol, formattedTrace, stateOverrides, configPath, filters, service, enso_url, EXECUTION_TIMEOUT } = $.params
 
 /**
  * Number of running instances of the service
@@ -51,14 +50,9 @@ const config = require(`${process.cwd()}${configPath}`)
 configurePool([config.RPC_WSS])
 
 /**
- * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
- */
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
-
-/**
  * Interface for enso simulator
  */
-const simulator = createSimulator(enso_url, formatTrace, stateOverrides)
+const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 /**
  * Create fetcher and queue

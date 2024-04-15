@@ -36,7 +36,7 @@
         "update_time": 5
       },
       "privateKey": "",
-      "formatTrace": false,
+      "formattedTrace": false,
       "simulationContract": "0xF50024f746D94F144a79003D00000000e380A500",
       "stateOverrides": {
         "0xF50024f746D94F144a79003D00000000e380A500": {
@@ -47,7 +47,7 @@
   },
 
   "V1Subgraph": {
-    "forks": 9,
+    "forks": 3,
 
     "listen": {
       "onReservesData": {
@@ -75,7 +75,7 @@
   },
 
   "V2Subgraph": {
-    "forks": 16,
+    "forks": 1,
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V2",
@@ -105,7 +105,7 @@
   },
 
   "V3Subgraph": {
-    "forks": 9,
+    "forks": 6,
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V3",
@@ -135,7 +135,7 @@
   },
 
   "CompoundSubgraph": {
-    "forks": 5,
+    "forks": 2,
     "listen": {
       "handleUser": {
         "topic": "event/users/proxy/Compound",

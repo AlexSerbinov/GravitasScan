@@ -64,7 +64,7 @@ if (!nodeActive) {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: `archive terminating`,
   })
   setImmediate(() => {
@@ -143,7 +143,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 })

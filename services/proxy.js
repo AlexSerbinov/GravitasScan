@@ -67,9 +67,7 @@ $.on("drain", data => {
       const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
       console.log(`Received expected number of drain events: ${data.forks}`)
       drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
-      console.log(
-        `PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`
-      )
+      console.log(`PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`)
       console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
       $.send("info", {
         service,
@@ -184,7 +182,7 @@ const setupDrainTimer = () => {
         $.send("errorMessage", {
           service,
           protocol,
-          ev: "errorMessage",
+          ev: "error_message",
           data: error,
         })
 
@@ -202,7 +200,7 @@ fetcher.on("error", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data,
   })
 })
@@ -232,7 +230,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service: "archive",
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 })

@@ -1,6 +1,6 @@
 {
   "mq": {
-    "host": "mqtt://10.10.100.87",
+    "host": "mqtt://10.10.100.85",
     "topics": {
       "stats": "__system/stats",
       "command": "__system/commands"

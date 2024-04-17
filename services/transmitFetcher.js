@@ -68,7 +68,7 @@ fetcher.on("liquidate", data => {
   $.send("liquidateEvent", {
     service,
     protocol,
-    ev: "liquidateEvent",
+    ev: "liquidate_event",
     data: JSON.stringify(data.resp),
   })
 })
@@ -88,7 +88,7 @@ fetcher.on("errorMessage", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: { error: JSON.stringify(data) },
   })
 })
@@ -135,7 +135,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 })

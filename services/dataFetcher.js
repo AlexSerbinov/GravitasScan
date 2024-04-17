@@ -78,7 +78,7 @@ fetcher.on("deleteFromRedis", data => {
 fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
- fetcher.emit("info", data, "liquidate_event")
+  fetcher.emit("info", data, "liquidate_event")
 })
 
 fetcher.on("info", (data, ev = "info") => {
@@ -103,7 +103,7 @@ fetcher.on("errorMessage", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: JSON.stringify(data),
   })
 })
@@ -125,7 +125,7 @@ $.on("searcherExecute", async data => {
     service,
     protocol,
     ev: "Recieved input address",
-    data: JSON.stringify(data)
+    data: JSON.stringify(data),
   })
   fetcher.fetchData(data)
 })
@@ -154,7 +154,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service: "subgraph",
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 })

@@ -1,14 +1,7 @@
 const { configurePool } = require("../lib/ethers/pool")
 
 const { createBlockWatcher } = require("../lib/services/events/watcher-block")
-const {
-  createWatcherV1,
-  createWatcherV2,
-  createWatcherV3,
-  createWatcherCompound,
-  createWatcherLiquity,
-  createWatcherMakerDao,
-} = require("../lib/services/events/reserves")
+const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves")
 const { EventEmitter } = require("node:events")
 
 /**
@@ -172,7 +165,7 @@ const sendErrorEvent = (error, protocol) => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 }
@@ -190,7 +183,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol: "All",
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 })

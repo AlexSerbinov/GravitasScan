@@ -65,12 +65,7 @@ fetcher.on("response", async data => {
 
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data.resp)
-  $.send("liquidateEvent", {
-    service,
-    protocol,
-    ev: "liquidate_event",
-    data: JSON.stringify(data.resp),
-  })
+  fetcher.emit("info", data.resp, "liquidate_event")
 })
 
 fetcher.on("info", (data, ev = "info") => {
@@ -98,16 +93,21 @@ $.on(`onReservesData`, data => {
 })
 
 $.on("transmit", async data => {
-  fetcher.emit("info", data, "input transmit")
-  if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
-    return
-  }
+  try {
+    fetcher.emit("info", data, "input_transmit")
+    if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
+      return
+    }
 
-  const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
-  if (usersByAssets.length == 0) return
-  usersByAssets.forEach((user, index) => {
-    fetcher.request(user, data, index + 1 == usersByAssets.length)
-  })
+    const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
+    if (usersByAssets.length == 0) return
+    fetcher.emit("info", `Simulations started`, `simulations_started`)
+    usersByAssets.forEach((user, index) => {
+      fetcher.request(user, data, index + 1 == usersByAssets.length)
+    })
+  } catch (error) {
+    fetcher.emit("errorMessage", error)
+  }
 })
 
 /**

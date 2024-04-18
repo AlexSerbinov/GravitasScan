@@ -101,7 +101,7 @@ const start = async mode => {
   /**
    * Start block watcher
    */
-  blockWatcher.start(mode, GET_BLOCK_NUMBER_HTTP_INTERVAL)
+  blockWatcher.start(GET_BLOCK_NUMBER_HTTP_INTERVAL)
 
   /**
    * Start reserves watchers

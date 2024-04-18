@@ -81,7 +81,7 @@ queue.on("drain", async () => {
   $.send("info", {
     service,
     protocol,
-    ev: "info",
+    ev: "send_drain_event",
     data: `send drain event ${date}`,
   })
 })
@@ -91,7 +91,7 @@ queue.on("drain", async () => {
  */
 fetcher.on("fetch", data => {
   $.send("sendDataToDataFetcher", data)
-  fetcher.emit("info", data, "sendUserToDataFetcher")
+  fetcher.emit("info", data, "send_user_to_data_fetcher")
 })
 
 /**

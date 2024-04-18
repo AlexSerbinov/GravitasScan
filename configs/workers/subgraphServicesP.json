@@ -25,7 +25,7 @@
     "params": {
       "service": "subgraph",
       "EXECUTION_TIMEOUT": 10000,
-      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle",
       "configPath": "/configs/Main.json",
       "filters": {
         "mode": "fetch",
@@ -36,7 +36,7 @@
         "update_time": 5
       },
       "privateKey": "",
-      "formattedTrace": false,
+      "formatTrace": false,
       "simulationContract": "0xF50024f746D94F144a79003D00000000e380A500",
       "stateOverrides": {
         "0xF50024f746D94F144a79003D00000000e380A500": {
@@ -47,7 +47,7 @@
   },
 
   "V1Subgraph": {
-    "forks": 1,
+    "forks": 9,
 
     "listen": {
       "onReservesData": {
@@ -70,12 +70,12 @@
     "params": {
       "protocol": "V1",
       "selector": "0xc3096a60",
-      "enso_url": "http://10.10.100.82:9991/api/v1/simulate-bundle"
+      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle"
     }
   },
 
   "V2Subgraph": {
-    "forks": 1,
+    "forks": 16,
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V2",
@@ -99,13 +99,13 @@
     },
     "params": {
       "protocol": "V2",
-      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle",
-      "selector": "0xfa428ceb"
+      "selector": "0xfa428ceb",
+      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle"
     }
   },
 
   "V3Subgraph": {
-    "forks": 1,
+    "forks": 9,
     "listen": {
       "onReservesData": {
         "topic": "data:reserves:V3",
@@ -129,13 +129,13 @@
     },
     "params": {
       "protocol": "V3",
-      "enso_url": "http://10.10.100.82:9993/api/v1/simulate-bundle",
-      "selector": "0xcac570cc"
+      "selector": "0xcac570cc",
+      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle"
     }
   },
 
   "CompoundSubgraph": {
-    "forks": 1,
+    "forks": 5,
     "listen": {
       "handleUser": {
         "topic": "event/users/proxy/Compound",
@@ -159,8 +159,8 @@
     },
     "params": {
       "protocol": "Compound",
-      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle",
-      "selector": "0x1a2214af"
+      "selector": "0x1a2214af",
+      "enso_url": "http://10.10.13.7:7700/api/v1/simulate-bundle"
     }
   }
 }

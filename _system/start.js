@@ -14,11 +14,11 @@ const sleep = ms => {
 }
 
 /**
- * Run service
- * @param {string} name - service name
- * @param {string} params - service params
- * @param {string} mode - can be: 'debug'
- * @returns
+ * Run service with PM2
+ * @param {string} name - Service name to start
+ * @param {string} namespace - Namespace for the service
+ * @param {string} params - JSON stringified parameters for the service
+  * @returns
  */
 const runService = async (name, namespace, params) => {
   console.log(`Starting: ${name} | ${namespace}`)
@@ -28,8 +28,29 @@ const runService = async (name, namespace, params) => {
 }
 
 /**
- * System entry point
- * @param {string} confP - path to config file
+ * Merge default settings with specific service settings
+ * @param {Object} defaults - Default settings object
+ * @param {Object} specific - Specific settings for a protocol
+ * @returns {Object} Merged settings object
+ */
+const mergeSettings = (defaults, specific) => {
+  const merge = (target, source) => {
+    Object.keys(source).forEach(key => {
+      if (source[key] && typeof source[key] === "object") {
+        target[key] = merge(target[key] || {}, source[key])
+      } else {
+        target[key] = source[key]
+      }
+    })
+    return target
+  }
+
+  return merge(defaults, specific)
+}
+
+/**
+ * Main function to start the cluster with given configuration
+ * @param {string} confP - Path to config file
  */
 const start = async confP => {
   const config = getConfig()
@@ -37,27 +58,27 @@ const start = async confP => {
   console.log("*** STARTING CLUSTER WITH CONFIG *** \n")
   console.dir(config)
   console.log("\n************************************\n")
+
   const cwd = process.cwd()
   const conf = require(`${cwd}/${confP}`)
-  const confs = []
+  const defaultSettings = conf.DefaultSettings || {}
+  
+  for (const serviceName in conf) {
+    if (serviceName === "DefaultSettings") continue
 
-  for (const name in conf) {
-    const p = conf[name]
-    Object.assign(p, { name })
-    confs.push(p)
-  }
+    const specificSettings = conf[serviceName]
+    const combinedSettings = mergeSettings(defaultSettings, specificSettings)
+    combinedSettings.name = serviceName  
 
-  for await (const p of confs) {
-    const { namespace, name } = p
-    const params = JSON.stringify(p)
-    await runService(name, namespace, params)
+    const { namespace } = combinedSettings
+    const params = JSON.stringify(combinedSettings)
+    await runService(serviceName, namespace, params)
   }
 
   console.log(`\n*** WATCH SYSTEM STATE THROUGH MQTT ***\n`)
   console.log(`mqtt sub -h '${config.mq.host.split("//")[1]}' -t '${config.mq.topics.stats}'`)
   console.log("\n************************************\n")
 }
-
 /**
  * Services config json path
  */

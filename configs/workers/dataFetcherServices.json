@@ -1,8 +1,34 @@
 {
-  "V1DataFetcher": {
+  "DefaultSettings": {
     "forks": 1,
     "script": "services/dataFetcher.js",
-    "namespace": "LiqRegistry",
+    "namespace": "DataFetcher",
+    "notify": {
+      "errorMessage": {
+        "topic": "logger/liquidator"
+      },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "service": "dataFetcher",
+      "filters": {
+        "minHfDel": "0.2",
+        "maxHfDel": "1.1",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.1",
+        "minCollateral": "0.1"
+      },
+      "configPath": "/configs/Main.json"
+    }
+  },
+
+  "V1DataFetcher": {
     "listen": {
       "searcherExecute": {
         "topic": "execute/dataFetcher/V1",
@@ -14,52 +40,16 @@
       }
     },
     "notify": {
-      "pushToRedis": {
-        "topic": "logger/liquidator/V1"
-      },
-      "deleteFromRedis": {
-        "topic": "logger/liquidator/V1"
-      },
-      "reject": {
-        "topic": "logger/liquidator/V1"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/V1"
-      },
-      "start": {
-        "topic": "logger/liquidator/V1"
-      },
-      "stop": {
-        "topic": "logger/liquidator/V1"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator/V1"
-      },
       "liquidateCommand": {
         "topic": "execute/liquidator/V1"
-      },
-      "info": {
-        "topic": "logger/liquidator/V1"
       }
     },
     "params": {
-      "service": "dataFetcher",
-      "protocol":  "V1",
-      "settings": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V1"
     }
   },
+
   "V2DataFetcher": {
-    "forks": 1,
-    "script": "services/dataFetcher.js",
-    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
         "topic": "execute/dataFetcher/V2",
@@ -71,52 +61,16 @@
       }
     },
     "notify": {
-      "pushToRedis": {
-        "topic": "logger/liquidator/V2"
-      },
-      "deleteFromRedis": {
-        "topic": "logger/liquidator/V2"
-      },
-      "reject": {
-        "topic": "logger/liquidator/V2"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/V2"
-      },
-      "start": {
-        "topic": "logger/liquidator/V2"
-      },
-      "stop": {
-        "topic": "logger/liquidator/V2"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator/V2"
-      },
       "liquidateCommand": {
         "topic": "execute/liquidator/V2"
-      },
-      "info": {
-        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
-      "service": "dataFetcher",
-      "protocol":  "V2",
-      "settings": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V2"
     }
   },
+
   "V3DataFetcher": {
-    "forks": 1,
-    "script": "services/dataFetcher.js",
-    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
         "topic": "execute/dataFetcher/V3",
@@ -128,52 +82,16 @@
       }
     },
     "notify": {
-      "pushToRedis": {
-        "topic": "logger/liquidator/V3"
-      },
-      "deleteFromRedis": {
-        "topic": "logger/liquidator/V3"
-      },
-      "reject": {
-        "topic": "logger/liquidator/V3"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/V3"
-      },
-      "start": {
-        "topic": "logger/liquidator/V3"
-      },
-      "stop": {
-        "topic": "logger/liquidator/V3"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator/V3"
-      },
       "liquidateCommand": {
         "topic": "execute/liquidator/V3"
-      },
-      "info": {
-        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
-      "service": "dataFetcher",
-      "protocol":  "V3",
-      "settings": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V3"
     }
   },
+
   "CompoundDataFetcher": {
-    "forks": 1,
-    "script": "services/dataFetcher.js",
-    "namespace": "LiqRegistry",
     "listen": {
       "searcherExecute": {
         "topic": "execute/dataFetcher/Compound",
@@ -185,46 +103,12 @@
       }
     },
     "notify": {
-      "pushToRedis": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "deleteFromRedis": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "reject": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "start": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "stop": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "liquidateEvent": {
-        "topic": "logger/liquidator/Compound"
-      },
       "liquidateCommand": {
         "topic": "execute/liquidator/Compound"
-      },
-      "info": {
-        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {
-      "service": "dataFetcher",
-      "protocol":  "Compound",
-      "settings": {
-        "minHfDel": "0.01",
-        "maxHfDel": "1",
-        "minHfLiq": "0.9",
-        "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "Compound"
     }
   }
 }

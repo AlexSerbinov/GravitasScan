@@ -1,0 +1,45 @@
+{
+  "Events": {
+    "forks": 1,
+    "script": "services/events.js",
+    "namespace": "Events",
+    "notify": {
+      "sendBlock": {
+        "topic": "data:block"
+      },
+      "sendGlobalReservesV1": {
+        "topic": "data:reserves:V1"
+      },
+      "sendGlobalReservesV2": {
+        "topic": "data:reserves:V2"
+      },
+      "sendGlobalReservesV3": {
+        "topic": "data:reserves:V3"
+      },
+      "sendGlobalReservesCompound": {
+        "topic": "data:reserves:Compound"
+      },
+      "sendGlobalReservesLiquity": {
+        "topic": "data:reserves:Liquity"
+      },
+      "sendGlobalReservesMakerDAO_CDP": {
+        "topic": "data:reserves:MakerDAO_CDP"
+      },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      },
+      "errorMessage": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "mode": "http",
+      "GET_BLOCK_NUMBER_HTTP_INTERVAL": 10,
+      "WATCHER_RESERVES_INTERVAL": 500,
+      "configPath": "/configs/Main.json"
+    }
+  }
+}

@@ -1,4 +1,3 @@
-const redis = require("../lib/redis/redis/lib/redis")
 const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
 const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
@@ -9,7 +8,7 @@ const { createSimulator } = require("../lib/simulator")
  * preventing the system from being stalled by tasks that take too long to complete.
  * Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
  *
- * @param {*} settings - The settings object containing the following properties:
+ * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
  *  - min_collateral_amount: The minimum collateral amount
  *  - min_borrow_amount: The minimum borrow amount
@@ -19,57 +18,52 @@ const { createSimulator } = require("../lib/simulator")
  *
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
  *
- * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
+ * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {Function} formatTrace - A function used in the simulator to format the trace log. It displays every
+ * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
  * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
  *
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
- * 
+ *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ *
+ * @param {string} enso_url - The url to enso simulator
  */
-const { protocol, formatTrace, stateOverrides, configPath, settings, service, EXECUTION_TIMEOUT } = $.params
 
+const { protocol, formattedTrace, stateOverrides, configPath, filters, service, enso_url, EXECUTION_TIMEOUT } = $.params
 
 /**
  * Number of running instances of the service
  */
-const forks = $.forks 
-
+const forks = $.forks
 
 /**
  *  Load the configuration from Main.json
  */
 const config = require(`${process.cwd()}${configPath}`)
 
-
 /**
  * Service initial data
  */
 configurePool([config.RPC_WSS])
 
-
-/**
-* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-*/
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
-
 /**
  * Interface for enso simulator
  */
-const simulator = createSimulator(config.ENSO_URL, formatTrace, stateOverrides)
+const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 /**
  * Create fetcher and queue
  */
 
-const fetcher = getFetcher($.params, settings, config, simulator)
+const fetcher = getFetcher($.params, filters, config, simulator)
 const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
 
-const { mode } = settings
+const { mode } = filters
 
+console.log("subgraph started")
 $.send("start", {
   service,
   protocol,
@@ -97,13 +91,34 @@ queue.on("drain", async () => {
  */
 fetcher.on("fetch", data => {
   $.send("sendDataToDataFetcher", data)
-  const date = new Date().toUTCString()
+  fetcher.emit("info", data, "sendUserToDataFetcher")
+})
+
+/**
+ * Used for sending logs from other parths of protocol
+ */
+fetcher.on("info", (data, ev = "info") => {
+  console.log(`\nevent = ${ev}`)
+  console.log(data, `\n`)
   $.send("info", {
     service,
     protocol,
-    ev: "info",
-    data: { date, ...data },
+    ev,
+    data: JSON.stringify(data),
   })
+})
+
+fetcher.on("errorMessage", (error, ev = "errorMessage") => {
+  if (error && error.message) {
+    const errorData = { message: error.message }
+
+    $.send("errorMessage", {
+      service,
+      protocol,
+      ev,
+      error: errorData,
+    })
+  }
 })
 
 fetcher.once("fetcherReady", () => {
@@ -153,11 +168,11 @@ $.onExit(async () => {
 })
 
 // Handle uncaught exceptions
-process.on("uncaughtException", error => {
+process.on("uncaughtException", (error, ev) => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev,
     data: error,
   })
 })

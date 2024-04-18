@@ -2,7 +2,6 @@ const EventEmitter = require("node:events")
 const redis = require("../lib/redis/redis/lib/redis")
 const { getArchiveData } = require("../lib/redis/index")
 
-
 /**
  * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
  * sent to the subgraph in each operation, affecting the throughput and efficiency of the data processing.
@@ -17,21 +16,21 @@ const { getArchiveData } = require("../lib/redis/index")
  * @param {number} SEND_WITHOUT_DRAIN_TIMEOUT - The maximum amount of time (in milliseconds) to wait before forcibly sending a
  * batch of users if no 'drain' event is received. This timeout ensures that data continues to flow, preventing potential
  * deadlocks or stalls in data processing.
- * 
+ *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
- * 
+ *
  */
 const { batchSize, protocol, configPath, service, SEND_WITHOUT_DRAIN_TIMEOUT } = $.params
 const config = require(`${process.cwd()}${configPath}`)
 const fetcher = new EventEmitter()
 
-
 /**
-* We prepare redis here because only in this place we have config params. And we don't want to use global variables.
-*/
+ * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
+console.log(`proxy started`)
 $.send("start", {
   service,
   protocol,
@@ -41,7 +40,6 @@ $.send("start", {
 
 let isSending = false // Flag to indicate if sending is in progress
 
-
 /**
  * Handles the 'sendUsersToSubgraph' event by fetching non-blacklisted users
  * and sending them to the subgraph in batches.
@@ -50,7 +48,6 @@ fetcher.on("sendUsersToSubgraph", async () => {
   const nonBlacklistedUsers = await getNonBlacklistedUsers(protocol)
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
 })
-
 
 /**
  * Listener for 'drain' events to manage sending users to the subgraph.
@@ -70,9 +67,7 @@ $.on("drain", data => {
       const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
       console.log(`Received expected number of drain events: ${data.forks}`)
       drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
-      console.log(
-        `PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`
-      )
+      console.log(`PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`)
       console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
       $.send("info", {
         service,
@@ -87,7 +82,6 @@ $.on("drain", data => {
   }
 })
 
-
 /**
  * Triggered upon receiving a drain event, this function fetches non-blacklisted users
  * and sends them to the subgraph in batches.
@@ -98,7 +92,6 @@ const onDrain = async () => {
   await sendUsersToSubraphInBatches(nonBlacklistedUsers)
   isSending = false
 }
-
 
 /**
  * Retrieves non-blacklisted users for the given protocol.
@@ -112,14 +105,11 @@ const getNonBlacklistedUsers = async protocol => {
   console.log(`${protocol} all users count: ${usersToCheck.length}`)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
 
-  const nonBlacklistedUsers = allUsers
-    .filter((_, index) => checkBlacklistUsers[index] === 0)
-    .map(userInfo => userInfo.user.toLowerCase())  // Mapping to get only user addresses and Convert users to lowercase after filtering
+  const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0).map(userInfo => userInfo.user.toLowerCase()) // Mapping to get only user addresses and Convert users to lowercase after filtering
   console.log(`${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`)
 
   return nonBlacklistedUsers
 }
-
 
 /**
  * Fetches users from the archive or subgraph for the given protocol.
@@ -132,7 +122,6 @@ const getArchiveUsers = async protocol => {
   const users = Object.values(allUsers).flat()
   return users
 }
-
 
 /**
  * Sends the non-blacklisted users to the subgraph in batches.
@@ -155,18 +144,17 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
           service,
           protocol,
           ev: "info",
-          data: `Sending the last batch number ${batchNumber} of users ${new Date().toISOString()}`,
+          data: `Sent all ${batchNumber} batches. Each batch contain ${batchSize} of users`,
         })
       }
       $.send("sendUsersToSubgraph", batch)
-      
+
       batchesSent++
       // Check if all batches have been sent
       if (batchesSent === totalBatches) isSending = false // Reset the sending flag after the last iteration
     })
   }
 }
-
 
 /**
  * Sets up a timer to trigger the drain event manually if not received within a specified timeout.
@@ -194,7 +182,7 @@ const setupDrainTimer = () => {
         $.send("errorMessage", {
           service,
           protocol,
-          ev: "errorMessage",
+          ev: "error_message",
           data: error,
         })
 
@@ -202,7 +190,6 @@ const setupDrainTimer = () => {
       })
   }, SEND_WITHOUT_DRAIN_TIMEOUT)
 }
-
 
 // Initiate the main functionality immediately upon script start
 onDrain()
@@ -213,11 +200,10 @@ fetcher.on("error", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data,
   })
 })
-
 
 /**
  * Handle process exit
@@ -239,13 +225,12 @@ $.onExit(async () => {
   })
 })
 
-
 // Handle uncaught exceptions
 process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service: "archive",
     protocol,
-    ev: "errorMessage",
+    ev: "error_message",
     data: error,
   })
 })

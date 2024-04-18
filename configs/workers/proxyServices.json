@@ -1,130 +1,88 @@
 {
-  "V1Proxy": {
+  "DefaultSettings": {
     "forks": 1,
     "script": "services/proxy.js",
-    "namespace": "LiqRegistry",
+    "namespace": "Proxy",
+    "notify": {
+      "errorMessage": {
+        "topic": "logger/liquidator"
+      },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "service": "proxy",
+      "batchSize": 30,
+      "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V1Proxy": {
     "listen": {
       "drain": {
         "topic": "event/drain/subgraph/V1",
-        "roundrobing": false
+        "roundrobin": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
         "topic": "event/users/proxy/V1"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/V1"
-      },
-      "start": {
-        "topic": "logger/liquidator/V1"
-      },
-      "info": {
-        "topic": "logger/liquidator/V1"
       }
     },
     "params": {
-      "service": "proxy",
-      "protocol":  "V1",
-      "batchSize": 20,
-      "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
-      "configPath": "/configs/Main.json"
+      "protocol": "V1"
     }
   },
   "V2Proxy": {
-    "forks": 1,
-    "script": "services/proxy.js",
-    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
         "topic": "event/drain/subgraph/V2",
-        "roundrobing": false
+        "roundrobin": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
         "topic": "event/users/proxy/V2"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/V2"
-      },
-      "start": {
-        "topic": "logger/liquidator/V2"
-      },
-      "info": {
-        "topic": "logger/liquidator/V2"
       }
     },
     "params": {
-      "service": "proxy",
-      "protocol":  "V2",
-      "batchSize": 20,
-      "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
-      "configPath": "/configs/Main.json"
+      "protocol": "V2"
     }
   },
   "V3Proxy": {
-    "forks": 1,
-    "script": "services/proxy.js",
-    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
         "topic": "event/drain/subgraph/V3",
-        "roundrobing": false
+        "roundrobin": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
         "topic": "event/users/proxy/V3"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/V3"
-      },
-      "start": {
-        "topic": "logger/liquidator/V3"
-      },
-      "info": {
-        "topic": "logger/liquidator/V3"
       }
     },
     "params": {
-      "service": "proxy",
-      "protocol":  "V3",
-      "batchSize": 20,
-      "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
-      "configPath": "/configs/Main.json"
+      "protocol": "V3"
     }
   },
   "CompoundProxy": {
-    "forks": 1,
-    "script": "services/proxy.js",
-    "namespace": "LiqRegistry",
     "listen": {
       "drain": {
         "topic": "event/drain/subgraph/Compound",
-        "roundrobing": false
+        "roundrobin": false
       }
     },
     "notify": {
       "sendUsersToSubgraph": {
         "topic": "event/users/proxy/Compound"
-      },
-      "errorMessage": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "start": {
-        "topic": "logger/liquidator/Compound"
-      },
-      "info": {
-        "topic": "logger/liquidator/Compound"
       }
     },
     "params": {
-      "service": "proxy",
-      "protocol":  "Compound",
-      "batchSize": 20,
-      "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000,
-      "configPath": "/configs/Main.json"
+      "protocol": "Compound"
     }
   }
 }

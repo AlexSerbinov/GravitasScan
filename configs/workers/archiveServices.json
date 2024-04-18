@@ -1,126 +1,55 @@
 {
+  "DefaultSettings": {
+    "forks": 1,
+    "script": "services/archive.js",
+    "namespace": "Archive",
+    "listen": {
+      "onBlock": {
+        "topic": "data:block",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "sendFetchedUsersEvent": {
+        "topic": "logger/liquidator"
+      },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "service": "archive",
+      "settings": {
+        "mode": "node"
+      },
+      "configPath": "/configs/Main.json"
+    }
+  },
+
   "V1Archive": {
-    "forks": 1,
-    "script": "services/archive.js",
-    "namespace": "Archive",
-    "listen": {
-      "onBlock": {
-        "topic": "data:block",
-        "roundrobing": false
-      }
-    },
-
-    "notify": {
-      "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "info": {
-        "topic": "logger/liquidator"
-      }
-    },
     "params": {
-      "service": "archive",
-      "protocol": "V1",
-      "settings": {
-        "mode": "node"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V1"
     }
   },
+
   "V2Archive": {
-    "forks": 1,
-    "script": "services/archive.js",
-    "namespace": "Archive",
-    "listen": {
-      "onBlock": {
-        "topic": "data:block",
-        "roundrobing": false
-      }
-    },
-
-    "notify": {
-      "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "info": {
-        "topic": "logger/liquidator"
-      }
-    },
     "params": {
-      "service": "archive",
-      "protocol": "V2",
-      "settings": {
-        "mode": "node"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V2"
     }
   },
+
   "V3Archive": {
-    "forks": 1,
-    "script": "services/archive.js",
-    "namespace": "Archive",
-    "listen": {
-      "onBlock": {
-        "topic": "data:block",
-        "roundrobing": false
-      }
-    },
-
-    "notify": {
-      "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "info": {
-        "topic": "logger/liquidator"
-      }
-    },
     "params": {
-      "service": "archive",
-      "protocol": "V3",
-      "settings": {
-        "mode": "node"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "V3"
     }
   },
+  
   "CompoundArchive": {
-    "forks": 1,
-    "script": "services/archive.js",
-    "namespace": "Archive",
-    "listen": {
-      "onBlock": {
-        "topic": "data:block",
-        "roundrobing": false
-      }
-    },
-
-    "notify": {
-      "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator"
-      },
-      "start": {
-        "topic": "logger/liquidator"
-      },
-      "info": {
-        "topic": "logger/liquidator"
-      }
-    },
     "params": {
-      "service": "archive",
-      "protocol": "Compound",
-      "settings": {
-        "mode": "node"
-      },
-      "configPath": "/configs/Main.json"
+      "protocol": "Compound"
     }
   }
 }

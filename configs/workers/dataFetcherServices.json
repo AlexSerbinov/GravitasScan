@@ -12,6 +12,9 @@
       },
       "info": {
         "topic": "logger/liquidator"
+      },
+      "stop": {
+        "topic": "logger/liquidator"
       }
     },
     "params": {

@@ -96,10 +96,10 @@ $.on("onBlock", data => {
 fetcher.on("fetch", async data => {
   const { users, toBlock } = data
   await saveUsersToArchive(protocol, toBlock, users, "archive_users")
-  $.send("sendFetchedUsersEvent", {
+  $.send("info", {
     service,
     protocol,
-    ev: "sendFetchedUsersEvent",
+    ev: "users_saved_to_archive",
     data: users,
   })
 })

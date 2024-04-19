@@ -10,13 +10,13 @@
       }
     },
     "notify": {
-      "sendFetchedUsersEvent": {
-        "topic": "logger/liquidator"
-      },
       "start": {
         "topic": "logger/liquidator"
       },
       "info": {
+        "topic": "logger/liquidator"
+      },
+      "stop": {
         "topic": "logger/liquidator"
       }
     },
@@ -46,7 +46,7 @@
       "protocol": "V3"
     }
   },
-  
+
   "CompoundArchive": {
     "params": {
       "protocol": "Compound"

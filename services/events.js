@@ -187,3 +187,23 @@ process.on("uncaughtException", error => {
     data: error,
   })
 })
+
+/**
+ * Handle process exit
+ */
+$.onExit(async () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const { pid } = process
+      console.log(pid, "Ready to exit.")
+      const date = new Date().toUTCString()
+      $.send("stop", {
+        service,
+        protocol,
+        ev: "stop",
+        data: date,
+      })
+      resolve()
+    }, 100) // Small timeout to ensure async cleanup completes
+  })
+})

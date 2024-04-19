@@ -10,6 +10,9 @@
       "start": {
         "topic": "logger/liquidator"
       },
+      "stop": {
+        "topic": "logger/liquidator"
+      },
       "info": {
         "topic": "logger/liquidator"
       }

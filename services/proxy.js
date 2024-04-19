@@ -35,7 +35,7 @@ $.send("start", {
   service,
   protocol,
   ev: "start",
-  data: `proxy started`,
+  data: `proxy started. batchSize = ${batchSize}, SEND_WITHOUT_DRAIN_TIMEOUT = ${SEND_WITHOUT_DRAIN_TIMEOUT}`,
 })
 
 let isSending = false // Flag to indicate if sending is in progress
@@ -72,8 +72,8 @@ $.on("drain", data => {
       $.send("info", {
         service,
         protocol,
-        ev: "info",
-        data: `${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`,
+        ev: "received_drain_event",
+        data: `${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain`,
       })
 
       clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
@@ -143,8 +143,8 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
         $.send("info", {
           service,
           protocol,
-          ev: "info",
-          data: `Sent all ${batchNumber} batches. Each batch contain ${batchSize} of users`,
+          ev: "all_batches_sent",
+          data: `Sent all ${batchNumber} batches. Each batch contain ${batchSize} users`,
         })
       }
       $.send("sendUsersToSubgraph", batch)
@@ -169,7 +169,7 @@ const setupDrainTimer = () => {
       $.send("info", {
         service,
         protocol,
-        ev: "info",
+        ev: "bad_begavior",
         data: `Bad behavior. manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event. It can be when subgraf not send "drain" event. Or subgraph do not have enough time for user processing`,
       })
 

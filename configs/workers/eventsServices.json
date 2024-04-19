@@ -31,6 +31,9 @@
       "info": {
         "topic": "logger/liquidator"
       },
+      "stop": {
+        "topic": "logger/liquidator"
+      },
       "errorMessage": {
         "topic": "logger/liquidator"
       }

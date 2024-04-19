@@ -124,7 +124,7 @@ $.on("searcherExecute", async data => {
   $.send("info", {
     service,
     protocol,
-    ev: "Recieved input address",
+    ev: "recieved_input_address",
     data: JSON.stringify(data),
   })
   fetcher.fetchData(data)

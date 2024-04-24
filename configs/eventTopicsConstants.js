@@ -1,0 +1,16 @@
+module.exports = {
+  USER_SKIPPED_BY_LOW_HF: "user_skipped_by_low_hf",
+  USER_SKIPPED_BY_HIGH_HF: "user_skipped_by_high_hf",
+  USER_SKIPPED_BY_LOW_COLLATERAL: "user_skipped_by_collateral",
+  USER_SKIPPED_BY_LOW_BORROW: "user_skipped_by_low_borrow",
+  USER_ACCEPTED: "user_accepted",
+  USER_SKIPPED_BY_FILTERS: "user_skipped_by_filters",
+  SIMULATION_PASSED_WITH_STATUS_SUCCESS: "simulation_passed_with_status_success",
+  SIMULATION_PASSED_WITH_STATUS_FAILED: "simulation_passed_with_status_failed",
+  SIMULATION_RESULT: "simulation_result",
+  SIMULATION_ERROR: "simulation_error",
+  PROVIDER_ERROR: "provider_error",
+  USERS_FROM_REDIS_TO_SIMULATION_BY_ASSEST: "users_from_redis_to_simulation_by_asset",
+  USERS_TO_EXECUTE: "users_to_execute",
+  NO_USERS_TO_EXECUTE: "no_users_to_execute",
+}

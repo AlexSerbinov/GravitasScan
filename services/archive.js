@@ -5,6 +5,8 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { PROTOCOLS_CONFIG } = require("../lib/constants/index")
 const connectionChecker = require("../lib/utils/connections")
 
+const { START, STOP } = require("../configs/eventTopicsConstants")
+
 /**
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
  *
@@ -52,7 +54,7 @@ const fetcher = getFetcher(protocol)
 $.send("start", {
   service,
   protocol,
-  ev: "start",
+  ev: START,
   data: { message: `${protocol} archive starting at ${new Date().toLocaleString("en-US")}` },
 })
 
@@ -64,7 +66,7 @@ if (!nodeActive) {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: `archive terminating`,
   })
   setImmediate(() => {
@@ -130,7 +132,7 @@ $.onExit(async () => {
       $.send("stop", {
         service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
@@ -143,7 +145,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 })

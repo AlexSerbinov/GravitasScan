@@ -3,6 +3,7 @@ const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 
+const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR_MESSAGE } = require("../configs/eventTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -51,7 +52,7 @@ const fetcher = createTransmitFetcher(protocol, filters, config, simulator)
 $.send("start", {
   service,
   protocol,
-  ev: "start",
+  ev: START,
   data: { date: new Date().toUTCString() },
 })
 console.log(`TransmitFetcher started ${protocol}`)
@@ -65,7 +66,7 @@ fetcher.on("response", async data => {
 
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data.resp)
-  fetcher.emit("info", data.resp, "liquidate_event")
+  fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
 })
 
 fetcher.on("info", (data, ev = "info") => {
@@ -83,7 +84,7 @@ fetcher.on("errorMessage", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: { error: JSON.stringify(data) },
   })
 })
@@ -94,14 +95,14 @@ $.on(`onReservesData`, data => {
 
 $.on("transmit", async data => {
   try {
-    fetcher.emit("info", data, "input_transmit")
+    fetcher.emit("info", data, INPUT_TRANSMIT)
     if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
       return
     }
 
     const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
     if (usersByAssets.length == 0) return
-    fetcher.emit("info", `Simulations started`, `simulations_started`)
+    fetcher.emit("info", `Simulations started`, SIMULATIONS_STARTED)
     usersByAssets.forEach((user, index) => {
       fetcher.request(user, data, index + 1 == usersByAssets.length)
     })
@@ -122,7 +123,7 @@ $.onExit(async () => {
       $.send("stop", {
         service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
@@ -135,7 +136,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 })

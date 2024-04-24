@@ -2,6 +2,9 @@ const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
 const { createQueue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
+
+const { ERROR_MESSAGE, START, STOP, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT } = require("../configs/eventTopicsConstants")
+
 /**
  * @param {number} EXECUTION_TIMEOUT - The time limit for each task's execution within the queue. (ms),
  * If a task exceeds this duration, the queue will attempt to move on to the next task,
@@ -67,7 +70,7 @@ console.log("subgraph started")
 $.send("start", {
   service,
   protocol,
-  ev: "start",
+  ev: START,
   data: `${protocol} subgraph started in ${mode} mode`,
 })
 
@@ -81,7 +84,7 @@ queue.on("drain", async () => {
   $.send("info", {
     service,
     protocol,
-    ev: "send_drain_event",
+    ev: SEND_DRAIN_EVENT,
     data: `send drain event ${date}`,
   })
 })
@@ -91,7 +94,7 @@ queue.on("drain", async () => {
  */
 fetcher.on("fetch", data => {
   $.send("sendDataToDataFetcher", data)
-  fetcher.emit("info", data, "send_user_to_data_fetcher")
+  fetcher.emit("info", data, SEND_USER_TO_DATA_FETCHER)
 })
 
 /**
@@ -125,7 +128,7 @@ fetcher.once("fetcherReady", () => {
   $.send("start", {
     service,
     protocol,
-    ev: "start",
+    ev: START,
     data: `All data ready, user processing has started`,
   })
 })
@@ -159,7 +162,7 @@ $.onExit(async () => {
       $.send("stop", {
         service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()

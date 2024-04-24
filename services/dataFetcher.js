@@ -3,6 +3,8 @@ const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
+const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/eventTopicsConstants")
+
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -39,7 +41,7 @@ console.log(`dataFetcher started ${protocol}`)
 $.send("start", {
   service,
   protocol,
-  ev: "start",
+  ev: START,
   data: { date: new Date().toUTCString() },
 })
 
@@ -78,7 +80,7 @@ fetcher.on("deleteFromRedis", data => {
 fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
-  fetcher.emit("info", data, "liquidate_event")
+  fetcher.emit("info", data, LIQUIDATE_EVENT)
 })
 
 fetcher.on("info", (data, ev = "info") => {
@@ -103,7 +105,7 @@ fetcher.on("errorMessage", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: JSON.stringify(data),
   })
 })
@@ -124,7 +126,7 @@ $.on("searcherExecute", async data => {
   $.send("info", {
     service,
     protocol,
-    ev: "recieved_input_address",
+    ev: RECIEVED_INPUT_ADDRESS,
     data: JSON.stringify(data),
   })
   fetcher.fetchData(data)
@@ -139,9 +141,9 @@ $.onExit(async () => {
       const { pid } = process
       const date = new Date().toUTCString()
       $.send("stop", {
-        service: "subgraph",
+        service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
@@ -152,9 +154,9 @@ $.onExit(async () => {
 // Handle uncaught exceptions
 process.on("uncaughtException", error => {
   $.send("errorMessage", {
-    service: "subgraph",
+    service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 })

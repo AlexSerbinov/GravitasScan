@@ -1,4 +1,6 @@
 module.exports = {
+  START: "start",
+  STOP: "stop",
   USER_SKIPPED_BY_LOW_HF: "user_skipped_by_low_hf",
   USER_SKIPPED_BY_HIGH_HF: "user_skipped_by_high_hf",
   USER_SKIPPED_BY_LOW_COLLATERAL: "user_skipped_by_collateral",
@@ -13,4 +15,11 @@ module.exports = {
   USERS_FROM_REDIS_TO_SIMULATION_BY_ASSEST: "users_from_redis_to_simulation_by_asset",
   USERS_TO_EXECUTE: "users_to_execute",
   NO_USERS_TO_EXECUTE: "no_users_to_execute",
+  LIQUIDATE_EVENT: "liquidate_event",
+  SIMULATIONS_STARTED: "simulations_started",
+  INPUT_TRANSMIT: "input_transmit",
+  ERROR_MESSAGE: "error_message",
+  RECIEVED_INPUT_ADDRESS: "recieved_input_address",
+  SEND_USER_TO_DATA_FETCHER: "send_user_to_data_fetcher",
+  SEND_DRAIN_EVENT: "send_drain_event",
 }

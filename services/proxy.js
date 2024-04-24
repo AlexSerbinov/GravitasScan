@@ -2,6 +2,8 @@ const EventEmitter = require("node:events")
 const redis = require("../lib/redis/redis/lib/redis")
 const { getArchiveData } = require("../lib/redis/index")
 
+const { ERROR_MESSAGE, START, STOP } = require("../configs/eventTopicsConstants")
+
 /**
  * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
  * sent to the subgraph in each operation, affecting the throughput and efficiency of the data processing.
@@ -34,7 +36,7 @@ console.log(`proxy started`)
 $.send("start", {
   service,
   protocol,
-  ev: "start",
+  ev: START,
   data: `proxy started. batchSize = ${batchSize}, SEND_WITHOUT_DRAIN_TIMEOUT = ${SEND_WITHOUT_DRAIN_TIMEOUT}`,
 })
 
@@ -182,7 +184,7 @@ const setupDrainTimer = () => {
         $.send("errorMessage", {
           service,
           protocol,
-          ev: "error_message",
+          ev: ERROR_MESSAGE,
           data: error,
         })
 
@@ -200,7 +202,7 @@ fetcher.on("error", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data,
   })
 })
@@ -217,7 +219,7 @@ $.onExit(async () => {
       $.send("stop", {
         service: "archive",
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
@@ -230,7 +232,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service: "archive",
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 })

@@ -3,6 +3,7 @@ const { configurePool } = require("../lib/ethers/pool")
 const { createBlockWatcher } = require("../lib/services/events/watcher-block")
 const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves")
 const { EventEmitter } = require("node:events")
+const { ERROR_MESSAGE, START, STOP } = require("../configs/eventTopicsConstants")
 
 /**
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
@@ -115,7 +116,7 @@ const start = async mode => {
   $.send("start", {
     service,
     protocol: "All",
-    ev: "start",
+    ev: START,
     data: "All event watchers started",
   })
 }
@@ -133,7 +134,7 @@ const stop = () => {
   $.send("stop", {
     service,
     protocol: "All",
-    ev: "stop",
+    ev: STOP,
     data: "All event watchers stopped",
   })
 }
@@ -153,7 +154,7 @@ $.onExit(async () => {
       $.send("stop", {
         service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
@@ -165,7 +166,7 @@ const sendErrorEvent = (error, protocol) => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 }
@@ -183,7 +184,7 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol: "All",
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 })
@@ -200,7 +201,7 @@ $.onExit(async () => {
       $.send("stop", {
         service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()

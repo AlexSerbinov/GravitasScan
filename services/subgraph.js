@@ -1,5 +1,5 @@
 const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
-const { createQueue } = require("../lib/helpers/queue/lib")
+const { Queue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
 
@@ -62,7 +62,7 @@ const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
  */
 
 const fetcher = getFetcher($.params, filters, config, simulator)
-const queue = createQueue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
+const queue = new Queue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
 
 const { mode } = filters
 
@@ -78,6 +78,17 @@ $.send("start", {
  * Create fetcher
  * Proccess all users and then drain queues inbetween proxy<>subgraph and assign some sleep time
  */
+
+queue.on("errorMessage", (error, ev = "errorMessage") => {
+  console.log(`received error message from queue | eventName: ${ev} | Error:`, JSON.stringify(error))
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev,
+    error,
+  })
+})
+
 queue.on("drain", async () => {
   $.send("drain", { forks })
   const date = new Date().toUTCString()

@@ -5,25 +5,25 @@
     "namespace": "Events",
     "notify": {
       "sendBlock": {
-        "topic": "data:block"
+        "topic": "data/block"
       },
       "sendGlobalReservesV1": {
-        "topic": "data:reserves:V1"
+        "topic": "data/reserves/V1"
       },
       "sendGlobalReservesV2": {
-        "topic": "data:reserves:V2"
+        "topic": "data/reserves/V2"
       },
       "sendGlobalReservesV3": {
-        "topic": "data:reserves:V3"
+        "topic": "data/reserves/V3"
       },
       "sendGlobalReservesCompound": {
-        "topic": "data:reserves:Compound"
+        "topic": "data/reserves/Compound"
       },
       "sendGlobalReservesLiquity": {
-        "topic": "data:reserves:Liquity"
+        "topic": "data/reserves/Liquity"
       },
       "sendGlobalReservesMakerDAO_CDP": {
-        "topic": "data:reserves:MakerDAO_CDP"
+        "topic": "data/reserves/MakerDAO_CDP"
       },
       "start": {
         "topic": "logger/liquidator"

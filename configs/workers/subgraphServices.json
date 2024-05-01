@@ -29,10 +29,10 @@
       "configPath": "/configs/Main.json",
       "filters": {
         "mode": "fetch",
-        "min_collateral_amount": 0.2,
-        "min_borrow_amount": 0.4,
-        "min_health_factor": 0.79,
-        "max_health_factor": 1.1,
+        "min_collateral_amount": 0.1,
+        "min_borrow_amount": 0.1,
+        "min_health_factor": 0.8,
+        "max_health_factor": 1.07,
         "update_time": 5
       },
       "privateKey": "",
@@ -51,7 +51,7 @@
 
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:V1",
+        "topic": "data/reserves/V1",
         "roundrobing": false
       },
       "handleUser": {
@@ -78,7 +78,7 @@
     "forks": 3,
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:V2",
+        "topic": "data/reserves/V2",
         "roundrobing": false
       },
       "handleUser": {
@@ -108,7 +108,7 @@
     "forks": 2,
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:V3",
+        "topic": "data/reserves/V3",
         "roundrobing": false
       },
       "handleUser": {
@@ -129,7 +129,7 @@
     },
     "params": {
       "protocol": "V3",
-      "enso_url": "http://10.10.100.82:9993/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle",
       "selector": "0xcac570cc"
     }
   },
@@ -142,7 +142,7 @@
         "roundrobing": true
       },
       "onReservesData": {
-        "topic": "data:reserves:Compound",
+        "topic": "data/reserves/Compound",
         "roundrobing": true
       }
     },

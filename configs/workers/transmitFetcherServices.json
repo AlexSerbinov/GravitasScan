@@ -37,7 +37,7 @@
       },
       "service": "transmitFetcher",
       "configPath": "/configs/Main.json",
-      "enso_url": "http://10.10.100.82:9993/api/v1/simulate-bundle"
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
     }
   },
 

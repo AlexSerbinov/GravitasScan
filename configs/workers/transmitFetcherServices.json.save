@@ -1,8 +1,14 @@
 {
   "DefaultSettings": {
     "forks": 1,
-    "script": "services/dataFetcher.js",
-    "namespace": "DataFetcher",
+    "script": "services/transmitFetcher.js",
+    "namespace": "Transmit",
+    "listen": {
+      "transmit": {
+        "topic": "dev-data/eth/pending/transmit_assets",
+        "roundrobing": true
+      }
+    },
     "notify": {
       "errorMessage": {
         "topic": "logger/liquidator"
@@ -10,33 +16,33 @@
       "start": {
         "topic": "logger/liquidator"
       },
-      "info": {
+      "stop": {
         "topic": "logger/liquidator"
       },
-      "stop": {
+      "liquidateEvent": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
         "topic": "logger/liquidator"
       }
     },
     "params": {
-      "service": "dataFetcher",
       "filters": {
         "minHfDel": "0.2",
         "maxHfDel": "1.1",
         "minHfLiq": "0.9",
-        "maxHfLiq": "1",
+        "maxHfLiq": "1.1",
         "minBorrow": "0.1",
         "minCollateral": "0.1"
       },
-      "configPath": "/configs/Main.json"
+      "service": "transmitFetcher",
+      "configPath": "/configs/Main.json",
+      "enso_url": "http://10.10.100.82:9993/api/v1/simulate-bundle"
     }
   },
 
-  "V1DataFetcher": {
+  "V1TransmitFetcher": {
     "listen": {
-      "searcherExecute": {
-        "topic": "execute/dataFetcher/V1",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data/reserves/V1",
         "roundrobing": false
@@ -52,33 +58,23 @@
     }
   },
 
-  "V2DataFetcher": {
+  "V2TransmitFetcher": {
     "listen": {
-      "searcherExecute": {
-        "topic": "execute/dataFetcher/V2",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data/reserves/V2",
         "roundrobing": false
       }
     },
-    "notify": {
-      "liquidateCommand": {
-        "topic": "execute/liquidator/V2"
-      }
+    "liquidateCommand": {
+      "topic": "execute/liquidator/V2"
     },
     "params": {
       "protocol": "V2"
     }
   },
 
-  "V3DataFetcher": {
+  "V3TransmitFetcher": {
     "listen": {
-      "searcherExecute": {
-        "topic": "execute/dataFetcher/V3",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data/reserves/V3",
         "roundrobing": false
@@ -94,12 +90,8 @@
     }
   },
 
-  "CompoundDataFetcher": {
+  "CompoundTransmitFetcher": {
     "listen": {
-      "searcherExecute": {
-        "topic": "execute/dataFetcher/Compound",
-        "roundrobing": true
-      },
       "onReservesData": {
         "topic": "data/reserves/Compound",
         "roundrobing": false

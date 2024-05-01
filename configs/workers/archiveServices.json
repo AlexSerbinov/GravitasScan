@@ -5,7 +5,7 @@
     "namespace": "Archive",
     "listen": {
       "onBlock": {
-        "topic": "data:block",
+        "topic": "data/block",
         "roundrobing": false
       }
     },

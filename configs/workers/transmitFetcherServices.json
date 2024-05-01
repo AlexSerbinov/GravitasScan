@@ -44,7 +44,7 @@
   "V1TransmitFetcher": {
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:V1",
+        "topic": "data/reserves/V1",
         "roundrobing": false
       }
     },
@@ -61,7 +61,7 @@
   "V2TransmitFetcher": {
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:V2",
+        "topic": "data/reserves/V2",
         "roundrobing": false
       }
     },
@@ -76,7 +76,7 @@
   "V3TransmitFetcher": {
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:V3",
+        "topic": "data/reserves/V3",
         "roundrobing": false
       }
     },
@@ -93,7 +93,7 @@
   "CompoundTransmitFetcher": {
     "listen": {
       "onReservesData": {
-        "topic": "data:reserves:Compound",
+        "topic": "data/reserves/Compound",
         "roundrobing": false
       }
     },

@@ -43,29 +43,30 @@ const blockWatcher = createBlockWatcher()
  */
 const reservesV1 = createWatcherV1(config)
   .onReserves(data => {
+    console.log(`======================= sendGlobalReservesV1 ===================`)
     $.send("sendGlobalReservesV1", data)
-    sendInfoEvent("sendGlobalReserves", {}, "V1")
+    sendInfoEvent("sendGlobalReserves", data, "V1")
   })
   .onError(e => sendErrorEvent(e, "V1"))
 
 const reservesV2 = createWatcherV2(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV2", data)
-    sendInfoEvent("sendGlobalReserves", {}, "V2")
+    sendInfoEvent("sendGlobalReserves", data, "V2")
   })
   .onError(e => sendErrorEvent(e, "V2"))
 
 const reservesV3 = createWatcherV3(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV3", data)
-    sendInfoEvent("sendGlobalReserves", {}, "V3")
+    sendInfoEvent("sendGlobalReserves", data, "V3")
   })
   .onError(e => sendErrorEvent(e, "V3"))
 
 const reservesCompound = createWatcherCompound(config)
   .onReserves(data => {
     $.send("sendGlobalReservesCompound", data)
-    sendInfoEvent("sendGlobalReserves", {}, "Compound")
+    sendInfoEvent("sendGlobalReserves", data, "Compound")
   })
   .onError(e => sendErrorEvent(e, "Compound"))
 
@@ -172,6 +173,15 @@ const sendErrorEvent = (error, protocol) => {
 }
 
 const sendInfoEvent = (ev, info, protocol) => {
+  console.log(`1----=-----=----=----=----=----=----- info event -----=-----=-----=-----=-- 1`)
+  console.log({
+    service,
+    protocol,
+    ev,
+    data: info,
+  })
+  console.log(`2----=-----=----=----=----=----=----- info event -----=-----=-----=-----=-- 2`)
+
   $.send("info", {
     service,
     protocol,

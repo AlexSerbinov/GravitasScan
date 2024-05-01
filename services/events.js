@@ -43,7 +43,6 @@ const blockWatcher = createBlockWatcher()
  */
 const reservesV1 = createWatcherV1(config)
   .onReserves(data => {
-    console.log(`======================= sendGlobalReservesV1 ===================`)
     $.send("sendGlobalReservesV1", data)
     sendInfoEvent("sendGlobalReserves", data, "V1")
   })
@@ -73,14 +72,14 @@ const reservesCompound = createWatcherCompound(config)
 const watcherLiquity = createWatcherLiquity(config)
   .onReserves(data => {
     $.send("sendGlobalReservesLiquity", data)
-    sendInfoEvent("sendGlobalReserves", {}, "Liquity")
+    sendInfoEvent("sendGlobalReserves", data, "Liquity")
   })
   .onError(e => sendErrorEvent(e, "Liquity"))
 
 const watcherMakerDao = createWatcherMakerDao(config)
   .onReserves(data => {
     $.send("sendGlobalReservesMakerDAO_CDP", data)
-    sendInfoEvent("sendGlobalReserves", {}, "MakerDAO_CDP")
+    sendInfoEvent("sendGlobalReserves", data, "MakerDAO_CDP")
   })
   .onError(e => sendErrorEvent(e, "MakerDAO_CDP"))
 
@@ -103,7 +102,7 @@ const start = async mode => {
   /**
    * Start block watcher
    */
-  blockWatcher.start(GET_BLOCK_NUMBER_HTTP_INTERVAL)
+  blockWatcher.start(mode, GET_BLOCK_NUMBER_HTTP_INTERVAL)
 
   /**
    * Start reserves watchers
@@ -173,14 +172,12 @@ const sendErrorEvent = (error, protocol) => {
 }
 
 const sendInfoEvent = (ev, info, protocol) => {
-  console.log(`1----=-----=----=----=----=----=----- info event -----=-----=-----=-----=-- 1`)
   console.log({
     service,
     protocol,
     ev,
-    data: info,
+    date: new Date().toLocaleString('uk-UA'),
   })
-  console.log(`2----=-----=----=----=----=----=----- info event -----=-----=-----=-----=-- 2`)
 
   $.send("info", {
     service,

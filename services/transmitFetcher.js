@@ -58,9 +58,21 @@ $.send("start", {
 console.log(`TransmitFetcher started ${protocol}`)
 
 fetcher.on("response", async data => {
+  // console.log(`1----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 1`)
+  // console.log(data)
+  // console.log(`2----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 2`)
+
   if (data.simulateData.length == 0) return
   let userToLiquidate = fetcher.userToExecute(data)
+  // console.log(`======================= userToExecute ===================`)
+  // console.log(`1----=-----=----=----=----=----=----- userToLiquidate -----=-----=-----=-----=-- 1`)
+  // console.log(userToLiquidate);
+  // console.log(`2----=-----=----=----=----=----=----- userToLiquidate -----=-----=-----=-----=-- 2`)
+  
+  
   if (userToLiquidate.length == 0) return
+  // console.log(`======================= executeUser ===================`)
+  
   userToLiquidate.forEach(userData => fetcher.executeUser(userData.user, userData.hf, data.rawTransmit))
 })
 
@@ -94,12 +106,17 @@ $.on(`onReservesData`, data => {
 })
 
 $.on("transmit", async data => {
+  console.log()
+
   try {
-    fetcher.emit("info", data, INPUT_TRANSMIT)
     if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
+      console.log(`protocol not included in transmit data`)
+
       return
     }
+    console.log(`protocol included in transmit data`)
 
+    fetcher.emit("info", data, INPUT_TRANSMIT)
     const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
     if (usersByAssets.length == 0) return
     fetcher.emit("info", `Simulations started`, SIMULATIONS_STARTED)

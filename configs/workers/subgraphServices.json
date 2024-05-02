@@ -30,7 +30,7 @@
       "filters": {
         "mode": "fetch",
         "min_collateral_amount": 0.1,
-        "min_borrow_amount": 0.1,
+        "min_borrow_amount": 0.2,
         "min_health_factor": 0.8,
         "max_health_factor": 1.07,
         "update_time": 5

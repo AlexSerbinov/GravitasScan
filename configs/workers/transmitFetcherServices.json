@@ -31,7 +31,7 @@
         "minHfDel": "0.2",
         "maxHfDel": "1.1",
         "minHfLiq": "0.9",
-        "maxHfLiq": "1.1",
+        "maxHfLiq": "1",
         "minBorrow": "0.1",
         "minCollateral": "0.1"
       },

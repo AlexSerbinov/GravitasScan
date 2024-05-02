@@ -35,6 +35,7 @@
         "minBorrow": "0.1",
         "minCollateral": "0.1"
       },
+      "maxNumberOfUsersToSimulation": "30",
       "service": "transmitFetcher",
       "configPath": "/configs/Main.json",
       "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
@@ -50,7 +51,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "execute/liquidator/V1"
+        "topic": "dev-execute/liquidator/V1"
       }
     },
     "params": {
@@ -66,7 +67,7 @@
       }
     },
     "liquidateCommand": {
-      "topic": "execute/liquidator/V2"
+      "topic": "dev-execute/liquidator/V2"
     },
     "params": {
       "protocol": "V2"
@@ -82,7 +83,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "execute/liquidator/V3"
+        "topic": "dev-execute/liquidator/V3"
       }
     },
     "params": {
@@ -99,7 +100,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "execute/liquidator/Compound"
+        "topic": "dev-execute/liquidator/Compound"
       }
     },
     "params": {

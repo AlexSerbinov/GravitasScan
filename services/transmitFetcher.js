@@ -27,8 +27,12 @@ const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
  *
  * @param {string} enso_url - The url to enso simulator
+ *
+ * @param {number} maxNumberOfUsersToSimulation - The maximum number of users for parallel simulation.
+ * Be careful when using numbers greater than 40 due to gas limit restrictions.
+ * Try to find the optimal number, the more the better until an error occurs.
  */
-const { protocol, configPath, filters, service, formattedTrace, stateOverrides, enso_url } = $.params
+const { protocol, configPath, filters, service, formattedTrace, maxNumberOfUsersToSimulation, stateOverrides, enso_url } = $.params
 
 /**
  * Now we save the path for config params for each protocol in [serviceName]service.json file.
@@ -47,7 +51,7 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
  */
 const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
-const fetcher = createTransmitFetcher(protocol, filters, config, simulator)
+const fetcher = createTransmitFetcher(protocol, filters, maxNumberOfUsersToSimulation, config, simulator)
 
 $.send("start", {
   service,
@@ -57,33 +61,14 @@ $.send("start", {
 })
 console.log(`TransmitFetcher started ${protocol}`)
 
-fetcher.on("response", async data => {
-  // console.log(`1----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 1`)
-  // console.log(data)
-  // console.log(`2----=-----=----=----=----=----=----- data -----=-----=-----=-----=-- 2`)
-
-  if (data.simulateData.length == 0) return
-  let userToLiquidate = fetcher.userToExecute(data)
-  // console.log(`======================= userToExecute ===================`)
-  // console.log(`1----=-----=----=----=----=----=----- userToLiquidate -----=-----=-----=-----=-- 1`)
-  // console.log(userToLiquidate);
-  // console.log(`2----=-----=----=----=----=----=----- userToLiquidate -----=-----=-----=-----=-- 2`)
-  
-  
-  if (userToLiquidate.length == 0) return
-  // console.log(`======================= executeUser ===================`)
-  
-  userToLiquidate.forEach(userData => fetcher.executeUser(userData.user, userData.hf, data.rawTransmit))
-})
-
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data.resp)
   fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
 })
 
 fetcher.on("info", (data, ev = "info") => {
-  console.log(`\n event = ${ev}`)
-  console.log(data)
+  console.log(`recieved log: service: ${service} | event: ${ev}`)
+  // console.log(data)
   $.send("info", {
     service,
     protocol,
@@ -106,16 +91,8 @@ $.on(`onReservesData`, data => {
 })
 
 $.on("transmit", async data => {
-  console.log()
-
   try {
-    if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
-      console.log(`protocol not included in transmit data`)
-
-      return
-    }
-    console.log(`protocol included in transmit data`)
-
+    if (!data.assets || !Object.keys(data.assets).includes(protocol)) return // skip if no assets for this protocol
     fetcher.emit("info", data, INPUT_TRANSMIT)
     const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
     if (usersByAssets.length == 0) return

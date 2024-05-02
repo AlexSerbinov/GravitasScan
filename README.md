@@ -113,10 +113,17 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 
 # Updates
 
+## 2024-05-2
+
+1. Fixed a bug where 29/30 users were skipped in the transmitFetcher.
+2. Refactored the transmitFetcher for better readability.
+3. Changed the names of some functions in transmitFetcher and dataFetcher for better understanding of their purpose.
+4. Added symbols: ✓ x ○ E to the logs for better visual readability.
+5. Changed the names of some logs for better understanding of their contents.
+
 ## 2024-04-12
 
-1. Duplicated console.log's to mqqt logger 
-
+1. Duplicated console.log's to mqqt logger
 
 ## 2024-04-09
 

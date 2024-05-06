@@ -44,7 +44,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/V1"
+        "topic": "data-fetcher-dev-execute/liquidator/V1"
       }
     },
     "params": {
@@ -65,7 +65,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/V2"
+        "topic": "data-fetcher-dev-execute/liquidator/V2"
       }
     },
     "params": {
@@ -86,7 +86,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/V3"
+        "topic": "data-fetcher-dev-execute/liquidator/V3"
       }
     },
     "params": {
@@ -107,7 +107,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/Compound"
+        "topic": "data-fetcher-dev-execute/liquidator/Compound"
       }
     },
     "params": {

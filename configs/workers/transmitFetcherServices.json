@@ -51,7 +51,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/V1"
+        "topic": "transmit-transmit-dev-execute/liquidator/V1"
       }
     },
     "params": {
@@ -67,7 +67,7 @@
       }
     },
     "liquidateCommand": {
-      "topic": "dev-execute/liquidator/V2"
+      "topic": "transmit-dev-execute/liquidator/V2"
     },
     "params": {
       "protocol": "V2"
@@ -83,7 +83,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/V3"
+        "topic": "transmit-dev-execute/liquidator/V3"
       }
     },
     "params": {
@@ -100,7 +100,7 @@
     },
     "notify": {
       "liquidateCommand": {
-        "topic": "dev-execute/liquidator/Compound"
+        "topic": "transmit-dev-execute/liquidator/Compound"
       }
     },
     "params": {

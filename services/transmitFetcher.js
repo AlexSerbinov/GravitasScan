@@ -62,7 +62,7 @@ $.send("start", {
 console.log(`TransmitFetcher started ${protocol}`)
 
 fetcher.on("liquidate", data => {
-  $.send("liquidateCommand", data.resp)
+  $.send("liquidateCommand", data)
   fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
 })
 
@@ -92,7 +92,10 @@ $.on(`onReservesData`, data => {
 
 $.on("transmit", async data => {
   try {
-    if (!data.assets || !Object.keys(data.assets).includes(protocol)) return // skip if no assets for this protocol
+    if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
+      console.log(`Recieved transmit but not for current protocol: ${protocol}`)
+      return // skip if no assets for this protocol
+    }
     fetcher.emit("info", data, INPUT_TRANSMIT)
     const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
     if (usersByAssets.length == 0) return

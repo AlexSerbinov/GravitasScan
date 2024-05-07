@@ -5,6 +5,7 @@
  * By centralizing the namespace definitions in a single file, we can easily manage and maintain the Redis 
  * key structure for different environments without modifying the code of namespaces in deep code structure.
  */
+// For prod remove -dev
 const REDIS_NAMESPACES = {
   globalNamespace: "dev-liq-registry",
   blacklist: {

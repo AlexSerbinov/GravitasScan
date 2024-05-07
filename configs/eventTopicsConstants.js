@@ -26,7 +26,7 @@ module.exports = {
     PROVIDER_ERROR:                           "E provider_error                           ",
     USERS_FROM_REDIS_TO_SIMULATION_BY_ASSEST: "✓ users_from_redis_to_simulation_by_asset  ",
     ALL_UNIQUE_USERS_FROM_REDIS_TO_SIMULATION:"✓ all_unique_users_from_redis_to_simulation",
-    NO_USERS_TO_FIND_BORROW_AND_COLLATERAL:   "x all_users_skipped_by_hf                  ",
+    ALL_USERS_SKIPPED_BY_HF:                  "x all_users_skipped_by_hf                  ",
     LIQUIDATE_EVENT:                          "✓ liquidate_event                          ",
     SIMULATIONS_STARTED:                      "✓ simulations_started                      ",
     INPUT_TRANSMIT:                           "○ input_transmit                           ",

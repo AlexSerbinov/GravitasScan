@@ -6,6 +6,13 @@
 module.exports = {
     START:                                    "○ start                                    ",
     STOP:                                     "○ stop                                     ",
+    INFO:                                     "○ info                                     ",
+    ARCHIVE_SYNCRONIZATION_FINISHED:          "✓ archive_syncronization_finished          ",
+    NUMBER_OF_STORED_USERS:                   "✓ number_of_stored_users                   ",
+    ARCHIVE_PERIOD_SCANNED:                   "✓ archive_period_scanned                   ",
+    NEW_BLOCK_RECEIVED:                       "✓ new_block_received                       ",
+    LATEST_STORED_BLOCK:                      "✓ latest_stored_block                      ",
+    USERS_SAVED_TO_ARCHIVE:                   "✓ users_saved_to_archive                   ",
     USER_SKIPPED_BY_LOW_HF:                   "x user_skipped_by_low_hf                   ",
     USER_SKIPPED_BY_HIGH_HF:                  "x user_skipped_by_high_hf                  ",
     USER_SKIPPED_BY_HF:                       "x user_skipped_by_hf                       ",

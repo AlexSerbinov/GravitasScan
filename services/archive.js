@@ -1,11 +1,11 @@
 const { getFetcher } = require("../lib/services/archive/fetcher")
-const { getLatestRedisBlock, saveUsersToArchive } = require("../lib/services/archive/utils")
+const { getLatestRedisBlock, saveUsersToArchive, getUsersCount } = require("../lib/services/archive/utils")
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { PROTOCOLS_CONFIG } = require("../lib/constants/index")
 const connectionChecker = require("../lib/utils/connections")
 
-const { START, STOP } = require("../configs/eventTopicsConstants")
+const { START, STOP, INFO, ERROR_MESSAGE, ARCHIVE_SYNCRONIZATION_FINISHED, USERS_SAVED_TO_ARCHIVE, NEW_BLOCK_RECEIVED, LATEST_STORED_BLOCK, NUMBER_OF_STORED_USERS } = require("../configs/eventTopicsConstants")
 
 /**
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
@@ -38,18 +38,22 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 configurePool([config.RPC_WSS])
 const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
 let latestArchiveBlock = (await getLatestRedisBlock(protocol)) || CREATED_AT_BLOCK
-console.log(`latest block stored to archive: ${latestArchiveBlock}`)
-$.send("info", {
-  service,
-  protocol,
-  ev: "info",
-  data: `latest block stored to archive: ${latestArchiveBlock}`, // look workers/archiveServices.json start event
-})
 
 /**
  * Initialize fetcher instance
  */
 const fetcher = getFetcher(protocol)
+
+/**
+ * Log current state
+ */
+
+const logCurrentArchiveStatus = async () => {
+  let archiveUsersCount = await getUsersCount(protocol)
+  fetcher.emit("info", `In archive stored ${archiveUsersCount} users}`, NUMBER_OF_STORED_USERS)
+  fetcher.emit("info", `latest block stored to archive: ${latestArchiveBlock}`, INFO)
+}
+logCurrentArchiveStatus()
 
 $.send("start", {
   service,
@@ -83,12 +87,8 @@ $.on("onBlock", data => {
   const { number } = data
   if (!fetcher.inProgress && latestArchiveBlock && number - latestArchiveBlock > archiveBlockDiff) {
     fetcher.start(latestArchiveBlock, number)
-    $.send("info", {
-      service,
-      protocol,
-      ev: "info",
-      data: `New block ${JSON.stringify(number)} recived`, // look workers/archiveServices.json start event
-    })
+    fetcher.emit("info", `Received new block ${number}`, NEW_BLOCK_RECEIVED)
+    fetcher.emit("info", `Latest block stored in archive: ${latestArchiveBlock}`, LATEST_STORED_BLOCK)
   }
 })
 
@@ -98,12 +98,9 @@ $.on("onBlock", data => {
 fetcher.on("fetch", async data => {
   const { users, toBlock } = data
   await saveUsersToArchive(protocol, toBlock, users, "archive_users")
-  $.send("info", {
-    service,
-    protocol,
-    ev: "users_saved_to_archive",
-    data: users,
-  })
+  fetcher.emit("info", `users saved to archive: ${data.users?.length}, scanned preriod until block: ${data?.toBlock} | saved users to archive: ${JSON.stringify(users)}`, USERS_SAVED_TO_ARCHIVE)
+  let archiveUsersCount = await getUsersCount(protocol)
+  fetcher.emit("info", `In archive stored ${archiveUsersCount} users`, NUMBER_OF_STORED_USERS)
 })
 
 /**
@@ -116,8 +113,25 @@ $.on(`onReservesData`, data => {
 /**
  * Set the last archive block, called when process of scanning in particular protocol is finished
  */
-fetcher.on("finished", data => {
+fetcher.on("finished", async data => {
   latestArchiveBlock = data.latestBlock
+  fetcher.emit("info", `Scaning Finished: Latest Stored Archive Block: ${latestArchiveBlock}`, ARCHIVE_SYNCRONIZATION_FINISHED)
+  let archiveUsersCount = await getUsersCount(protocol)
+  fetcher.emit("info", `In archive stored ${archiveUsersCount} users`, NUMBER_OF_STORED_USERS)
+})
+
+/**
+ * Used for sending logs from other parths of protocol
+ */
+fetcher.on("info", (data, ev = "info") => {
+  console.log(`\nevent = ${ev}`)
+  console.log(data, `\n`)
+  $.send("info", {
+    service,
+    protocol,
+    ev,
+    data: JSON.stringify(data),
+  })
 })
 
 /**

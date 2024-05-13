@@ -14,6 +14,8 @@
     "debugSubgraph": "node _system/debug configs/workers/subgraphServices.json",
     "proxy": "node _system/start configs/workers/proxyServices.json",
     "debugProxy": "node _system/debug configs/workers/proxyServices.json",
+    "blacklist": "node _system/start configs/workers/blacklistServices.json",
+    "debugBlacklist": "node _system/debug configs/workers/blacklistServices.json",
     "archive": "node _system/start configs/workers/archiveServices.json",
     "debugArchive": "node _system/debug configs/workers/archiveServices.json",
     "events": "node _system/start configs/workers/eventsServices.json",

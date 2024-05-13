@@ -75,7 +75,7 @@ fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
   fetcher.emit("info", data, LIQUIDATE_EVENT)
-  fetcher.emit("info", `+user: ${data?.user} | ${data}`, LIQUIDATE_EVENT) // dev need to test "L" - mean liquidate, "+" positive
+  fetcher.emit("info", `+user: ${data?.user} | ${data}`, LIQUIDATE_EVENT)
 })
 
 fetcher.on("info", (data, ev = "info") => {

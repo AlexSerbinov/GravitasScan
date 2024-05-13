@@ -1,0 +1,78 @@
+{
+  "DefaultSettings": {
+    "forks": 1,
+    "script": "services/blacklist.js",
+    "namespace": "Blacklist",
+    "notify": {
+      "errorMessage": {
+        "topic": "logger/liquidator"
+      },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "stop": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "service": "blacklist",
+      "filters": {
+        "sleep_time": 0,
+        "min_collateral_amount": 0.01,
+        "min_borrow_amount": 0.01,
+        "min_health_factor": 0.5,
+        "max_health_factor": 1.8
+      },
+      "concurrency": 2,
+      "EXECUTION_TIMEOUT": 15000,
+      "configPath": "/configs/Main.json"
+    }
+  },
+  "V1Blacklist": {
+    "listen": {
+      "onReservesData": {
+        "topic": "data/reserves/V1",
+        "roundrobing": false
+      }
+    },
+    "params": {
+      "protocol": "V1"
+    }
+  },
+  "V2Blacklist": {
+    "listen": {
+      "onReservesData": {
+        "topic": "data/reserves/V2",
+        "roundrobing": false
+      }
+    },
+    "params": {
+      "protocol": "V2"
+    }
+  },
+  "V3Blacklist": {
+    "listen": {
+      "onReservesData": {
+        "topic": "data/reserves/V3",
+        "roundrobing": false
+      }
+    },
+    "params": {
+      "protocol": "V3"
+    }
+  },
+  "CompoundBlacklist": {
+    "listen": {
+      "onReservesData": {
+        "topic": "data/reserves/Compound",
+        "roundrobing": false
+      }
+    },
+    "params": {
+      "protocol": "Compound"
+    }
+  }
+}

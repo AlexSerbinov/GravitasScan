@@ -2,7 +2,7 @@ const EventEmitter = require("node:events")
 const redis = require("../lib/redis/redis/lib/redis")
 const { getArchiveData } = require("../lib/redis/index")
 
-const { ERROR_MESSAGE, START, STOP } = require("../configs/eventTopicsConstants")
+const { ERROR_MESSAGE, START, RECEIVED_DRAIN_EVENT, PROXY_BAD_BEHAVIOUR, ALL_BATCHES_SENT } = require("../configs/eventTopicsConstants")
 
 /**
  * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
@@ -59,7 +59,6 @@ let lastDrainTime = Date.now() // Initialize lastDrainTime to the current time
 let drainEventCount = 0 // Counter for drain events
 
 $.on("drain", data => {
-  console.log(`drain called`)
   if (!isSending) {
     drainEventCount++
     console.log(`drainEventCount = ${drainEventCount} of ${data.forks}`)
@@ -67,14 +66,11 @@ $.on("drain", data => {
       const currentTime = Date.now()
       lastDrainTime = currentTime // Update lastDrainTime
       const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
-      console.log(`Received expected number of drain events: ${data.forks}`)
       drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
-      console.log(`PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`)
-      console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
       $.send("info", {
         service,
         protocol,
-        ev: "received_drain_event",
+        ev: RECEIVED_DRAIN_EVENT,
         data: `${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain`,
       })
 
@@ -145,7 +141,7 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
         $.send("info", {
           service,
           protocol,
-          ev: "all_batches_sent",
+          ev: ALL_BATCHES_SENT,
           data: `Sent all ${batchNumber} batches. Each batch contain ${batchSize} users`,
         })
       }
@@ -171,7 +167,7 @@ const setupDrainTimer = () => {
       $.send("info", {
         service,
         protocol,
-        ev: "bad_begavior",
+        ev: PROXY_BAD_BEHAVIOUR,
         data: `Bad behavior. manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event. It can be when subgraf not send "drain" event. Or subgraph do not have enough time for user processing`,
       })
 
@@ -197,42 +193,3 @@ const setupDrainTimer = () => {
 onDrain()
 // Start the drain timer to send batches if fist drain event nor recieved
 setupDrainTimer()
-
-fetcher.on("error", data => {
-  $.send("errorMessage", {
-    service,
-    protocol,
-    ev: ERROR_MESSAGE,
-    data,
-  })
-})
-
-/**
- * Handle process exit
- */
-$.onExit(async () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const { pid } = process
-      console.log(pid, "Ready to exit.")
-      const date = new Date().toUTCString()
-      $.send("stop", {
-        service: "archive",
-        protocol,
-        ev: STOP,
-        data: date,
-      })
-      resolve()
-    }, 100) // Small timeout to ensure async cleanup completes
-  })
-})
-
-// Handle uncaught exceptions
-process.on("uncaughtException", error => {
-  $.send("errorMessage", {
-    service: "archive",
-    protocol,
-    ev: ERROR_MESSAGE,
-    data: error,
-  })
-})

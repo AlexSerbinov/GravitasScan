@@ -112,8 +112,8 @@ fetcher.on("fetch", data => {
  * Used for sending logs from other parths of protocol
  */
 fetcher.on("info", (data, ev = "info") => {
-  //console.log(`\nevent = ${ev}`)
-//  console.log(data, `\n`)
+  //console.log(`\nevent = ${ev}`)   // uncoment for rewieving all logs in console
+  //  console.log(data, `\n`)        // uncoment for rewieving all logs in console
   $.send("info", {
     service,
     protocol,
@@ -135,15 +135,6 @@ fetcher.on("errorMessage", (error, ev = "errorMessage") => {
   }
 })
 
-fetcher.once("fetcherReady", () => {
-  $.send("start", {
-    service,
-    protocol,
-    ev: START,
-    data: `All data ready, user processing has started`,
-  })
-})
-
 /**
  * Listeners
  */
@@ -152,9 +143,10 @@ $.on(`onReservesData`, data => {
 })
 
 /**
- * Input point from PROXY service
+ * Input point from Subgraph service
  * Add arrays of users to the queue for processing.
  * Because, in the simulator, we send a batch of users by time.
+ * Not all users together
  * @param {Array} users - Array of users
  */
 $.on("handleUser", async users => {

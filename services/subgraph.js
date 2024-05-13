@@ -112,8 +112,8 @@ fetcher.on("fetch", data => {
  * Used for sending logs from other parths of protocol
  */
 fetcher.on("info", (data, ev = "info") => {
-  console.log(`\nevent = ${ev}`)
-  console.log(data, `\n`)
+  //console.log(`\nevent = ${ev}`)
+//  console.log(data, `\n`)
   $.send("info", {
     service,
     protocol,

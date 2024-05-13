@@ -29,10 +29,10 @@
       "configPath": "/configs/Main.json",
       "filters": {
         "mode": "fetch",
-        "min_collateral_amount": 0.1,
-        "min_borrow_amount": 0.2,
+        "min_collateral_amount": 0.02,
+        "min_borrow_amount": 0.02,
         "min_health_factor": 0.8,
-        "max_health_factor": 1.07,
+        "max_health_factor": 1.15,
         "update_time": 5
       },
       "privateKey": "",
@@ -47,7 +47,7 @@
   },
 
   "V1Subgraph": {
-    "forks": 1,
+    "forks": 3,
 
     "listen": {
       "onReservesData": {
@@ -75,7 +75,7 @@
   },
 
   "V2Subgraph": {
-    "forks": 3,
+    "forks": 4,
     "listen": {
       "onReservesData": {
         "topic": "data/reserves/V2",
@@ -135,7 +135,7 @@
   },
 
   "CompoundSubgraph": {
-    "forks": 2,
+    "forks": 6,
     "listen": {
       "handleUser": {
         "topic": "event/users/proxy/Compound",

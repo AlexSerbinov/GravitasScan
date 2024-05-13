@@ -28,12 +28,12 @@
     },
     "params": {
       "filters": {
-        "minHfDel": "0.2",
-        "maxHfDel": "1.1",
+        "minHfDel": "0.8",
+        "maxHfDel": "1.15",
         "minHfLiq": "0.9",
         "maxHfLiq": "1",
-        "minBorrow": "0.1",
-        "minCollateral": "0.1"
+        "minBorrow": "0.02",
+        "minCollateral": "0.02"
       },
       "maxNumberOfUsersToSimulation": "30",
       "service": "transmitFetcher",

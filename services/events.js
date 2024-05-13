@@ -44,42 +44,36 @@ const blockWatcher = createBlockWatcher()
 const reservesV1 = createWatcherV1(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV1", data)
-    sendInfoEvent("sendGlobalReserves", data, "V1")
   })
   .onError(e => sendErrorEvent(e, "V1"))
 
 const reservesV2 = createWatcherV2(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV2", data)
-    sendInfoEvent("sendGlobalReserves", data, "V2")
   })
   .onError(e => sendErrorEvent(e, "V2"))
 
 const reservesV3 = createWatcherV3(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV3", data)
-    sendInfoEvent("sendGlobalReserves", data, "V3")
   })
   .onError(e => sendErrorEvent(e, "V3"))
 
 const reservesCompound = createWatcherCompound(config)
   .onReserves(data => {
     $.send("sendGlobalReservesCompound", data)
-    sendInfoEvent("sendGlobalReserves", data, "Compound")
   })
   .onError(e => sendErrorEvent(e, "Compound"))
 
 const watcherLiquity = createWatcherLiquity(config)
   .onReserves(data => {
     $.send("sendGlobalReservesLiquity", data)
-    sendInfoEvent("sendGlobalReserves", data, "Liquity")
   })
   .onError(e => sendErrorEvent(e, "Liquity"))
 
 const watcherMakerDao = createWatcherMakerDao(config)
   .onReserves(data => {
     $.send("sendGlobalReservesMakerDAO_CDP", data)
-    sendInfoEvent("sendGlobalReserves", data, "MakerDAO_CDP")
   })
   .onError(e => sendErrorEvent(e, "MakerDAO_CDP"))
 
@@ -172,13 +166,6 @@ const sendErrorEvent = (error, protocol) => {
 }
 
 const sendInfoEvent = (ev, info, protocol) => {
-  console.log({
-    service,
-    protocol,
-    ev,
-    date: new Date().toLocaleString('uk-UA'),
-  })
-
   $.send("info", {
     service,
     protocol,

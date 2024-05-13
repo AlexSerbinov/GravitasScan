@@ -53,12 +53,6 @@ fetcher.on("pushToRedis", data => {
   for (let index = 0; index < assets.length; index++) {
     addUsersToDataFetcherSet([user], protocol, assets[index])
   }
-  // $.send("info", {
-  //   service,
-  //   protocol,
-  //   ev: "pushToRedis",
-  //   data: JSON.stringify(data),
-  // })
 })
 /**
  * When user deletes
@@ -81,6 +75,7 @@ fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
   fetcher.emit("info", data, LIQUIDATE_EVENT)
+  fetcher.emit("info", `+user: ${data?.user} | ${data}`, LIQUIDATE_EVENT) // dev need to test "L" - mean liquidate, "+" positive
 })
 
 fetcher.on("info", (data, ev = "info") => {

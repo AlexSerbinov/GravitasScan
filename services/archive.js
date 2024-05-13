@@ -55,6 +55,7 @@ const logCurrentArchiveStatus = async () => {
 }
 logCurrentArchiveStatus()
 
+console.log(`${service} started`)
 $.send("start", {
   service,
   protocol,
@@ -124,8 +125,8 @@ fetcher.on("finished", async data => {
  * Used for sending logs from other parths of protocol
  */
 fetcher.on("info", (data, ev = "info") => {
-  console.log(`\nevent = ${ev}`)
-  console.log(data, `\n`)
+  // console.log(`\nevent = ${ev}`)
+  // console.log(data, `\n`)
   $.send("info", {
     service,
     protocol,

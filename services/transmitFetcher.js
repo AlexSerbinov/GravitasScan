@@ -64,11 +64,11 @@ console.log(`TransmitFetcher started ${protocol}`)
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data)
   fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
+  fetcher.emit("info", `+user: ${data?.resp?.user} | ${data.resp}`, LIQUIDATE_EVENT) // dev need to test. If okay keep only this line
 })
 
 fetcher.on("info", (data, ev = "info") => {
-  console.log(`recieved log: service: ${service} | event: ${ev}`)
-  // console.log(data)
+  // console.log(`recieved log: service: ${service} | event: ${ev}`)
   $.send("info", {
     service,
     protocol,
@@ -93,7 +93,7 @@ $.on(`onReservesData`, data => {
 $.on("transmit", async data => {
   try {
     if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
-      console.log(`Recieved transmit but not for current protocol: ${protocol}`)
+      // console.log(`Recieved transmit but not for current protocol: ${protocol}`)
       return // skip if no assets for this protocol
     }
     fetcher.emit("info", data, INPUT_TRANSMIT)

@@ -19,6 +19,7 @@ module.exports = {
     USER_SKIPPED_BY_LOW_HF:                   "x user_skipped_by_low_hf                   ",
     USER_SKIPPED_BY_HIGH_HF:                  "x user_skipped_by_high_hf                  ",
     USER_SKIPPED_BY_HF:                       "x user_skipped_by_hf                       ",
+    USERS_SKIPPED_BY_TO_DIFFERENT_HF:         "x users_skipped_by_to_different_hf         ",
     USER_SKIPPED_BY_LOW_COLLATERAL:           "x user_skipped_by_collateral               ",
     USER_SKIPPED_BY_LOW_BORROW:               "x user_skipped_by_low_borrow               ",
     USER_ACCEPTED:                            "✓ user_accepted                            ",
@@ -44,4 +45,5 @@ module.exports = {
     RECIEVED_INPUT_ADDRESS:                   "✓ recieved_input_address                   ",
     SEND_USER_TO_DATA_FETCHER:                "✓ send_user_to_data_fetcher                ",
     SEND_DRAIN_EVENT:                         "✓ send_drain_event                         ",
+    ERROR_MESSAGE_IN_QUEUE:                   "E error_message_in_queue                   ",
 }

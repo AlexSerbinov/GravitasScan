@@ -71,7 +71,7 @@ $.send("start", {
   service,
   protocol,
   ev: START,
-  data: `${protocol} subgraph started in ${mode} mode`,
+  data: `${protocol} subgraph started`,
 })
 
 /**
@@ -80,12 +80,11 @@ $.send("start", {
  */
 
 queue.on("errorMessage", (error, ev = "errorMessage") => {
-  console.log(`received error message from queue | eventName: ${ev} | Error:`, JSON.stringify(error))
   $.send("errorMessage", {
     service,
     protocol,
     ev,
-    error,
+    error: JSON.stringify(error),
   })
 })
 
@@ -130,7 +129,7 @@ fetcher.on("errorMessage", (error, ev = "errorMessage") => {
       service,
       protocol,
       ev,
-      error: errorData,
+      error: JSON.stringify(errorData),
     })
   }
 })

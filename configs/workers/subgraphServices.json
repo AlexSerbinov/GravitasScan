@@ -47,7 +47,7 @@
   },
 
   "V1Subgraph": {
-    "forks": 3,
+    "forks": 1,
 
     "listen": {
       "onReservesData": {

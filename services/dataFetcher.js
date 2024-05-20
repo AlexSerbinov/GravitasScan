@@ -1,9 +1,11 @@
 const { createFetcher } = require("../lib/services/data-fetcher/fetchers")
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
+const { createSimulator } = require("../lib/simulator")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
 const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/eventTopicsConstants")
+const { Simulator } = require("../lib/simulator")
 
 /**
  * @param {*} filters - The filters object containing the following properties:
@@ -21,9 +23,16 @@ const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = 
  *
  * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
  *
+ * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
+ * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
+ *
+ * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
+ * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
+ *
+ * @param {string} enso_url - The url to enso simulator
  */
 
-const { protocol, configPath, filters, service } = $.params
+const { protocol, configPath, filters, service, formattedTrace, stateOverrides, enso_url } = $.params
 
 // Main.json
 const config = require(`${process.cwd()}${configPath}`)
@@ -35,9 +44,17 @@ configurePool([config.RPC_WSS])
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
-const fetcher = createFetcher(protocol, filters, config)
+/**
+ * Interface for enso simulator
+ */
+const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
-console.log(`dataFetcher started ${protocol}`)
+/**
+ * Create fetcher. Main filtering logic
+ */
+const fetcher = createFetcher(protocol, filters, config, $.params, simulator)
+
+console.log(`dataFetcher started ${protocol} using ${$.params.mode}`)
 $.send("start", {
   service,
   protocol,
@@ -75,7 +92,6 @@ fetcher.on("liquidate", data => {
   console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
   fetcher.emit("info", data, LIQUIDATE_EVENT)
-  fetcher.emit("info", `+user: ${data?.user} | ${data}`, LIQUIDATE_EVENT)
 })
 
 fetcher.on("info", (data, ev = "info") => {

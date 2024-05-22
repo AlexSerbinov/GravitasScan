@@ -5,7 +5,7 @@
     "namespace": "Transmit",
     "listen": {
       "transmit": {
-        "topic": "data/eth/pending/transmit_assets",
+        "topic": "mempool/transmit",
         "roundrobing": true
       }
     },

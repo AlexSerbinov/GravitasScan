@@ -1,5 +1,5 @@
 const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
-const { configurePool } = require("../lib/ethers/pool")
+const { configurePool, getProvider } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 
@@ -52,6 +52,7 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 const fetcher = createTransmitFetcher(protocol, filters, maxNumberOfUsersToSimulation, config, simulator)
+const provider = getProvider()
 
 $.send("start", {
   service,
@@ -64,7 +65,6 @@ console.log(`TransmitFetcher started ${protocol}`)
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data)
   fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
-  fetcher.emit("info", `+user: ${data?.resp?.user} | ${data.resp}`, LIQUIDATE_EVENT) // dev need to test. If okay keep only this line
 })
 
 fetcher.on("info", (data, ev = "info") => {
@@ -90,18 +90,26 @@ $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
 
+/**
+ * input point
+ */
 $.on("transmit", async data => {
   try {
-    if (!data.assets || !Object.keys(data.assets).includes(protocol)) {
-      // console.log(`Recieved transmit but not for current protocol: ${protocol}`)
+    if (!data.transaction) return // if no transaction hash, skip
+    const transactionHash = data.transaction
+    const fullTransactionDetails = await provider.getTransaction(transactionHash)
+    if (!data.decoded.configs.some(config => config.protocols && config.protocols.includes(protocol))) {
       return // skip if no assets for this protocol
     }
     fetcher.emit("info", data, INPUT_TRANSMIT)
-    const usersByAssets = await fetcher.getUsersByAsset(data.assets[`${protocol}`])
-    if (usersByAssets.length == 0) return
+    const assets = data.decoded.configs.filter(config => config.protocols && config.protocols.includes(protocol)).map(config => config.token)
+    const usersByAssets = await fetcher.getUsersByAsset(assets)
+    if (usersByAssets.length == 0) {
+      return
+    }
     fetcher.emit("info", `Simulations started`, SIMULATIONS_STARTED)
     usersByAssets.forEach((user, index) => {
-      fetcher.request(user, data, index + 1 == usersByAssets.length)
+      fetcher.request(user, fullTransactionDetails, index + 1 == usersByAssets.length)
     })
   } catch (error) {
     fetcher.emit("errorMessage", error)

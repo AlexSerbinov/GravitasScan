@@ -89,7 +89,7 @@ fetcher.on("deleteFromRedis", data => {
 })
 
 fetcher.on("liquidate", data => {
-  console.log(`send liquidate Command`, data)
+  // console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
   fetcher.emit("info", data, LIQUIDATE_EVENT)
 })
@@ -133,7 +133,7 @@ $.on(`onReservesData`, data => {
  * Main entry point. Listen user's adddresess
  */
 $.on("searcherExecute", async data => {
-  console.log(`dataFetcher ${protocol} Recieved input address ${JSON.stringify(data)}`)
+  // console.log(`dataFetcher ${protocol} Recieved input address ${JSON.stringify(data)}`)
   $.send("info", {
     service,
     protocol,

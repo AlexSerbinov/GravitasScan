@@ -1,10 +1,11 @@
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createConcurrency } = require("../lib/helpers/queue/lib")
+const { createSimulator } = require("../lib/simulator")
 
 const { getFetcher } = require("../lib/services/blacklist/fetcher/index")
 
-const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE } = require("../configs/eventTopicsConstants")
+const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_BLACKLIST, REMOVE_USER_FROM_BLACKLIST } = require("../configs/eventTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -33,9 +34,16 @@ const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE } = require(".
  * preventing the system from being stalled by tasks that take too long to complete.
  * Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
  *
+ * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
+ * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
+ *
+ * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
+ * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
+ *
+ * @param {string} enso_url - The url to enso simulator
  */
 
-const { protocol, configPath, filters, service, concurrency, EXECUTION_TIMEOUT } = $.params
+const { protocol, configPath, filters, service, concurrency, EXECUTION_TIMEOUT, formattedTrace, stateOverrides, enso_url } = $.params
 
 /**
  * Now we save the path for config params for each protocol in [serviceName]service.json file.
@@ -55,14 +63,15 @@ const { addUsersToBlacklistSet, removeUsersFromBlacklistSet } = require("../lib/
 const { getArchiveOrSubgraphUsers } = require("../lib/services/blacklist/utils")
 
 /**
- * Create fetcher. Main filtering logic
+ * Interface for enso simulator
  */
-const fetcher = getFetcher(protocol, filters, config)
+const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 /**
- * Create queue
+ * Create queue and fetcher. Main filtering logic
  */
 let allQueuesFull = new Array(concurrency).fill(true)
+const fetcher = getFetcher(protocol, $.params, filters, config, simulator)
 const queue = createConcurrency(concurrency, async user => fetcher.fetchUser(user), EXECUTION_TIMEOUT)
 
 /**
@@ -71,7 +80,12 @@ const queue = createConcurrency(concurrency, async user => fetcher.fetchUser(use
 queue.on("drain", async q => {
   allQueuesFull[q.queue] = false
   if (allQueuesFull.every(value => value === false)) {
-    this.emit("info", `All users for protocol ${protocol} was filtered and some added to blacklist`, BLACKLIST_FILTERING_LOOP_DONE)
+    $.send("info", {
+      service,
+      protocol,
+      ev: BLACKLIST_FILTERING_LOOP_DONE,
+      data: `All users for protocol ${protocol} were filtered and some added to blacklist`,
+    })
     allQueuesFull = new Array(concurrency).fill(true)
     getArchiveOrSubgraphUsers(protocol, queue)
   }
@@ -86,7 +100,7 @@ $.send("start", {
   ev: START,
   data: `${service} started. Concurency number: ${concurrency}, date: ${new Date().toUTCString()}`,
 })
-console.log(`${service} started ${protocol}`)
+console.log(`${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"} mode.`)
 
 /**
  * Fetcher events. Update user in redis
@@ -95,8 +109,10 @@ fetcher.on("fetch", async data => {
   const { user, add } = data
 
   if (add) {
+    fetcher.emit("info", JSON.stringify(data), ADD_USER_TO_BLACKLIST)
     addUsersToBlacklistSet([user], protocol)
   } else {
+    fetcher.emit("info", JSON.stringify(data), REMOVE_USER_FROM_BLACKLIST)
     removeUsersFromBlacklistSet([user], protocol)
   }
 })

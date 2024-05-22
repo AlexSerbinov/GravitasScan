@@ -28,8 +28,7 @@
         "minCollateral": "0.00002"
       },
       "configPath": "/configs/Main.json",
-      "mode": "simulator",
-      "-mode": "node",
+      "useSimulatorInsteadOfNode": true,
       "formattedTrace": false,
       "simulationContract": "0xF50024f746D94F144a79003D00000000e380A500",
       "stateOverrides": {

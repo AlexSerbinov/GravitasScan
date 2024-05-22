@@ -28,11 +28,11 @@ const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR
  *
  * @param {string} enso_url - The url to enso simulator
  *
- * @param {number} maxNumberOfUsersToSimulation - The maximum number of users for parallel simulation.
+ * @param {number} maxNumberOfUsersToSimulate - The maximum number of users for parallel simulation.
  * Be careful when using numbers greater than 40 due to gas limit restrictions.
  * Try to find the optimal number, the more the better until an error occurs.
  */
-const { protocol, configPath, filters, service, formattedTrace, maxNumberOfUsersToSimulation, stateOverrides, enso_url } = $.params
+const { protocol, configPath, filters, service, formattedTrace, maxNumberOfUsersToSimulate, stateOverrides, enso_url } = $.params
 
 /**
  * Now we save the path for config params for each protocol in [serviceName]service.json file.
@@ -51,7 +51,7 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
  */
 const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
-const fetcher = createTransmitFetcher(protocol, filters, maxNumberOfUsersToSimulation, config, simulator)
+const fetcher = createTransmitFetcher(protocol, filters, maxNumberOfUsersToSimulate, config, simulator)
 const provider = getProvider()
 
 $.send("start", {

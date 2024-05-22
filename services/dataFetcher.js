@@ -5,7 +5,6 @@ const { createSimulator } = require("../lib/simulator")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
 const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/eventTopicsConstants")
-const { Simulator } = require("../lib/simulator")
 
 /**
  * @param {*} filters - The filters object containing the following properties:
@@ -54,7 +53,8 @@ const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
  */
 const fetcher = createFetcher(protocol, filters, config, $.params, simulator)
 
-console.log(`dataFetcher started ${protocol} using ${$.params.mode}`)
+console.log(`${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"} mode.`)
+
 $.send("start", {
   service,
   protocol,

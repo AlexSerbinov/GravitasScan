@@ -12,6 +12,8 @@ module.exports = {
     PROXY_BAD_BEHAVIOUR:                      "x proxy_bad_behaviour                      ",
     ALL_BATCHES_SENT:                         "✓ all_batches_sent                         ",
     BLACKLIST_FILTERING_LOOP_DONE:            "✓ blacklist_filtering_loop_done            ",
+    ADD_USER_TO_BLACKLIST:                    "✓ add_user_to_blacklist                    ",
+    REMOVE_USER_FROM_BLACKLIST:               "✓ remove_user_from_blacklist               ",
     NUMBER_OF_STORED_USERS:                   "✓ number_of_stored_users                   ",
     NEW_BLOCK_RECEIVED:                       "✓ new_block_received                       ",
     LATEST_STORED_BLOCK:                      "✓ latest_stored_block                      ",

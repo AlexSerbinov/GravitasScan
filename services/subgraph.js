@@ -59,6 +59,7 @@ const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 /**
  * Create fetcher and queue
+ * Proccess all users and then drain queues inbetween proxy<>subgraph and assign some sleep time
  */
 
 const fetcher = getFetcher($.params, filters, config, simulator)
@@ -74,19 +75,7 @@ $.send("start", {
   data: `${protocol} subgraph started`,
 })
 
-/**
- * Create fetcher
- * Proccess all users and then drain queues inbetween proxy<>subgraph and assign some sleep time
- */
 
-queue.on("errorMessage", (error, ev = "errorMessage") => {
-  $.send("errorMessage", {
-    service,
-    protocol,
-    ev,
-    error: JSON.stringify(error),
-  })
-})
 
 queue.on("drain", async () => {
   $.send("drain", { forks })
@@ -96,6 +85,15 @@ queue.on("drain", async () => {
     protocol,
     ev: SEND_DRAIN_EVENT,
     data: `send drain event ${date}`,
+  })
+})
+
+queue.on("errorMessage", (error, ev = "errorMessage") => {
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev,
+    error: JSON.stringify(error),
   })
 })
 

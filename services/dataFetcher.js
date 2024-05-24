@@ -1,10 +1,10 @@
-const { createFetcher } = require("../lib/services/data-fetcher/fetchers")
+const { createFetcher } = require("../lib/services/data-fetcher/fetchers/fetcher-factory")
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
-const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/eventTopicsConstants")
+const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {*} filters - The filters object containing the following properties:
@@ -20,7 +20,7 @@ const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = 
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
  * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
@@ -33,15 +33,20 @@ const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = 
 
 const { protocol, configPath, filters, service, formattedTrace, stateOverrides, enso_url } = $.params
 
-// Main.json
+// Load the configuration Main.json file
 const config = require(`${process.cwd()}${configPath}`)
 
-configurePool([config.RPC_WSS])
-
 /**
- * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ * Prepare Redis connection
+ * @param {string} config.REDIS_HOST - Redis host address
+ * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
+
+/**
+ * Initiating the connection to the Ethereum node
+ */
+configurePool([config.RPC_WSS])
 
 /**
  * Interface for enso simulator
@@ -89,7 +94,6 @@ fetcher.on("deleteFromRedis", data => {
 })
 
 fetcher.on("liquidate", data => {
-  // console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
   fetcher.emit("info", data, LIQUIDATE_EVENT)
 })

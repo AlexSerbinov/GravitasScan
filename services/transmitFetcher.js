@@ -3,7 +3,7 @@ const { configurePool, getProvider } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 
-const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR_MESSAGE } = require("../configs/eventTopicsConstants")
+const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR_MESSAGE } = require("../configs/loggerTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -18,7 +18,7 @@ const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
  * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.

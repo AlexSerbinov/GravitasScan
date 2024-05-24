@@ -1,12 +1,12 @@
-const { getFetcher } = require("../lib/services/subgraph/data-fetcher")
+const { getFetcher } = require("../lib/services/subgraph/fetchers/fetcher-factory")
 const { Queue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
 
-const { ERROR_MESSAGE, START, STOP, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT } = require("../configs/eventTopicsConstants")
+const { ERROR_MESSAGE, START, STOP, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT } = require("../configs/loggerTopicsConstants")
 
 /**
- * @param {number} EXECUTION_TIMEOUT - The time limit for each task's execution within the queue. (ms),
+ * @param {number} execution_timeout - The time limit for each task's execution within the queue. (ms),
  * If a task exceeds this duration, the queue will attempt to move on to the next task,
  * preventing the system from being stalled by tasks that take too long to complete.
  * Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
@@ -30,12 +30,12 @@ const { ERROR_MESSAGE, START, STOP, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT 
  * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  * @param {string} enso_url - The url to enso simulator
  */
 
-const { protocol, formattedTrace, stateOverrides, configPath, filters, service, enso_url, EXECUTION_TIMEOUT } = $.params
+const { protocol, formattedTrace, stateOverrides, configPath, filters, service, enso_url, execution_timeout } = $.params
 
 /**
  * Number of running instances of the service
@@ -59,13 +59,11 @@ const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
 /**
  * Create fetcher and queue
- * Proccess all users and then drain queues inbetween proxy<>subgraph and assign some sleep time
+ * Proccess all users and then drain queues inbetween proxy<>subgraph
  */
 
 const fetcher = getFetcher($.params, filters, config, simulator)
-const queue = new Queue(async users => await fetcher.fetchSubgraphUsers(users), EXECUTION_TIMEOUT)
-
-const { mode } = filters
+const queue = new Queue(async users => await fetcher.fetchSubgraphUsers(users), execution_timeout)
 
 console.log("subgraph started")
 $.send("start", {
@@ -74,8 +72,6 @@ $.send("start", {
   ev: START,
   data: `${protocol} subgraph started`,
 })
-
-
 
 queue.on("drain", async () => {
   $.send("drain", { forks })

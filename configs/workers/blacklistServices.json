@@ -2,7 +2,7 @@
   "DefaultSettings": {
     "forks": 1,
     "script": "services/blacklist.js",
-    "namespace": "Blacklist",
+    "namespace": "blacklist",
     "notify": {
       "errorMessage": {
         "topic": "logger/liquidator"
@@ -26,11 +26,13 @@
         "min_health_factor": 0.5,
         "max_health_factor": 1.8
       },
-      "concurrency": 2,
-      "EXECUTION_TIMEOUT": 15000,
+      "concurrency": 1,
+      "execution_timeout": 15000,
+      "batchSize": 30,
       "configPath": "/configs/Main.json",
-      "useSimulatorInsteadOfNode": false,
-      "formattedTrace": false,
+      "useSimulatorInsteadOfNode": true,
+      "delayBetweenRequestsToSimulator": 1000,
+      "formattedTrace": true,
       "simulationContract": "0xF50024f746D94F144a79003D00000000e380A500",
       "stateOverrides": {
         "0xF50024f746D94F144a79003D00000000e380A500": {
@@ -61,7 +63,7 @@
     },
     "params": {
       "protocol": "V2",
-      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle",
       "selector": "0xfa428ceb"
     }
   },
@@ -74,7 +76,7 @@
     },
     "params": {
       "protocol": "V3",
-      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle",
       "selector": "0xcac570cc"
     }
   },
@@ -87,7 +89,7 @@
     },
     "params": {
       "protocol": "Compound",
-      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle",
       "selector": "0x1a2214af"
     }
   }

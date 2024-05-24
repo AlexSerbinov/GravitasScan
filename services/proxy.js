@@ -2,7 +2,7 @@ const EventEmitter = require("node:events")
 const redis = require("../lib/redis/redis/lib/redis")
 const { getArchiveData } = require("../lib/redis/index")
 
-const { ERROR_MESSAGE, START, RECEIVED_DRAIN_EVENT, PROXY_BAD_BEHAVIOUR, ALL_BATCHES_SENT } = require("../configs/eventTopicsConstants")
+const { ERROR_MESSAGE, START, RECEIVED_DRAIN_EVENT, PROXY_BAD_BEHAVIOUR, ALL_BATCHES_SENT } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
@@ -19,7 +19,7 @@ const { ERROR_MESSAGE, START, RECEIVED_DRAIN_EVENT, PROXY_BAD_BEHAVIOUR, ALL_BAT
  * batch of users if no 'drain' event is received. This timeout ensures that data continues to flow, preventing potential
  * deadlocks or stalls in data processing.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  */
 const { batchSize, protocol, configPath, service, SEND_WITHOUT_DRAIN_TIMEOUT } = $.params
@@ -29,7 +29,7 @@ const fetcher = new EventEmitter()
 /**
  * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
  */
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
 console.log(`proxy started`)
@@ -61,7 +61,6 @@ let drainEventCount = 0 // Counter for drain events
 $.on("drain", data => {
   if (!isSending) {
     drainEventCount++
-    console.log(`drainEventCount = ${drainEventCount} of ${data.forks}`)
     if (drainEventCount === data.forks) {
       const currentTime = Date.now()
       lastDrainTime = currentTime // Update lastDrainTime

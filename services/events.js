@@ -1,9 +1,9 @@
 const { configurePool } = require("../lib/ethers/pool")
 
 const { createBlockWatcher } = require("../lib/services/events/watcher-block")
-const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves")
+const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves/watcher-reserves-factory")
 const { EventEmitter } = require("node:events")
-const { ERROR_MESSAGE, START, STOP } = require("../configs/eventTopicsConstants")
+const { ERROR_MESSAGE, START, STOP } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
@@ -11,7 +11,7 @@ const { ERROR_MESSAGE, START, STOP } = require("../configs/eventTopicsConstants"
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  * @param {string} mode - The protocol used for network communication: 'http', 'https', 'ws', or 'wss'.
  * This defines how the service will connect to provider for getting new block
@@ -25,7 +25,6 @@ const { ERROR_MESSAGE, START, STOP } = require("../configs/eventTopicsConstants"
 const { protocol, configPath, service, WATCHER_RESERVES_INTERVAL, GET_BLOCK_NUMBER_HTTP_INTERVAL, mode } = $.params
 
 const config = require(`${process.cwd()}${configPath}`)
-Object.assign(process.env, config)
 configurePool([config.RPC_WSS])
 
 /**

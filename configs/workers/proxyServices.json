@@ -2,7 +2,7 @@
   "DefaultSettings": {
     "forks": 1,
     "script": "services/proxy.js",
-    "namespace": "Proxy",
+    "namespace": "proxy",
     "notify": {
       "errorMessage": {
         "topic": "logger/liquidator"

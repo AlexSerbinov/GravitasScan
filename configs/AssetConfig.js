@@ -9,13 +9,11 @@ const AssetConfig = {
     V2: [
       "0xe5BbBdb2Bb953371841318E1Edfbf727447CeF2E", // Old one, probably not used | AccessControlledOffchainAggregator USDC / USD
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH  / USD (BASE to PEG)
-      "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0x789190466E21a8b78b8027866CBBDc151542A26C", // AccessControlledOffchainAggregator USDC / USD (ASSET to PEG)
     ],
     V1: [
       "0xe5BbBdb2Bb953371841318E1Edfbf727447CeF2E", // Old one, probably not used | AccessControlledOffchainAggregator USDC / USD
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH  / USD (BASE to PEG)
-      "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0x789190466E21a8b78b8027866CBBDc151542A26C", // AccessControlledOffchainAggregator USDC / USD (ASSET to PEG)
     ],
     SYMBOL: "USDC",
@@ -38,13 +36,11 @@ const AssetConfig = {
     V3: ["0xa964273552C1dBa201f5f000215F5BD5576e8f93"], // AccessControlledOffchainAggregator USDT / USD
     V2: [
       "0x7De0d6fce0C128395C488cb4Df667cdbfb35d7DE", // Old one, probably not used | AccessControlledOffchainAggregator USDT / USD
-      "0x3E7d1eAB13ad0104d2750B8863b489D65364e32D", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH  / USD (BASE to PEG)
       "0xa964273552C1dBa201f5f000215F5BD5576e8f93", // New one | AccessControlledOffchainAggregator USDT / USD (ASSET to PEG)
     ],
     V1: [
       "0x7De0d6fce0C128395C488cb4Df667cdbfb35d7DE", // Old one, probably not used | AccessControlledOffchainAggregator USDT / USD
-      "0x3E7d1eAB13ad0104d2750B8863b489D65364e32D", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH  / USD (BASE to PEG)
       "0xa964273552C1dBa201f5f000215F5BD5576e8f93", // New one | AccessControlledOffchainAggregator USDT / USD (ASSET to PEG)
     ],
@@ -53,11 +49,9 @@ const AssetConfig = {
   "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0": {
     V3: [
       "0x27b97a63091d185cE056e1747624b9B92BAAD056", // AccessControlledOffchainAggregator LUSD / USD
-      "0x3D7aE7E594f2f2091Ad8798313450130d0Aba3a0", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
     ],
     V2: [
       "0x27b97a63091d185cE056e1747624b9B92BAAD056", // AccessControlledOffchainAggregator LUSD / ETH (ASSET to PEG)
-      "0x3D7aE7E594f2f2091Ad8798313450130d0Aba3a0", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH  / USD (BASE to PEG)
     ],
     Compound: ["0x27b97a63091d185cE056e1747624b9B92BAAD056"],
@@ -131,13 +125,11 @@ const AssetConfig = {
     V3: ["0x478238a1c8B862498c74D0647329Aef9ea6819Ed"], // AccessControlledOffchainAggregator DAI / USD
     V2: [
       "0x158228e08C52F3e2211Ccbc8ec275FA93f6033FC", // Old one, probably not used | AccessControlledOffchainAggregator DAI / ETH
-      "0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0x478238a1c8B862498c74D0647329Aef9ea6819Ed", // AccessControlledOffchainAggregator DAI / USD (ASSET to PEG)
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH / USD (BASE to PEG)
     ],
     V1: [
       "0x158228e08C52F3e2211Ccbc8ec275FA93f6033FC", // Old one, probably not used | AccessControlledOffchainAggregator DAI / ETH
-      "0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9", // I think it's wrong because it's an EACAggregatorProxy, there are no transmits to this contract
       "0x478238a1c8B862498c74D0647329Aef9ea6819Ed", // AccessControlledOffchainAggregator DAI / USD (ASSET to PEG)
       "0xE62B71cf983019BFf55bC83B48601ce8419650CC", // AccessControlledOffchainAggregator ETH / USD (BASE to PEG)
     ],

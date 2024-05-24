@@ -2,7 +2,7 @@
   "DefaultSettings": {
     "forks": 1,
     "script": "services/transmitFetcher.js",
-    "namespace": "Transmit",
+    "namespace": "transmit",
     "listen": {
       "transmit": {
         "topic": "mempool/transmit",
@@ -38,7 +38,7 @@
       "maxNumberOfUsersToSimulate": "30",
       "service": "transmitFetcher",
       "configPath": "/configs/Main.json",
-      "enso_url": "http://10.10.100.82:9990/api/v1/simulate-bundle"
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
     }
   },
 

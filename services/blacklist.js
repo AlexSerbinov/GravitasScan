@@ -3,9 +3,9 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { createConcurrency } = require("../lib/helpers/queue/lib")
 const { createSimulator } = require("../lib/simulator")
 
-const { getFetcher } = require("../lib/services/blacklist/fetcher/index")
+const { getFetcher } = require("../lib/services/blacklist/fetchers/fetcher-factory")
 
-const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_BLACKLIST, REMOVE_USER_FROM_BLACKLIST } = require("../configs/eventTopicsConstants")
+const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_BLACKLIST, REMOVE_USER_FROM_BLACKLIST } = require("../configs/loggerTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -20,7 +20,7 @@ const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_B
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  * @param {number} concurrency - This parameter determines the number of parallel executions of the filtering functions.
  * It affects the speed at which all users in the blacklist are filtered. However, the speed of the blacklist is not
@@ -29,7 +29,7 @@ const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_B
  * The system will still function properly, but it will consume more resources especially of the provider.
  * Therefore, values between 2 and 5 are generally acceptable.
  *
- * @param {number} EXECUTION_TIMEOUT - The time limit for each task's execution within the queue. (ms),
+ * @param {number} execution_timeout - The time limit for each task's execution within the queue. (ms),
  * If a task exceeds this duration, the queue will attempt to move on to the next task,
  * preventing the system from being stalled by tasks that take too long to complete.
  * Adjusting this value can help manage the balance between responsiveness and allowing adequate time for task completion.
@@ -41,12 +41,18 @@ const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_B
  * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
  *
  * @param {string} enso_url - The url to enso simulator
+ *
+ * @Note @param {number} delayBetweenRequestsToSimulator - Important parameter for controlling the rate of requests sent to the simulator when updating the blacklist.
+ * By setting a delay between requests, we prevent overloading the simulator. Without this parameter, blacklist will use all aveiliable power of the simulator
+ * Since frequent updates to the blacklist are unnecessary, incorporating a pause between requests helps maintain the simulator's performance.
+ * Although it would be more intuitive to include this parameter in the queue.js file, the decision was made to avoid modifying the existing queue.js mechanism.
+ * This parameter is utilized in the file lib/services/blacklist/fetchers/fetcher.js to regulate the timing of requests to the simulator.
  */
 
-const { protocol, configPath, filters, service, concurrency, EXECUTION_TIMEOUT, formattedTrace, stateOverrides, enso_url } = $.params
+const { protocol, configPath, filters, service, concurrency, execution_timeout, formattedTrace, stateOverrides, enso_url } = $.params
 
 /**
- * Now we save the path for config params for each protocol in [serviceName]service.json file.
+ * Load the configuration Main.json file
  */
 const config = require(`${process.cwd()}${configPath}`)
 
@@ -56,11 +62,13 @@ const config = require(`${process.cwd()}${configPath}`)
 configurePool([config.RPC_WSS])
 
 /**
- * Redis functions
+ * Prepare Redis connection
+ * @param {string} config.REDIS_HOST - Redis host address
+ * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 const { addUsersToBlacklistSet, removeUsersFromBlacklistSet } = require("../lib/redis")
-const { getArchiveOrSubgraphUsers } = require("../lib/services/blacklist/utils")
+const { getArchiveUsersAndStartScanning } = require("../lib/services/blacklist/utils")
 
 /**
  * Interface for enso simulator
@@ -72,7 +80,7 @@ const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
  */
 let allQueuesFull = new Array(concurrency).fill(true)
 const fetcher = getFetcher(protocol, $.params, filters, config, simulator)
-const queue = createConcurrency(concurrency, async user => fetcher.fetchUser(user), EXECUTION_TIMEOUT)
+const queue = createConcurrency(concurrency, async user => fetcher.fetchUser(user), execution_timeout)
 
 /**
  * When all queues are empty, start processing again.
@@ -87,7 +95,7 @@ queue.on("drain", async q => {
       data: `All users for protocol ${protocol} were filtered and some added to blacklist`,
     })
     allQueuesFull = new Array(concurrency).fill(true)
-    getArchiveOrSubgraphUsers(protocol, queue)
+    getArchiveUsersAndStartScanning(protocol, queue, $.params)
   }
 })
 
@@ -98,9 +106,9 @@ $.send("start", {
   service,
   protocol,
   ev: START,
-  data: `${service} started. Concurency number: ${concurrency}, date: ${new Date().toUTCString()}`,
+  data: `${service} ${protocol} started using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"}. Concurency number: ${concurrency}, date: ${new Date().toUTCString()}`,
 })
-console.log(`${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"} mode.`)
+console.log(`${service} ${protocol} started using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"}`)
 
 /**
  * Fetcher events. Update user in redis
@@ -120,8 +128,8 @@ fetcher.on("fetch", async data => {
 /**
  * Fetcher ready event, start processing
  */
-fetcher.once("fetcherReady", data => {
-  getArchiveOrSubgraphUsers(protocol, queue)
+fetcher.once("fetcherReady", () => {
+  getArchiveUsersAndStartScanning(protocol, queue, $.params)
 })
 
 /**
@@ -140,8 +148,8 @@ $.on(`onReservesData`, data => {
  * Used for sending logs from other parths of protocol
  */
 fetcher.on("info", (data, ev = "info") => {
-  //console.log(`\nevent = ${ev}`) // uncoment for rewieving all logs in console
-  //  console.log(data, `\n`)      // uncoment for rewieving all logs in console
+  //console.log(`\nevent = ${ev}`) // uncoment for rewieving all topics that going to logger service in console
+  //  console.log(data, `\n`)      // uncoment for rewieving all messages that going to logger service in console
   $.send("info", {
     service,
     protocol,

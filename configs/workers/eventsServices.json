@@ -2,7 +2,7 @@
   "Events": {
     "forks": 1,
     "script": "services/events.js",
-    "namespace": "Events",
+    "namespace": "events",
     "notify": {
       "sendBlock": {
         "topic": "data/block"

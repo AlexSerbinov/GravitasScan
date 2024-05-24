@@ -2,7 +2,7 @@
   "DefaultSettings": {
     "forks": 1,
     "script": "services/archive.js",
-    "namespace": "Archive",
+    "namespace": "archive",
     "listen": {
       "onBlock": {
         "topic": "data/block",

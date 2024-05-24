@@ -1,4 +1,4 @@
-const { createTransmitFetcher } = require("../lib/services/transmit/fetchers")
+const { createTransmitFetcher } = require("../lib/services/transmit/fetchers/fetcher-factory")
 const { configurePool, getProvider } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")

@@ -31,7 +31,7 @@
       "batchSize": 30,
       "configPath": "/configs/Main.json",
       "useSimulatorInsteadOfNode": true,
-      "delayBetweenRequestsToSimulator": 1000,
+      "delayBetweenRequestsToSimulator": 5000,
       "formattedTrace": true,
       "simulationContract": "0xF50024f746D94F144a79003D00000000e380A500",
       "stateOverrides": {

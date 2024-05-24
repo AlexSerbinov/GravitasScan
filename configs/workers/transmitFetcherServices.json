@@ -5,7 +5,7 @@
     "namespace": "transmit",
     "listen": {
       "transmit": {
-        "topic": "mempool/transmit",
+        "topic": "listener/transmit",
         "roundrobing": true
       }
     },

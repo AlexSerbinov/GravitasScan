@@ -99,11 +99,11 @@ const getNonBlacklistedUsers = async protocol => {
   const allUsers = await getArchiveUsers(protocol)
 
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
-  console.log(`${protocol} all users count: ${usersToCheck.length}`)
+  // console.log(`${protocol} all users count: ${usersToCheck.length}`)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
 
   const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0).map(userInfo => userInfo.user.toLowerCase()) // Mapping to get only user addresses and Convert users to lowercase after filtering
-  console.log(`${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`)
+  // console.log(`${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`)
 
   return nonBlacklistedUsers
 }

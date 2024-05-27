@@ -95,9 +95,10 @@ $.on(`onReservesData`, data => {
  */
 $.on("transmit", async data => {
   try {
-    if (!data.transaction) return // if no transaction hash, skip
-    const transactionHash = data.transaction
-    const fullTransactionDetails = await provider.getTransaction(transactionHash)
+    if (!data.transaction) {
+      return // if no transaction hash, skip
+    }
+    const fullTransactionDetails = data.fullTxData
     if (!data.decoded.configs.some(config => config.protocols && config.protocols.includes(protocol))) {
       return // skip if no assets for this protocol
     }
@@ -112,6 +113,7 @@ $.on("transmit", async data => {
       fetcher.request(user, fullTransactionDetails, index + 1 == usersByAssets.length)
     })
   } catch (error) {
+    console.error(error)
     fetcher.emit("errorMessage", error)
   }
 })

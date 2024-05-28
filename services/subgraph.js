@@ -6,7 +6,7 @@ const { createSimulator } = require("../lib/simulator")
 /**
  * import events logger constants from loggerTopicsConstants
  */
-const { ERROR_MESSAGE, START, STOP, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT } = require("../configs/loggerTopicsConstants")
+const { START, STOP, INFO, ERROR_MESSAGE, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {number} execution_timeout - The time limit for each task's execution within the queue. (ms),
@@ -51,7 +51,7 @@ const forks = $.forks
 const config = require(`${process.cwd()}${configPath}`)
 
 /**
- * Service initial data
+ * Initiating the connection to the Ethereum node
  */
 configurePool([config.RPC_WSS])
 
@@ -102,7 +102,7 @@ fetcher.on("fetch", data => {
 /**
  * Used for sending logs from other parths of protocol
  */
-fetcher.on("info", (data, ev = "info") => {
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,

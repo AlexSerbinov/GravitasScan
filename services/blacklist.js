@@ -5,7 +5,7 @@ const { createSimulator } = require("../lib/simulator")
 
 const { getFetcher } = require("../lib/services/blacklist/fetchers/fetcher-factory")
 
-const { START, STOP, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_BLACKLIST, REMOVE_USER_FROM_BLACKLIST } = require("../configs/loggerTopicsConstants")
+const { START, STOP, INFO, ERROR_MESSAGE, BLACKLIST_FILTERING_LOOP_DONE, ADD_USER_TO_BLACKLIST, REMOVE_USER_FROM_BLACKLIST } = require("../configs/loggerTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -63,7 +63,7 @@ configurePool([config.RPC_WSS])
 
 /**
  * Prepare Redis connection
- * @param {string} config.REDIS_HOST - Redis host address
+ * @param {url} config.REDIS_HOST - Redis host address
  * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
@@ -148,7 +148,7 @@ $.on(`onReservesData`, data => {
  * Used for sending logs from other parts of the protocol to the logger server
  * Main logger handler, use this instead of this.emit("info", data) directly
  */
-fetcher.on("info", (data, ev = "info") => {
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,

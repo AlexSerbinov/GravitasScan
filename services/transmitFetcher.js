@@ -6,7 +6,7 @@ const { createSimulator } = require("../lib/simulator")
 /**
  * import events logger constants from loggerTopicsConstants
  */
-const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR_MESSAGE } = require("../configs/loggerTopicsConstants")
+const { START, STOP, INFO, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR_MESSAGE } = require("../configs/loggerTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
  *  - mode: The mode of operation (e.g. "fetch")
@@ -42,6 +42,9 @@ const { protocol, configPath, filters, service, formattedTrace, stateOverrides, 
  */
 const config = require(`${process.cwd()}${configPath}`)
 
+/**
+ * Initiating the connection to the Ethereum node
+ */
 configurePool([config.RPC_WSS])
 
 /**
@@ -80,6 +83,7 @@ $.on("transmit", async data => {
       return // skip if no assets for this protocol
     }
     fetcher.emit("info", data, INPUT_TRANSMIT)
+    // check if transmit assets have current protocol
     const assets = data.decoded.configs.filter(config => config.protocols && config.protocols.includes(protocol)).map(config => config.token)
     const usersByAssets = await fetcher.getUsersByAsset(assets)
     if (usersByAssets.length == 0) {
@@ -116,7 +120,7 @@ $.on(`onReservesData`, data => {
  * Used for sending logs from other parts of the protocol to the logger server
  * Main logger handler, use this instead of this.emit("info", data) directly
  */
-fetcher.on("info", (data, ev = "info") => {
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,

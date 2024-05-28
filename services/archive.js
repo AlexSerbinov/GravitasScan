@@ -32,17 +32,25 @@ const config = require(`${process.cwd()}${configPath}`)
 
 /**
  * Prepare Redis connection
- * @param {string} config.REDIS_HOST - Redis host address
+ * @param {url} config.REDIS_HOST - Redis host address
  * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
 /**
  * Configure the Ethereum connection pool
- * @param {number} archiveBlockDiff - Time buffer to process block logs efficiently
  */
 configurePool([config.RPC_WSS])
+
+/**
+ * @param {number} archiveBlockDiff - Time buffer to process block logs efficiently
+ */
 const archiveBlockDiff = config.ARCHIVE_BLOCKS_DIFF || 10
+
+/**
+ * Get latesr block stored in the redis.
+ * From this block will continue scanning
+ */
 let latestArchiveBlock = (await getLatestRedisBlock(protocol)) || CREATED_AT_BLOCK
 
 /**
@@ -175,7 +183,7 @@ await logUsersAddressesDaily(protocol, fetcher, 100)
  * Used for sending logs from other parts of the protocol to the logger server
  * Main logger handler, use this instead of this.emit("info", data) directly
  */
-fetcher.on("info", (data, ev = "info") => {
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,

@@ -7,7 +7,7 @@ const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../
 /**
  * import events logger constants from loggerTopicsConstants
  */
-const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/loggerTopicsConstants")
+const { START, STOP, INFO, LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {*} filters - The filters object containing the following properties:
@@ -41,7 +41,7 @@ const config = require(`${process.cwd()}${configPath}`)
 
 /**
  * Prepare Redis connection
- * @param {string} config.REDIS_HOST - Redis host address
+ * @param {url} config.REDIS_HOST - Redis host address
  * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
@@ -110,7 +110,7 @@ fetcher.on("liquidate", data => {
  * Used for sending logs from other parts of the protocol to the logger server
  * Main logger handler, use this instead of this.emit("info", data) directly
  */
-fetcher.on("info", (data, ev = "info") => {
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,

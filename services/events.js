@@ -3,14 +3,13 @@ const { configurePool } = require("../lib/ethers/pool")
 const { createBlockWatcher } = require("../lib/services/events/watcher-block")
 const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves/watcher-reserves-factory")
 const { EventEmitter } = require("node:events")
+
 /**
  * import events logger constants from loggerTopicsConstants
  */
-const { ERROR_MESSAGE, START, STOP } = require("../configs/loggerTopicsConstants")
+const { START, STOP, INFO, ERROR_MESSAGE } = require("../configs/loggerTopicsConstants")
 
 /**
- * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
- *
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
@@ -25,9 +24,15 @@ const { ERROR_MESSAGE, START, STOP } = require("../configs/loggerTopicsConstants
  * @param {number} WATCHER_RESERVES_INTERVAL - The time interval (in milliseconds) for the reserves watcher to trigger.
  * It defines how frequently the service should check or update reserves related data.
  */
-const { protocol, configPath, service, WATCHER_RESERVES_INTERVAL, GET_BLOCK_NUMBER_HTTP_INTERVAL, mode } = $.params
+const { configPath, service, WATCHER_RESERVES_INTERVAL, GET_BLOCK_NUMBER_HTTP_INTERVAL, mode } = $.params
 
+/**
+ * Load the configuration Main.json file
+ */
 const config = require(`${process.cwd()}${configPath}`)
+/**
+ * Initiating the connection to the Ethereum node
+ */
 configurePool([config.RPC_WSS])
 
 /**

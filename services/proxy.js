@@ -5,7 +5,7 @@ const { getArchiveData } = require("../lib/redis/index")
 /**
  * import events logger constants from loggerTopicsConstants
  */
-const { ERROR_MESSAGE, START, STOP, RECEIVED_DRAIN_EVENT, PROXY_BAD_BEHAVIOUR, ALL_BATCHES_SENT } = require("../configs/loggerTopicsConstants")
+const { ERROR_MESSAGE, START, STOP, INFO, RECEIVED_DRAIN_EVENT, ALL_BATCHES_SENT, TOTAL_STORED_USERS, NON_BLACKLIST_USERS_COUNT } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
@@ -30,19 +30,15 @@ const config = require(`${process.cwd()}${configPath}`)
 const fetcher = new EventEmitter()
 
 /**
- * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ * Prepare Redis connection
+ * @param {url} config.REDIS_HOST - Redis host address
+ * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
 console.log(`${service} started`)
-
-fetcher.emit("info", {
-  service,
-  protocol,
-  ev: START,
-  data: `proxy started. batchSize = ${batchSize}, SEND_WITHOUT_DRAIN_TIMEOUT = ${SEND_WITHOUT_DRAIN_TIMEOUT}`,
-})
+fetcher.emit("info", `proxy started. batchSize = ${batchSize}, SEND_WITHOUT_DRAIN_TIMEOUT = ${SEND_WITHOUT_DRAIN_TIMEOUT}`, START)
 
 let isSending = false // Flag to indicate if sending is in progress
 
@@ -59,22 +55,18 @@ fetcher.on("sendUsersToSubgraph", async () => {
  * Listener for 'drain' events to manage sending users to the subgraph.
  * It keeps track of the time and count of drain events to ensure timely processing.
  */
-let lastDrainTime = Date.now() // Initialize lastDrainTime to the current time
 let drainEventCount = 0 // Counter for drain events
 
 $.on("drain", data => {
-  if (!isSending) {
-    drainEventCount++
-    if (drainEventCount === data.forks) {
-      const currentTime = Date.now()
-      const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
-      lastDrainTime = currentTime // Update lastDrainTime
-      drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
-      fetcher.emit("info", `${protocol} Received drain event from subgraph. Flag isSending = ${isSending}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain`, RECEIVED_DRAIN_EVENT)
+  fetcher.emit("info", `${protocol} Received drain event from subgraph. Flag isSending = ${isSending}`, RECEIVED_DRAIN_EVENT)
+  if (isSending) return
+  drainEventCount++
+  if (drainEventCount === data.forks) {
+    fetcher.emit("info", `${protocol} Received all ${drainEventCount}/${data.forks} drain event from subgraph. Flag isSending = ${isSending}`, RECEIVED_DRAIN_EVENT)
+    drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
 
-      clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
-      onDrain()
-    }
+    clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
+    onDrain()
   }
 })
 
@@ -98,11 +90,11 @@ const getNonBlacklistedUsers = async protocol => {
   const allUsers = await getArchiveUsers(protocol)
 
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
-  fetcher.emit("info", `${protocol} all users count: ${usersToCheck.length}`, INFO)
+  fetcher.emit("info", `${protocol} all users count: ${usersToCheck.length}`, TOTAL_STORED_USERS)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
 
   const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0).map(userInfo => userInfo.user.toLowerCase()) // Mapping to get only user addresses and Convert users to lowercase after filtering
-  fetcher.emit("info", `${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`, INFO)
+  fetcher.emit("info", `${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`, NON_BLACKLIST_USERS_COUNT)
 
   return nonBlacklistedUsers
 }
@@ -134,11 +126,11 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
       const batch = nonBlacklistedUsers.slice(i, i + batchSize)
       const batchNumber = i / batchSize + 1
 
+      $.send("sendUsersToSubgraph", batch)
       // Check if the current batch is the last one
       if (batchNumber === totalBatches) {
         fetcher.emit("info", `Sent all ${batchNumber} batches. Each batch contains ${batchSize} users`, ALL_BATCHES_SENT)
       }
-      fetcher.emit("info", `sendUsersToSubgraph`, batch)
 
       batchesSent++
       // Check if all batches have been sent
@@ -151,16 +143,12 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
  * Sets up a timer to trigger the drain event manually if not received within a specified timeout.
  */
 let drainTimer
-let manualTriggerCount = 0
 const setupDrainTimer = () => {
   clearTimeout(drainTimer)
 
   drainTimer = setTimeout(() => {
-    if (manualTriggerCount >= 10) fetcher.emit("info", `Bad behavior. manualTriggerCount = ${manualTriggerCount}! Executes too often. Something with drain event. It can be when subgraph not send "drain" event. Or subgraph does not have enough time for user processing`, PROXY_BAD_BEHAVIOUR)
-
     onDrain()
       .then(() => {
-        manualTriggerCount++
         setupDrainTimer() // Reset the timer after successful drain
       })
       .catch(error => {
@@ -179,9 +167,7 @@ setupDrainTimer()
  * Used for sending logs from other parts of the protocol to the logger server
  * Main logger handler, use this instead of this.emit("info", data) directly
  */
-fetcher.on("info", (data, ev = "info") => {
-  console.log(`ev ${ev}`)
-
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,

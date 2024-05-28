@@ -27,7 +27,7 @@
         "max_health_factor": 1.8
       },
       "concurrency": 1,
-      "execution_timeout": 15000,
+      "execution_timeout": 30000,
       "batchSize": 30,
       "configPath": "/configs/Main.json",
       "useSimulatorInsteadOfNode": true,

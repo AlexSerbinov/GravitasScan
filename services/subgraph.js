@@ -3,6 +3,9 @@ const { Queue } = require("../lib/helpers/queue/lib")
 const { configurePool } = require("../lib/ethers/pool")
 const { createSimulator } = require("../lib/simulator")
 
+/**
+ * import events logger constants from loggerTopicsConstants
+ */
 const { ERROR_MESSAGE, START, STOP, SEND_USER_TO_DATA_FETCHER, SEND_DRAIN_EVENT } = require("../configs/loggerTopicsConstants")
 
 /**
@@ -84,20 +87,15 @@ queue.on("drain", async () => {
   })
 })
 
-queue.on("errorMessage", (error, ev = "errorMessage") => {
-  $.send("errorMessage", {
-    service,
-    protocol,
-    ev,
-    error: JSON.stringify(error),
-  })
+queue.on("errorMessage", (error, ev = ERROR_MESSAGE) => {
+  fetcher.emit("errorMessage", error, ev)
 })
 
 /**
  * Output point
  */
 fetcher.on("fetch", data => {
-  $.send("sendDataToDataFetcher", data)
+  $.send("sendToDataFetcher", data)
   fetcher.emit("info", data, SEND_USER_TO_DATA_FETCHER)
 })
 
@@ -105,8 +103,6 @@ fetcher.on("fetch", data => {
  * Used for sending logs from other parths of protocol
  */
 fetcher.on("info", (data, ev = "info") => {
-  //console.log(`\nevent = ${ev}`)   // uncoment for rewieving all logs in console
-  //  console.log(data, `\n`)        // uncoment for rewieving all logs in console
   $.send("info", {
     service,
     protocol,
@@ -115,7 +111,7 @@ fetcher.on("info", (data, ev = "info") => {
   })
 })
 
-fetcher.on("errorMessage", (error, ev = "errorMessage") => {
+fetcher.on("errorMessage", (error, ev = ERROR_MESSAGE) => {
   if (error && error.message) {
     const errorData = { message: error.message }
 
@@ -147,7 +143,20 @@ $.on("handleUser", async users => {
 })
 
 /**
+ * Handle uncaught exceptions
+ */
+process.on("uncaughtException", (error, ev) => {
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev,
+    data: error,
+  })
+})
+
+/**
  * Handle process exit
+ * If you need to perform some cleanup before the process exits, add this functionale here
  */
 $.onExit(async () => {
   return new Promise(resolve => {
@@ -163,15 +172,5 @@ $.onExit(async () => {
       })
       resolve()
     }, 100) // Small timeout to ensure async cleanup completes
-  })
-})
-
-// Handle uncaught exceptions
-process.on("uncaughtException", (error, ev) => {
-  $.send("errorMessage", {
-    service,
-    protocol,
-    ev,
-    data: error,
   })
 })

@@ -4,6 +4,9 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
 
+/**
+ * import events logger constants from loggerTopicsConstants
+ */
 const { LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS, START, STOP } = require("../configs/loggerTopicsConstants")
 
 /**
@@ -64,7 +67,7 @@ $.send("start", {
   service,
   protocol,
   ev: START,
-  data: { date: new Date().toUTCString() },
+  data: `${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"} mode.`,
 })
 
 /**
@@ -93,11 +96,20 @@ fetcher.on("deleteFromRedis", data => {
   })
 })
 
+/**
+ * Main output point.
+ * Send liquidate event to the Liquidator service
+ * And log to the logger server
+ */
 fetcher.on("liquidate", data => {
   $.send("liquidateCommand", data)
   fetcher.emit("info", data, LIQUIDATE_EVENT)
 })
 
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("info", data) directly
+ */
 fetcher.on("info", (data, ev = "info") => {
   $.send("info", {
     service,
@@ -107,15 +119,10 @@ fetcher.on("info", (data, ev = "info") => {
   })
 })
 
-fetcher.on("reject", data => {
-  $.send("reject", {
-    service,
-    protocol,
-    ev: "reject",
-    data,
-  })
-})
-
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("errorMessage", data) directly
+ */
 fetcher.on("errorMessage", data => {
   $.send("errorMessage", {
     service,
@@ -126,9 +133,12 @@ fetcher.on("errorMessage", data => {
 })
 
 /**
- * Listening
+ * Listeners
  */
 
+/**
+ * Set grobal reserves data
+ */
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
@@ -136,8 +146,7 @@ $.on(`onReservesData`, data => {
 /**
  * Main entry point. Listen user's adddresess
  */
-$.on("searcherExecute", async data => {
-  // console.log(`dataFetcher ${protocol} Recieved input address ${JSON.stringify(data)}`)
+$.on("processUser", async data => {
   $.send("info", {
     service,
     protocol,

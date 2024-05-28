@@ -126,7 +126,7 @@ fetcher.on("fetch", async data => {
 })
 
 /**
- * Fetcher ready event, start processing
+ * We start processing only after receiveng globalReserves on listener $.on(`onReservesData`)
  */
 fetcher.once("fetcherReady", () => {
   getArchiveUsersAndStartScanning(protocol, queue, $.params)
@@ -145,11 +145,10 @@ $.on(`onReservesData`, data => {
 })
 
 /**
- * Used for sending logs from other parths of protocol
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("info", data) directly
  */
 fetcher.on("info", (data, ev = "info") => {
-  //console.log(`\nevent = ${ev}`) // uncoment for rewieving all topics that going to logger service in console
-  //  console.log(data, `\n`)      // uncoment for rewieving all messages that going to logger service in console
   $.send("info", {
     service,
     protocol,
@@ -180,7 +179,7 @@ $.onExit(async () => {
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
       $.send("stop", {
-        service: "archive",
+        service,
         protocol,
         ev: STOP,
         data: date,
@@ -194,7 +193,7 @@ $.onExit(async () => {
 process.on("uncaughtException", error => {
   console.error(error)
   $.send("errorMessage", {
-    service: "archive",
+    service,
     protocol,
     ev: ERROR_MESSAGE,
     data: error,

@@ -3,6 +3,9 @@ const { configurePool } = require("../lib/ethers/pool")
 const { createBlockWatcher } = require("../lib/services/events/watcher-block")
 const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves/watcher-reserves-factory")
 const { EventEmitter } = require("node:events")
+/**
+ * import events logger constants from loggerTopicsConstants
+ */
 const { ERROR_MESSAGE, START, STOP } = require("../configs/loggerTopicsConstants")
 
 /**
@@ -33,7 +36,7 @@ configurePool([config.RPC_WSS])
 const blockWatcher = createBlockWatcher()
   .onBlock(number => {
     $.send("sendBlock", { number, chain: "eth" })
-    sendInfoEvent("sendBlock", number, "ALL")
+    sendInfoEvent("sendBlock", number)
   })
   .onError(e => sendErrorEvent(e))
 
@@ -124,12 +127,7 @@ const stop = () => {
   reservesV2.stop()
   reservesV3.stop()
   reservesCompound.stop()
-  $.send("stop", {
-    service,
-    protocol: "All",
-    ev: STOP,
-    data: "All event watchers stopped",
-  })
+  sendStopEvent(STOP, "All event watchers stopped")
 }
 
 module.exports = { start, stop }
@@ -144,18 +142,13 @@ $.onExit(async () => {
       stop()
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
-      $.send("stop", {
-        service,
-        protocol,
-        ev: STOP,
-        data: date,
-      })
+      sendStopEvent(STOP, date)
       resolve()
     }, 150) // Small timeout to ensure async cleanup completes
   })
 })
 
-const sendErrorEvent = (error, protocol) => {
+const sendErrorEvent = (error, protocol = "All") => {
   $.send("errorMessage", {
     service,
     protocol,
@@ -164,10 +157,19 @@ const sendErrorEvent = (error, protocol) => {
   })
 }
 
-const sendInfoEvent = (ev, info, protocol) => {
+const sendInfoEvent = (ev = INFO, info) => {
   $.send("info", {
     service,
-    protocol,
+    protocol: "All",
+    ev,
+    data: info,
+  })
+}
+
+const sendStopEvent = (ev = STOP, info) => {
+  $.send("stop", {
+    service,
+    protocol: "All",
     ev,
     data: info,
   })
@@ -191,12 +193,7 @@ $.onExit(async () => {
       const { pid } = process
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
-      $.send("stop", {
-        service,
-        protocol,
-        ev: STOP,
-        data: date,
-      })
+      sendStopEvent(STOP, date)
       resolve()
     }, 100) // Small timeout to ensure async cleanup completes
   })

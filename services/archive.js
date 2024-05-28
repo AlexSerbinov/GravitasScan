@@ -1,19 +1,22 @@
 // Import necessary modules and services
+const schedule = require("node-schedule")
 const { getFetcher } = require("../lib/services/archive/fetchers/fetcher-factory")
-const { getLatestRedisBlock, saveUsersToArchive, getUsersCount } = require("../lib/services/archive/utils")
+const { getLatestRedisBlock, saveUsersToArchive, getArchiveUsers } = require("../lib/services/archive/utils")
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { PROTOCOLS_CONFIG } = require("../lib/constants/index")
 const connectionChecker = require("../lib/utils/connections")
 
-// Import logger topics constants
-const { START, STOP, INFO, ERROR_MESSAGE, ARCHIVE_SYNCRONIZATION_FINISHED, USERS_SAVED_TO_ARCHIVE, NEW_BLOCK_RECEIVED, LATEST_STORED_BLOCK, NUMBER_OF_STORED_USERS } = require("../configs/loggerTopicsConstants")
+/**
+ * import events logger constants from loggerTopicsConstants
+ */
+const { START, STOP, INFO, ERROR_MESSAGE, ARCHIVE_SYNCRONIZATION_FINISHED, USERS_SAVED_TO_ARCHIVE, NEW_BLOCK_RECEIVED, LATEST_STORED_BLOCK, TOTAL_STORED_USERS, ARCHIVE_USERS_GROUP } = require("../configs/loggerTopicsConstants")
 
 /**
  * Extract necessary parameters from $.params
- * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
+ * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3", "Compound")
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary settings and parameters for the service.
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher", "proxy", "archive", "blacklist", etc.)
  */
 const { protocol, service, configPath } = $.params
 
@@ -47,23 +50,6 @@ let latestArchiveBlock = (await getLatestRedisBlock(protocol)) || CREATED_AT_BLO
  * Main scanning logic
  */
 const fetcher = getFetcher(protocol)
-
-/**
- * Log current archive status
- * @param {string} protocol - The name of the lending protocol. E.g., "V1", "V2", "V3" "Compound"
- * @param {Fetcher} fetcher - The fetcher instance
- * @param {number} latestArchiveBlock - The latest block stored in the archive.
- */
-const logCurrentArchiveStatus = async (protocol, fetcher, latestArchiveBlock) => {
-  let archiveUsersCount = await getUsersCount(protocol)
-  fetcher.emit("info", `In archive stored ${archiveUsersCount} users}`, NUMBER_OF_STORED_USERS)
-  fetcher.emit("info", `latest block stored to archive: ${latestArchiveBlock}`, INFO)
-}
-
-/**
- * Log current state
- */
-await logCurrentArchiveStatus(protocol, fetcher, latestArchiveBlock)
 
 console.log(`${service} started`)
 $.send("start", {
@@ -109,8 +95,8 @@ fetcher.on("fetch", async data => {
   const { users, toBlock } = data
   await saveUsersToArchive(protocol, toBlock, users, "archive_users")
   fetcher.emit("info", `Users saved to archive: ${data.users?.length}, scanned period until block: ${data?.toBlock} | saved users to archive: ${JSON.stringify(users)}`, USERS_SAVED_TO_ARCHIVE)
-  let archiveUsersCount = await getUsersCount(protocol)
-  fetcher.emit("info", `In archive stored ${archiveUsersCount} users`, NUMBER_OF_STORED_USERS)
+  const archiveUsers = await getArchiveUsers(protocol)
+  fetcher.emit("info", `In archive stored ${archiveUsers.length} users`, TOTAL_STORED_USERS)
 })
 
 /**
@@ -128,9 +114,62 @@ $.on(`onReservesData`, data => {
 fetcher.on("finished", async data => {
   latestArchiveBlock = data.latestBlock
   fetcher.emit("info", `Scanning Finished: Latest Stored Archive Block: ${latestArchiveBlock}`, ARCHIVE_SYNCRONIZATION_FINISHED)
-  let archiveUsersCount = await getUsersCount(protocol)
-  fetcher.emit("info", `In archive stored ${archiveUsersCount} users`, NUMBER_OF_STORED_USERS)
+  const users = await getArchiveUsers(protocol)
+  fetcher.emit("info", `In archive stored ${users.length} users`, TOTAL_STORED_USERS)
 })
+
+/**
+ * Log current archive status
+ * @param {string} protocol - The name of the lending protocol. E.g., "V1", "V2", "V3", "Compound"
+ * @param {Fetcher} fetcher - The fetcher instance
+ * @param {number} latestArchiveBlock - The latest block stored in the archive.
+ */
+const logCurrentArchiveStatus = async (protocol, fetcher, latestArchiveBlock) => {
+  const users = await getArchiveUsers(protocol)
+  const usersCount = users.length
+
+  fetcher.emit("info", `In archive stored ${usersCount} users`, TOTAL_STORED_USERS)
+  fetcher.emit("info", `Latest block stored to archive: ${latestArchiveBlock}`, INFO)
+}
+/**
+ * Log current state
+ */
+await logCurrentArchiveStatus(protocol, fetcher, latestArchiveBlock)
+
+/**
+ * Often, when we miss a liquidation for a user, we need to find out which service missed it.
+ * In the archive, each protocol can have 50,000 users.
+ * I decided to log all users at the start of the day to easily find them using VSCode in logs.
+ * Note: We log 50-200 users per line because VSCode doesn't show very long lines.
+ *
+ * Log users addresses in groups of a specified number every day at 00:01:00 UTC.
+ * @param {string} protocol - The name of the lending protocol. E.g., "V1", "V2", "V3", "Compound".
+ * @param {Fetcher} fetcher - The fetcher instance.
+ * @param {number} usersPerGroup - The number of users to log per group.
+ */
+const logUsersAddressesDaily = async (protocol, fetcher, usersPerGroup = 100) => {
+  schedule.scheduleJob({ hour: 0, minute: 1, second: 0, tz: "UTC" }, async () => {
+    try {
+      const users = await getArchiveUsers(protocol)
+
+      fetcher.emit("info", `Total users for protocol ${protocol}: ${users.length}`, TOTAL_STORED_USERS)
+
+      for (let i = 0; i < users.length; i += usersPerGroup) {
+        setImmediate(async () => {
+          const groupedUsers = users.slice(i, i + usersPerGroup)
+          fetcher.emit("info", `Users: ${groupedUsers.join(", ")}`, ARCHIVE_USERS_GROUP)
+        })
+      }
+    } catch (error) {
+      fetcher.emit("error", `Error logging all users addresses: ${error.message}`, ERROR_MESSAGE)
+    }
+  })
+}
+
+/**
+ * Start logging users addresses daily
+ */
+await logUsersAddressesDaily(protocol, fetcher, 100)
 
 /**
  * Used for sending logs from other parts of the protocol to the logger server

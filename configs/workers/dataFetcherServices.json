@@ -41,7 +41,7 @@
 
   "V1DataFetcher": {
     "listen": {
-      "searcherExecute": {
+      "processUser": {
         "topic": "execute/dataFetcher/V1",
         "roundrobing": true
       },
@@ -64,7 +64,7 @@
 
   "V2DataFetcher": {
     "listen": {
-      "searcherExecute": {
+      "processUser": {
         "topic": "execute/dataFetcher/V2",
         "roundrobing": true
       },
@@ -87,7 +87,7 @@
 
   "V3DataFetcher": {
     "listen": {
-      "searcherExecute": {
+      "processUser": {
         "topic": "execute/dataFetcher/V3",
         "roundrobing": true
       },
@@ -110,7 +110,7 @@
 
   "CompoundDataFetcher": {
     "listen": {
-      "searcherExecute": {
+      "processUser": {
         "topic": "execute/dataFetcher/Compound",
         "roundrobing": true
       },

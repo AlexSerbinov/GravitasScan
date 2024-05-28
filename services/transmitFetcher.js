@@ -3,6 +3,9 @@ const { configurePool, getProvider } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
 const { createSimulator } = require("../lib/simulator")
 
+/**
+ * import events logger constants from loggerTopicsConstants
+ */
 const { START, STOP, LIQUIDATE_EVENT, SIMULATIONS_STARTED, INPUT_TRANSMIT, ERROR_MESSAGE } = require("../configs/loggerTopicsConstants")
 /**
  * @param {*} filters - The filters object containing the following properties:
@@ -51,8 +54,10 @@ await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
  */
 const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
 
-const fetcher = createTransmitFetcher(protocol, filters, maxNumberOfUsersToSimulate, config, simulator)
-const provider = getProvider()
+/**
+ * Create transmit fetcher. The main filtering logic
+ */
+const fetcher = createTransmitFetcher($.params, filters, config, simulator)
 
 $.send("start", {
   service,
@@ -61,34 +66,6 @@ $.send("start", {
   data: { date: new Date().toUTCString() },
 })
 console.log(`TransmitFetcher started ${protocol}`)
-
-fetcher.on("liquidate", data => {
-  $.send("liquidateCommand", data)
-  fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
-})
-
-fetcher.on("info", (data, ev = "info") => {
-  // console.log(`recieved log: service: ${service} | event: ${ev}`)
-  $.send("info", {
-    service,
-    protocol,
-    ev,
-    data: JSON.stringify(data),
-  })
-})
-
-fetcher.on("errorMessage", data => {
-  $.send("errorMessage", {
-    service,
-    protocol,
-    ev: ERROR_MESSAGE,
-    data: { error: JSON.stringify(data) },
-  })
-})
-
-$.on(`onReservesData`, data => {
-  fetcher.setGlobalReservesData(data)
-})
 
 /**
  * input point
@@ -119,7 +96,61 @@ $.on("transmit", async data => {
 })
 
 /**
+ * Main output point.
+ * Send liquidate event to the Liquidator service
+ * And log to the logger server
+ */
+fetcher.on("liquidate", data => {
+  $.send("liquidateCommand", data)
+  fetcher.emit("info", data.resp, LIQUIDATE_EVENT)
+})
+
+/**
+ * Set grobal reserves data
+ */
+$.on(`onReservesData`, data => {
+  fetcher.setGlobalReservesData(data)
+})
+
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("info", data) directly
+ */
+fetcher.on("info", (data, ev = "info") => {
+  $.send("info", {
+    service,
+    protocol,
+    ev,
+    data: JSON.stringify(data),
+  })
+})
+
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("errorMessage", data) directly
+ */
+fetcher.on("errorMessage", data => {
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: ERROR_MESSAGE,
+    data: JSON.stringify(data),
+  })
+})
+
+// Handle uncaught exceptions
+process.on("uncaughtException", error => {
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: ERROR_MESSAGE,
+    data: error,
+  })
+})
+
+/**
  * Handle process exit
+ * If you need to perform some cleanup before the process exits, add this functionale here
  */
 $.onExit(async () => {
   return new Promise(resolve => {
@@ -135,15 +166,5 @@ $.onExit(async () => {
       })
       resolve()
     }, 100) // Small timeout to ensure async cleanup completes
-  })
-})
-
-// Handle uncaught exceptions
-process.on("uncaughtException", error => {
-  $.send("errorMessage", {
-    service,
-    protocol,
-    ev: ERROR_MESSAGE,
-    data: error,
   })
 })

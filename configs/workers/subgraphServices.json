@@ -6,7 +6,7 @@
       "drain": {
         "topic": "event/drain/subgraph/V1"
       },
-      "sendDataToDataFetcher": {
+      "sendToDataFetcher": {
         "topic": "execute/dataFetcher/V1"
       },
       "errorMessage": {
@@ -63,7 +63,7 @@
       "drain": {
         "topic": "event/drain/subgraph/V1"
       },
-      "sendDataToDataFetcher": {
+      "sendToDataFetcher": {
         "topic": "execute/dataFetcher/V1"
       }
     },
@@ -90,7 +90,7 @@
       "drain": {
         "topic": "event/drain/subgraph/V2"
       },
-      "sendDataToDataFetcher": {
+      "sendToDataFetcher": {
         "topic": "execute/dataFetcher/V2"
       }
     },
@@ -117,7 +117,7 @@
       "drain": {
         "topic": "event/drain/subgraph/V3"
       },
-      "sendDataToDataFetcher": {
+      "sendToDataFetcher": {
         "topic": "execute/dataFetcher/V3"
       }
     },
@@ -144,7 +144,7 @@
       "drain": {
         "topic": "event/drain/subgraph/Compound"
       },
-      "sendDataToDataFetcher": {
+      "sendToDataFetcher": {
         "topic": "dev-execute/dataFetcher/Compound"
       }
     },

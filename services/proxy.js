@@ -3,6 +3,11 @@ const redis = require("../lib/redis/redis/lib/redis")
 const { getArchiveData } = require("../lib/redis/index")
 
 /**
+ * import events logger constants from loggerTopicsConstants
+ */
+const { ERROR_MESSAGE, START, STOP, INFO, RECEIVED_DRAIN_EVENT, ALL_BATCHES_SENT, TOTAL_STORED_USERS, NON_BLACKLIST_USERS_COUNT } = require("../configs/loggerTopicsConstants")
+
+/**
  * @param {number} batchSize - The number of users to process in each batch. This determines the size of the user groups
  * sent to the subgraph in each operation, affecting the throughput and efficiency of the data processing.
  * This is also the number of users that will be sent to the simulator in one bundle. NOTE: that with a bundle size
@@ -17,7 +22,7 @@ const { getArchiveData } = require("../lib/redis/index")
  * batch of users if no 'drain' event is received. This timeout ensures that data continues to flow, preventing potential
  * deadlocks or stalls in data processing.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  */
 const { batchSize, protocol, configPath, service, SEND_WITHOUT_DRAIN_TIMEOUT } = $.params
@@ -25,18 +30,15 @@ const config = require(`${process.cwd()}${configPath}`)
 const fetcher = new EventEmitter()
 
 /**
- * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ * Prepare Redis connection
+ * @param {url} config.REDIS_HOST - Redis host address
+ * @param {number} config.REDIS_PORT - Redis port number
  */
-await redis.prepare(config.REDIS_HOST, config.REDIS_PORT) // Check if needed
+await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 const { checkUsersInBlacklistSet } = require("../lib/redis")
 
-console.log(`proxy started`)
-$.send("start", {
-  service,
-  protocol,
-  ev: "start",
-  data: `proxy started`,
-})
+console.log(`${service} started`)
+fetcher.emit("info", `proxy started. batchSize = ${batchSize}, SEND_WITHOUT_DRAIN_TIMEOUT = ${SEND_WITHOUT_DRAIN_TIMEOUT}`, START)
 
 let isSending = false // Flag to indicate if sending is in progress
 
@@ -53,32 +55,18 @@ fetcher.on("sendUsersToSubgraph", async () => {
  * Listener for 'drain' events to manage sending users to the subgraph.
  * It keeps track of the time and count of drain events to ensure timely processing.
  */
-let lastDrainTime = Date.now() // Initialize lastDrainTime to the current time
 let drainEventCount = 0 // Counter for drain events
 
 $.on("drain", data => {
-  console.log(`drain called`)
-  if (!isSending) {
-    drainEventCount++
-    console.log(`drainEventCount = ${drainEventCount} of ${data.forks}`)
-    if (drainEventCount === data.forks) {
-      const currentTime = Date.now()
-      lastDrainTime = currentTime // Update lastDrainTime
-      const elapsedSinceLastDrain = (currentTime - lastDrainTime) / 1000 // Time in seconds
-      console.log(`Received expected number of drain events: ${data.forks}`)
-      drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
-      console.log(`PROXY: Received drain event at ${new Date(currentTime).toISOString()}, ${elapsedSinceLastDrain.toFixed(2)} seconds since last drain.`)
-      console.log(`PROXY: ${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`)
-      $.send("info", {
-        service,
-        protocol,
-        ev: "info",
-        data: `${protocol} Received  drain event from subgraph. Flag isSending = ${isSending}`,
-      })
+  fetcher.emit("info", `${protocol} Received drain event from subgraph. Flag isSending = ${isSending}`, RECEIVED_DRAIN_EVENT)
+  if (isSending) return
+  drainEventCount++
+  if (drainEventCount === data.forks) {
+    fetcher.emit("info", `${protocol} Received all ${drainEventCount}/${data.forks} drain event from subgraph. Flag isSending = ${isSending}`, RECEIVED_DRAIN_EVENT)
+    drainEventCount = 0 // Reset the counter after reaching the expected number of drain events
 
-      clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
-      onDrain()
-    }
+    clearTimeout(drainTimer) // Reset the drain timer because of receiving the drain event
+    onDrain()
   }
 })
 
@@ -102,11 +90,11 @@ const getNonBlacklistedUsers = async protocol => {
   const allUsers = await getArchiveUsers(protocol)
 
   const usersToCheck = allUsers.map(userInfo => userInfo.user)
-  console.log(`${protocol} all users count: ${usersToCheck.length}`)
+  fetcher.emit("info", `${protocol} all users count: ${usersToCheck.length}`, TOTAL_STORED_USERS)
   const checkBlacklistUsers = await checkUsersInBlacklistSet(usersToCheck, protocol)
 
   const nonBlacklistedUsers = allUsers.filter((_, index) => checkBlacklistUsers[index] === 0).map(userInfo => userInfo.user.toLowerCase()) // Mapping to get only user addresses and Convert users to lowercase after filtering
-  console.log(`${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`)
+  fetcher.emit("info", `${protocol} non blacklisted users count: ${nonBlacklistedUsers.length}`, NON_BLACKLIST_USERS_COUNT)
 
   return nonBlacklistedUsers
 }
@@ -138,16 +126,11 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
       const batch = nonBlacklistedUsers.slice(i, i + batchSize)
       const batchNumber = i / batchSize + 1
 
+      $.send("sendUsersToSubgraph", batch)
       // Check if the current batch is the last one
       if (batchNumber === totalBatches) {
-        $.send("info", {
-          service,
-          protocol,
-          ev: "info",
-          data: `Sent all ${batchNumber} batches. Each batch contain ${batchSize} of users`,
-        })
+        fetcher.emit("info", `Sent all ${batchNumber} batches. Each batch contains ${batchSize} users`, ALL_BATCHES_SENT)
       }
-      $.send("sendUsersToSubgraph", batch)
 
       batchesSent++
       // Check if all batches have been sent
@@ -160,32 +143,16 @@ const sendUsersToSubraphInBatches = async nonBlacklistedUsers => {
  * Sets up a timer to trigger the drain event manually if not received within a specified timeout.
  */
 let drainTimer
-let manualTriggerCount = 0
 const setupDrainTimer = () => {
   clearTimeout(drainTimer)
 
   drainTimer = setTimeout(() => {
-    if (manualTriggerCount >= 10)
-      $.send("info", {
-        service,
-        protocol,
-        ev: "info",
-        data: `Bad behavior. manualTriggerCount = ${manualTriggerCount}! Executes to offen. Something with drain event. It can be when subgraf not send "drain" event. Or subgraph do not have enough time for user processing`,
-      })
-
     onDrain()
       .then(() => {
-        manualTriggerCount++
         setupDrainTimer() // Reset the timer after successful drain
       })
       .catch(error => {
-        $.send("errorMessage", {
-          service,
-          protocol,
-          ev: "error_message",
-          data: error,
-        })
-
+        fetcher.emit("error", error)
         console.error("Drain failed:", error)
       })
   }, SEND_WITHOUT_DRAIN_TIMEOUT)
@@ -193,20 +160,49 @@ const setupDrainTimer = () => {
 
 // Initiate the main functionality immediately upon script start
 onDrain()
-// Start the drain timer to send batches if fist drain event nor recieved
+// Start the drain timer to send batches if first drain event not received
 setupDrainTimer()
 
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("info", data) directly
+ */
+fetcher.on("info", (data, ev = INFO) => {
+  $.send("info", {
+    service,
+    protocol,
+    ev,
+    data: JSON.stringify(data),
+  })
+})
+
+/**
+ * Fetcher error event
+ */
 fetcher.on("error", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data,
+  })
+})
+
+// Handle uncaught exceptions
+process.on("uncaughtException", error => {
+  console.error(error)
+  fetcher.emit("error", error)
+  $.send("errorMessage", {
+    service,
+    protocol,
+    ev: ERROR_MESSAGE,
+    data: error,
   })
 })
 
 /**
  * Handle process exit
+ * If you need to perform some cleanup before the process exits, add this functionale here
  */
 $.onExit(async () => {
   return new Promise(resolve => {
@@ -215,22 +211,12 @@ $.onExit(async () => {
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
       $.send("stop", {
-        service: "archive",
+        service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
     }, 100) // Small timeout to ensure async cleanup completes
-  })
-})
-
-// Handle uncaught exceptions
-process.on("uncaughtException", error => {
-  $.send("errorMessage", {
-    service: "archive",
-    protocol,
-    ev: "error_message",
-    data: error,
   })
 })

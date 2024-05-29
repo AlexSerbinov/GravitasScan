@@ -2,28 +2,28 @@
   "Events": {
     "forks": 1,
     "script": "services/events.js",
-    "namespace": "Events",
+    "namespace": "events",
     "notify": {
       "sendBlock": {
-        "topic": "data:block"
+        "topic": "data/block"
       },
       "sendGlobalReservesV1": {
-        "topic": "data:reserves:V1"
+        "topic": "data/reserves/V1"
       },
       "sendGlobalReservesV2": {
-        "topic": "data:reserves:V2"
+        "topic": "data/reserves/V2"
       },
       "sendGlobalReservesV3": {
-        "topic": "data:reserves:V3"
+        "topic": "data/reserves/V3"
       },
       "sendGlobalReservesCompound": {
-        "topic": "data:reserves:Compound"
+        "topic": "data/reserves/Compound"
       },
       "sendGlobalReservesLiquity": {
-        "topic": "data:reserves:Liquity"
+        "topic": "data/reserves/Liquity"
       },
       "sendGlobalReservesMakerDAO_CDP": {
-        "topic": "data:reserves:MakerDAO_CDP"
+        "topic": "data/reserves/MakerDAO_CDP"
       },
       "start": {
         "topic": "logger/liquidator"
@@ -31,11 +31,15 @@
       "info": {
         "topic": "logger/liquidator"
       },
+      "stop": {
+        "topic": "logger/liquidator"
+      },
       "errorMessage": {
         "topic": "logger/liquidator"
       }
     },
     "params": {
+      "service": "events",
       "mode": "http",
       "GET_BLOCK_NUMBER_HTTP_INTERVAL": 10,
       "WATCHER_RESERVES_INTERVAL": 500,

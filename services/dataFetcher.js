@@ -1,7 +1,13 @@
-const { createFetcher } = require("../lib/services/data-fetcher/fetchers")
+const { createFetcher } = require("../lib/services/data-fetcher/fetchers/fetcher-factory")
 const { configurePool } = require("../lib/ethers/pool")
 const redis = require("../lib/redis/redis/lib/redis")
+const { createSimulator } = require("../lib/simulator")
 const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../lib/redis")
+
+/**
+ * import events logger constants from loggerTopicsConstants
+ */
+const { START, STOP, INFO, LIQUIDATE_EVENT, ERROR_MESSAGE, RECIEVED_INPUT_ADDRESS } = require("../configs/loggerTopicsConstants")
 
 /**
  * @param {*} filters - The filters object containing the following properties:
@@ -17,30 +23,51 @@ const { addUsersToDataFetcherSet, removeUsersFromDataFetcherSet } = require("../
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
+ * @param {Function} formattedTrace - A function used in the simulator to format the formattedTrace log. It displays every
+ * call between the smart contract, including call, delegate call, etc., providing a complete breakdown of interactions.
+ *
+ * @param {string} stateOverrides - The bytecode of the smart contract used for simulation. This is utilized
+ * to fetch user data using the simulator, effectively representing the bytecode of our smart contract.
+ *
+ * @param {string} enso_url - The url to enso simulator
  */
 
-const { protocol, configPath, filters, service } = $.params
+const { protocol, configPath, filters, service, formattedTrace, stateOverrides, enso_url } = $.params
 
-// Main.json
+// Load the configuration Main.json file
 const config = require(`${process.cwd()}${configPath}`)
 
-configurePool([config.RPC_WSS])
-
 /**
- * We prepare redis here because only in this place we have config params. And we don't want to use global variables.
+ * Prepare Redis connection
+ * @param {url} config.REDIS_HOST - Redis host address
+ * @param {number} config.REDIS_PORT - Redis port number
  */
 await redis.prepare(config.REDIS_HOST, config.REDIS_PORT)
 
-const fetcher = createFetcher(protocol, filters, config)
+/**
+ * Initiating the connection to the Ethereum node
+ */
+configurePool([config.RPC_WSS])
 
-console.log(`dataFetcher started ${protocol}`)
+/**
+ * Interface for enso simulator
+ */
+const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
+
+/**
+ * Create fetcher. Main filtering logic
+ */
+const fetcher = createFetcher(protocol, filters, config, $.params, simulator)
+
+console.log(`${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"}`)
+
 $.send("start", {
   service,
   protocol,
-  ev: "start",
-  data: { date: new Date().toUTCString() },
+  ev: START,
+  data: `${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"}`,
 })
 
 /**
@@ -51,12 +78,6 @@ fetcher.on("pushToRedis", data => {
   for (let index = 0; index < assets.length; index++) {
     addUsersToDataFetcherSet([user], protocol, assets[index])
   }
-  // $.send("info", {
-  //   service,
-  //   protocol,
-  //   ev: "pushToRedis",
-  //   data: JSON.stringify(data),
-  // })
 })
 /**
  * When user deletes
@@ -75,13 +96,21 @@ fetcher.on("deleteFromRedis", data => {
   })
 })
 
+/**
+ * Main output point.
+ * Send liquidate event to the Liquidator service
+ * And log to the logger server
+ */
 fetcher.on("liquidate", data => {
-  console.log(`send liquidate Command`, data)
   $.send("liquidateCommand", data)
-  fetcher.emit("info", data, "liquidate_event")
+  fetcher.emit("info", data, LIQUIDATE_EVENT)
 })
 
-fetcher.on("info", (data, ev = "info") => {
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("info", data) directly
+ */
+fetcher.on("info", (data, ev = INFO) => {
   $.send("info", {
     service,
     protocol,
@@ -90,28 +119,26 @@ fetcher.on("info", (data, ev = "info") => {
   })
 })
 
-fetcher.on("reject", data => {
-  $.send("reject", {
-    service,
-    protocol,
-    ev: "reject",
-    data,
-  })
-})
-
+/**
+ * Used for sending logs from other parts of the protocol to the logger server
+ * Main logger handler, use this instead of this.emit("errorMessage", data) directly
+ */
 fetcher.on("errorMessage", data => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: JSON.stringify(data),
   })
 })
 
 /**
- * Listening
+ * Listeners
  */
 
+/**
+ * Set grobal reserves data
+ */
 $.on(`onReservesData`, data => {
   fetcher.setGlobalReservesData(data)
 })
@@ -119,12 +146,11 @@ $.on(`onReservesData`, data => {
 /**
  * Main entry point. Listen user's adddresess
  */
-$.on("searcherExecute", async data => {
-  console.log(`dataFetcher ${protocol} Recieved input address ${JSON.stringify(data)}`)
+$.on("processUser", async data => {
   $.send("info", {
     service,
     protocol,
-    ev: "Recieved input address",
+    ev: RECIEVED_INPUT_ADDRESS,
     data: JSON.stringify(data),
   })
   fetcher.fetchData(data)
@@ -139,9 +165,9 @@ $.onExit(async () => {
       const { pid } = process
       const date = new Date().toUTCString()
       $.send("stop", {
-        service: "subgraph",
+        service,
         protocol,
-        ev: "stop",
+        ev: STOP,
         data: date,
       })
       resolve()
@@ -152,9 +178,9 @@ $.onExit(async () => {
 // Handle uncaught exceptions
 process.on("uncaughtException", error => {
   $.send("errorMessage", {
-    service: "subgraph",
+    service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 })

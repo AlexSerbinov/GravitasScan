@@ -1,16 +1,19 @@
 const { configurePool } = require("../lib/ethers/pool")
 
 const { createBlockWatcher } = require("../lib/services/events/watcher-block")
-const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves")
+const { createWatcherV1, createWatcherV2, createWatcherV3, createWatcherCompound, createWatcherLiquity, createWatcherMakerDao } = require("../lib/services/events/reserves/watcher-reserves-factory")
 const { EventEmitter } = require("node:events")
 
 /**
- * @param {string} protocol - The name of the lending protocol (e.g., "V1", "V2", "V3" "Compound")
- *
+ * import events logger constants from loggerTopicsConstants
+ */
+const { START, STOP, INFO, ERROR_MESSAGE } = require("../configs/loggerTopicsConstants")
+
+/**
  * @param {string} configPath - Path to the configuration file Main.json, that contains necessary filters and parameters for the service.
  * This file includes configurations such as database connections, service endpoints, and other operational parameters.
  *
- * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "TransmitFetcher" "Proxy", "Archive", etc.)
+ * @param {string} service - The name of the service (e.g., "subgraph", "dataFetcher", "transmitFetcher" "proxy", "archive", "blacklist", etc.)
  *
  * @param {string} mode - The protocol used for network communication: 'http', 'https', 'ws', or 'wss'.
  * This defines how the service will connect to provider for getting new block
@@ -21,10 +24,15 @@ const { EventEmitter } = require("node:events")
  * @param {number} WATCHER_RESERVES_INTERVAL - The time interval (in milliseconds) for the reserves watcher to trigger.
  * It defines how frequently the service should check or update reserves related data.
  */
-const { protocol, configPath, service, WATCHER_RESERVES_INTERVAL, GET_BLOCK_NUMBER_HTTP_INTERVAL, mode } = $.params
+const { configPath, service, WATCHER_RESERVES_INTERVAL, GET_BLOCK_NUMBER_HTTP_INTERVAL, mode } = $.params
 
+/**
+ * Load the configuration Main.json file
+ */
 const config = require(`${process.cwd()}${configPath}`)
-Object.assign(process.env, config)
+/**
+ * Initiating the connection to the Ethereum node
+ */
 configurePool([config.RPC_WSS])
 
 /**
@@ -33,7 +41,7 @@ configurePool([config.RPC_WSS])
 const blockWatcher = createBlockWatcher()
   .onBlock(number => {
     $.send("sendBlock", { number, chain: "eth" })
-    sendInfoEvent("sendBlock", number, "ALL")
+    sendInfoEvent("sendBlock", number)
   })
   .onError(e => sendErrorEvent(e))
 
@@ -43,42 +51,36 @@ const blockWatcher = createBlockWatcher()
 const reservesV1 = createWatcherV1(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV1", data)
-    sendInfoEvent("sendGlobalReserves", {}, "V1")
   })
   .onError(e => sendErrorEvent(e, "V1"))
 
 const reservesV2 = createWatcherV2(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV2", data)
-    sendInfoEvent("sendGlobalReserves", {}, "V2")
   })
   .onError(e => sendErrorEvent(e, "V2"))
 
 const reservesV3 = createWatcherV3(config)
   .onReserves(data => {
     $.send("sendGlobalReservesV3", data)
-    sendInfoEvent("sendGlobalReserves", {}, "V3")
   })
   .onError(e => sendErrorEvent(e, "V3"))
 
 const reservesCompound = createWatcherCompound(config)
   .onReserves(data => {
     $.send("sendGlobalReservesCompound", data)
-    sendInfoEvent("sendGlobalReserves", {}, "Compound")
   })
   .onError(e => sendErrorEvent(e, "Compound"))
 
 const watcherLiquity = createWatcherLiquity(config)
   .onReserves(data => {
     $.send("sendGlobalReservesLiquity", data)
-    sendInfoEvent("sendGlobalReserves", {}, "Liquity")
   })
   .onError(e => sendErrorEvent(e, "Liquity"))
 
 const watcherMakerDao = createWatcherMakerDao(config)
   .onReserves(data => {
     $.send("sendGlobalReservesMakerDAO_CDP", data)
-    sendInfoEvent("sendGlobalReserves", {}, "MakerDAO_CDP")
   })
   .onError(e => sendErrorEvent(e, "MakerDAO_CDP"))
 
@@ -115,7 +117,7 @@ const start = async mode => {
   $.send("start", {
     service,
     protocol: "All",
-    ev: "start",
+    ev: START,
     data: "All event watchers started",
   })
 }
@@ -130,12 +132,7 @@ const stop = () => {
   reservesV2.stop()
   reservesV3.stop()
   reservesCompound.stop()
-  $.send("stop", {
-    service,
-    protocol: "All",
-    ev: "stop",
-    data: "All event watchers stopped",
-  })
+  sendStopEvent(STOP, "All event watchers stopped")
 }
 
 module.exports = { start, stop }
@@ -150,30 +147,34 @@ $.onExit(async () => {
       stop()
       console.log(pid, "Ready to exit.")
       const date = new Date().toUTCString()
-      $.send("stop", {
-        service,
-        protocol,
-        ev: "stop",
-        data: date,
-      })
+      sendStopEvent(STOP, date)
       resolve()
     }, 150) // Small timeout to ensure async cleanup completes
   })
 })
 
-const sendErrorEvent = (error, protocol) => {
+const sendErrorEvent = (error, protocol = "All") => {
   $.send("errorMessage", {
     service,
     protocol,
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
   })
 }
 
-const sendInfoEvent = (ev, info, protocol) => {
+const sendInfoEvent = (ev = INFO, info) => {
   $.send("info", {
     service,
-    protocol,
+    protocol: "All",
+    ev,
+    data: info,
+  })
+}
+
+const sendStopEvent = (ev = STOP, info) => {
+  $.send("stop", {
+    service,
+    protocol: "All",
     ev,
     data: info,
   })
@@ -183,7 +184,22 @@ process.on("uncaughtException", error => {
   $.send("errorMessage", {
     service,
     protocol: "All",
-    ev: "error_message",
+    ev: ERROR_MESSAGE,
     data: error,
+  })
+})
+
+/**
+ * Handle process exit
+ */
+$.onExit(async () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const { pid } = process
+      console.log(pid, "Ready to exit.")
+      const date = new Date().toUTCString()
+      sendStopEvent(STOP, date)
+      resolve()
+    }, 100) // Small timeout to ensure async cleanup completes
   })
 })

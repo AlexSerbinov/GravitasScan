@@ -145,7 +145,7 @@
         "topic": "event/drain/subgraph/Compound"
       },
       "sendToDataFetcher": {
-        "topic": "dev-execute/dataFetcher/Compound"
+        "topic": "execute/dataFetcher/Compound"
       }
     },
     "params": {

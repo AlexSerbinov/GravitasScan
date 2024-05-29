@@ -61,13 +61,13 @@ const simulator = createSimulator(enso_url, formattedTrace, stateOverrides)
  */
 const fetcher = createFetcher(protocol, filters, config, $.params, simulator)
 
-console.log(`${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"} mode.`)
+console.log(`${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"}`)
 
 $.send("start", {
   service,
   protocol,
   ev: START,
-  data: `${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"} mode.`,
+  data: `${service} started ${protocol} using ${$.params?.useSimulatorInsteadOfNode ? "simulator" : "node"}`,
 })
 
 /**

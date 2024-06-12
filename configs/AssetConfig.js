@@ -122,7 +122,7 @@ const AssetConfig = {
     SYMBOL: "WBTC", // Wrapped Bitcoin
   },
   "0x6B175474E89094C44Da98b954EedeAC495271d0F": {
-    V3: ["0x478238a1c8B862498c74D0647329Aef9ea6819Ed"], // AccessControlledOffchainAggregator DAI / USD
+    V3: ["0x478238a1c8B862498c74D0647329Aef9ea6819Ed", "0xE62B71cf983019BFf55bC83B48601ce8419650CC"], // AccessControlledOffchainAggregator DAI / USD | UPDATE: Added AccessControlledOffchainAggregator ETH / USD
     V2: [
       "0x158228e08C52F3e2211Ccbc8ec275FA93f6033FC", // Old one, probably not used | AccessControlledOffchainAggregator DAI / ETH
       "0x478238a1c8B862498c74D0647329Aef9ea6819Ed", // AccessControlledOffchainAggregator DAI / USD (ASSET to PEG)
@@ -137,7 +137,7 @@ const AssetConfig = {
     SYMBOL: "DAI", // Dai Stablecoin
   },
   "0x83F20F44975D03b1b09e64809B757c47f942BEeA": {
-    V3: ["0x478238a1c8B862498c74D0647329Aef9ea6819Ed"], // AccessControlledOffchainAggregator DAI / USD (Yes, DAI / USD, not sDAI)
+    V3: ["0x478238a1c8B862498c74D0647329Aef9ea6819Ed", "0xE62B71cf983019BFf55bC83B48601ce8419650CC"], // AccessControlledOffchainAggregator DAI / USD (Yes, DAI / USD, not sDAI) | UPDATE: Added AccessControlledOffchainAggregator ETH / USD
     SYMBOL: "sDAI", // Synthetix DAI
   },
   "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0": {

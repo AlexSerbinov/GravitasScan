@@ -33,4 +33,4 @@ Blacklist is the first sub-service for filtering by Health Factor (HF), MinBorro
 
 ## Conclusion
 
-Blacklis
+Blacklist provides effective initial filtering of users who do not meet the necessary criteria, allowing focus on those worth working with further. The service constantly maintains an up-to-date list of users for further processing in the LiqRegistry system.

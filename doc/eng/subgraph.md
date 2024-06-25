@@ -26,6 +26,6 @@ Subgraph is a service that filters users for further liquidation. Subgraph focus
 5. **Circle Scanning**:
    - If a user's parameters remain within the Subgraph's output filters (for example, HF 0.95), they will be constantly sent to DataFetcher until they are liquidated or until their parameters go beyond the filters.
 
-#### Conclusion
+## Conclusion
 
 Subgraph provides accurate and fast filtering of users for further liquidation, taking into account all necessary parameters. The service is somewhat similar to Blacklist, but the speed of filtering is important for it.

@@ -1,41 +1,41 @@
 # DataFetcher
 
-DataFetcher – це один із кінцевих сервісів у системі. Його основне завдання – приймати рішення про ліквідацію користувачів або додавання їх до WatchList для подальшого моніторингу. DataFetcher працює разом із Subgraph і може бути як кінцевим сервісом, так і передавати користувачів до TransmitFetcher для подальшої обробки, шляхом додавання юзерів в Redis Watchlist.
+DataFetcher is one of the final services in the system. Its main task is to make decisions about liquidating users or adding them to the WatchList for further monitoring. DataFetcher works together with Subgraph and can be both a final service and pass users to TransmitFetcher for further processing by adding users to the Redis Watchlist.
 
-## Основні принципи роботи DataFetcher
+## Main principles of DataFetcher operation
 
-### 1. Ініціалізація:
+### 1. Initialization:
 
-- DataFetcher приймає користувачів тільки від сервісу Subgraph. Він не має механізмів читання юзерів (на вході) з баз даних (Redis).
-- Однак, DataFetcher має механізм роботи з Redis на виході. Після обробки користувачів, DataFetcher вирішує, чи додавати користувачів до WatchList у Redis, чи ні.
+- DataFetcher accepts users only from the Subgraph service. It does not have mechanisms for reading users (at the input) from databases (Redis).
+- However, DataFetcher has a mechanism for working with Redis at the output. After processing users, DataFetcher decides whether to add users to the WatchList in Redis or not.
 
-### 2. Аналіз користувачів:
+### 2. User analysis:
 
-- DataFetcher аналізує HF користувача, а також всі токени, що є в Borrow та Collateral у користувача. Він вибирає найбільший токен для ліквідації (Best Borrow та Best Collateral), оскільки ми можемо ліквідувати тільки один Borrow або один Collateral у користувача.
-- Наприклад, на етапі Subgraph ми перевіряємо MinBorrow і MinCollateral у користувачів. Якщо значення MinBorrow становить 0,1 ETH, Subgraph пропускає користувача далі на DataFetcher. Однак, DataFetcher перевіряє всі токени у користувача і може побачити, що у користувача є три токени в Borrow. Він вибирає найбільший токен для ліквідації.
-- Якщо найбільший з цих Borrow менше за MinBorrow (наприклад, менше 0,1 ETH), то такого користувача не буде ліквідовано.
+- DataFetcher analyzes the user's HF, as well as all tokens that are in the user's Borrow and Collateral. It selects the largest token for liquidation (Best Borrow and Best Collateral), as we can only liquidate one Borrow or one Collateral per user.
+- For example, at the Subgraph stage, we check MinBorrow and MinCollateral for users. If the MinBorrow value is 0.1 ETH, Subgraph passes the user further to DataFetcher. However, DataFetcher checks all tokens of the user and may see that the user has three tokens in Borrow. It selects the largest token for liquidation.
+- If the largest of these Borrows is less than MinBorrow (for example, less than 0.1 ETH), such a user will not be liquidated.
 
-### 3. Фільтри в параметрах:
+### 3. Filters in parameters:
 
-- MinHfDel і MaxHfDel: Якщо DataFetcher бачить, що Health Factor користувача менший за MinHfDel або більший за MaxHfDel, він видаляє такого користувача з WatchList.
-- MinHfLiq і MaxHfLiq: Якщо Health Factor користувача знаходиться в межах від MinHfLiq до MaxHfLiq, користувач буде відправлений на ліквідацію. Наприклад, якщо MaxHfLiq = 1 і MaxHfDel = 1.2, це означає, що якщо Health Factor користувача буде від 1 до 1.2, він залишатиметься в WatchList. Якщо більше 1.2, то користувач буде видалений з WatchList.
-- MinBorrow і MinCollateral: На відміну від Subgraph, де MinBorrow і MinCollateral означають Total MinBorrow (загальне значення borrow по всіх токенах у borrow користувача), у DataFetcher ці параметри визначають значення для одного найбільшого borrow і одного найбільшого collateral.
+- MinHfDel and MaxHfDel: If DataFetcher sees that the user's Health Factor is less than MinHfDel or greater than MaxHfDel, it removes such a user from the WatchList.
+- MinHfLiq and MaxHfLiq: If the user's Health Factor is between MinHfLiq and MaxHfLiq, the user will be sent for liquidation. For example, if MaxHfLiq = 1 and MaxHfDel = 1.2, it means that if the user's Health Factor is from 1 to 1.2, they will remain in the WatchList. If it's more than 1.2, the user will be removed from the WatchList.
+- MinBorrow and MinCollateral: Unlike Subgraph, where MinBorrow and MinCollateral mean Total MinBorrow (total borrow value across all tokens in the user's borrow), in DataFetcher these parameters define the value for one largest borrow and one largest collateral.
 
-### 4. Прийняття рішень:
+### 4. Decision making:
 
-- Якщо користувач підходить для ліквідації (наприклад, Health Factor < 1), DataFetcher відправляє подію liquidate (execute/liquidator/${protocol}) для LiqExecutor.
-- Якщо користувач не підходить для ліквідації, DataFetcher додає його до WatchList у Redis для подальшого моніторингу. Наприклад, якщо Health Factor користувача > 1 або його мінімальний Borrow/Collateral не підходять для ліквідації, DataFetcher додає його до WatchList.
-- DataFetcher також видаляє користувачів з WatchList, якщо їхні параметри змінилися і вони більше не відповідають критеріям для моніторингу або ліквідації.
+- If a user is suitable for liquidation (for example, Health Factor < 1), DataFetcher sends a liquidate event (execute/liquidator/${protocol}) to LiqExecutor.
+- If a user is not suitable for liquidation, DataFetcher adds them to the WatchList in Redis for further monitoring. For example, if the user's Health Factor > 1 or their minimum Borrow/Collateral is not suitable for liquidation, DataFetcher adds them to the WatchList.
+- DataFetcher also removes users from the WatchList if their parameters have changed and they no longer meet the criteria for monitoring or liquidation.
 
-### 5. Моніторинг та оновлення:
+### 5. Monitoring and updating:
 
-- Користувачі з WatchList будуть моніторитися TransmitFetcher.
-- DataFetcher постійно перевіряє користувачів, що надходять від Subgraph, і приймає відповідні дії (наприклад, ліквідація або видалення з WatchList).
+- Users from the WatchList will be monitored by TransmitFetcher.
+- DataFetcher constantly checks users coming from Subgraph and takes appropriate actions (for example, liquidation or removal from the WatchList).
 
-## Примітка
+## Note
 
-Як було описано в розділі Subgraph, якщо користувач відповідає критеріям ліквідації (наприклад, Health Factor 0,95), Subgraph буде постійно відправляти цього користувача на DataFetcher кожні півтори хвилини, поки користувач не буде ліквідований. Тому DataFetcher може часто отримувати одного і того ж користувача. Якщо DataFetcher вирішує не ліквідувати цього користувача, він все одно пройде на наступному кроці від Subgraph.
+As described in the Subgraph section, if a user meets the liquidation criteria (for example, Health Factor 0.95), Subgraph will constantly send this user to DataFetcher every one and a half minutes until the user is liquidated. Therefore, DataFetcher may often receive the same user. If DataFetcher decides not to liquidate this user, they will still pass on the next step from Subgraph.
 
-## Висновок
+## Conclusion
 
-DataFetcher забезпечує детальний аналіз користувачів і приймає рішення про їх ліквідацію або додавання до WatchList для подальшого моніторингу. Його функціонал дозволяє перевіряти кожен окремий borrow та collattral юзера. І на основі їх параметрів відправляти озера на ліквідацію чи додавати в Wathlist для подальшого спостереження сервісом TransmitFetcher.
+DataFetcher provides detailed user analysis and makes decisions about their liquidation or addition to the WatchList for further monitoring. Its functionality allows checking each individual borrow and collateral of the user. And based on their parameters, it sends users for liquidation or adds them to the Watchlist for further observation by the TransmitFetcher service.

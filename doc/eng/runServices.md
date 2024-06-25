@@ -1,184 +1,188 @@
-# Запуск проекту
+# Project Launch
 
-## Загальні інструкції
+## General Instructions
 
-Для запуску проекту необхідно виконати наступні кроки:
+To launch the project, you need to perform the following steps:
 
-1. Переконайтесь, що у вас встановлено pm2: `npm install -g pm2`
-2. встановіть npm пакети командою: `npm install`
-3. Налаштуйте всю необхідну інфраструктуру (розділ Налаштування інфраструктури)
-4. Запустіть всі сервіси командою: `npm run all`
-5. Щоб зупинити конкретний сервіс, використовуйте команду: `pm2 stop <назва сервісу чи неймспейсу>`
-6. Щоб повністю зупинити всі сервіси, використовуйте команду: `pm2 stop all`
-7. Після оновлення коду обов'язково виконуйте наступні команди, інакше зміни не будуть враховані у pm2: `pm2 stop all` `npm run all`
+1. Make sure you have pm2 installed: `npm install -g pm2`
+2. Install npm packages with the command: `npm install`
+3. Set up all necessary infrastructure (Infrastructure Setup section)
+4. Launch all services with the command: `npm run all`
+5. To stop a specific service, use the command: `pm2 stop <service name or namespace>`
+6. To completely stop all services, use the command: `pm2 stop all`
+7. After updating the code, always execute the following commands, otherwise changes will not be accounted for in pm2: `pm2 stop all` `npm run all`
 
-## Налаштування інфраструктури
+## Infrastructure Setup
 
-Інфраструктура проекту має два оточення: девелопмент і продакшн. Для кожного з цих оточень необхідно ввімкнути свій VPN.
+The project infrastructure has two environments: development and production. For each of these environments, you need to enable its own VPN.
 
-## Підключення до Redis
+## Connecting to Redis
 
-Файл конфігурації: `configs/Main.json`
+Configuration file: `configs/Main.json`
 
-## Підключення до MQTT хоста
+## Connecting to MQTT host
 
-Файл конфігурації: `sys.config.json`
+Configuration file: `sys.config.json`
 
-## Підключення до Ethereum ноди
+## Connecting to Ethereum node
 
-Файл конфігурації: `configs/Main.json`
+Configuration file: `configs/Main.json`
 
-Примітка: Для початкового сканування сервісом Archive має бути доступ до архівної full ноди ефіріум.
+Note: For initial scanning, the Archive service must have access to an archival full Ethereum node.
 
-## Доступ до локального Enso симулятора
+## Access to local Enso simulator
 
-Необхідно забезпечити доступ до локального Enso симулятора для коректної роботи сервісів.
+It is necessary to ensure access to the local Enso simulator for the correct operation of services.
 
-Лінки на Enso симулятор прописуються в файлах:
+Links to the Enso simulator are specified in the files:
 
 - `configs/workers/blacklistServices.json`
 - `configs/workers/subgraphServices.json`
 - `configs/workers/dataFetcherServices.json`
 - `configs/workers/transmitFetcherServices.json`
 
-## Залежності сервісів
+## Service Dependencies
 
-Всі сервіси залежать від `globalReservesData`, що надходять на топік `data/reserves/` (наприклад, `data/reserves/V1`). Якщо ваші сервіси запустилися, але нічого не відбувається, це означає, що не надійшли оновлення `globalReservesData` від сервісу `Events`.
+All services depend on `globalReservesData`, which comes on the topic `data/reserves/` (for example, `data/reserves/V1`). If your services have started but nothing is happening, check if the reason is that `globalReservesData` updates from the `Events` service have not arrived.
 
-Примітка: Events сервіс є в репозиторії
+Note: Events service is in the repository
 
-## Відслідковування логів
+## Transmit Fetcher Service Dependency
 
-Для відслідковування логів на прод чи дев інфраструктурі має бути запущений сервіс `UniversalLogger.js.log`
-
-(Опціонально) https://github.com/CybridgeTechnologies/UniversalLogger.js.log
-
-## Залежність сервісу Transmit Fetcher
-
-Сервіс Transmit Fetcher залежить від зовнішнього сервісу, який надсилає транзакції по топіку `listener/transmit`. Назва сервісу: `ETH_ImpossibleParser`
+The Transmit Fetcher service depends on an external service that sends transactions on the topic `listener/transmit`. Service name: `ETH_ImpossibleParser`
 https://github.com/CybridgeTechnologies/ETH_ImpossibleParser
 
-Порада: Ви можете підписатися на топіки з терміналу, щоб перевірити, чи надходять трансміти:
+Tip: You can subscribe to topics from the terminal to check if transmits are coming:
 `mqtt sub -h "<your_mqtt_host>" -t "listener/transmit"`
 
-Примітка: Трансміти надходять доволі рідко, час очікування може бути до 30 хвилин.
+Note: Transmits come quite rarely, waiting time can be up to 30 minutes.
 
-## Запуск в debug режимі
+## Log Tracking
 
-Запуск в debug режимі відбувається командою:
+For tracking logs on prod or dev infrastructure, the `UniversalLogger.js.log` service must be running
+
+(Optional) https://github.com/CybridgeTechnologies/UniversalLogger.js.log
+
+## Running in debug mode
+
+Running in debug mode is done with the command:
 `npm run debug<ServiceName> <Protocol><ServiceName>`
-Наприклад:
+For example:
 `npm run debugProxy V1Proxy`
 
-Для запуску сервісу events в дебаг режимі назву протоколу вказувати не треба, так як сервіс спільний для всіх протоколів.
-Для запуску events в debug mode
+To run the events service in debug mode, you don't need to specify the protocol name, as the service is common for all protocols.
+To run events in debug mode
 `npm run debugEvents Events`
 
-## Скрипти для запуску
+## Launch Scripts
 
-Всі скрипти для запуску можна знайти в `package.json`
+All launch scripts can be found in `package.json`
 
-### Опис архітектури
+I'd be happy to translate more sections if you need. Would you like me to continue with the next part?
 
-#### Вступ
+Here's the literal translation of the provided section into English:
 
-Архітектура нашого проекту базується на системі Cinnamon, яку використовує більшість проектів нашої компанії. Ця архітектура передбачає використання деяких шаблонів і стандартів, які допомагають забезпечити уніфікованість і ефективність роботи всіх сервісів.
+# Architecture Description
 
-#### Файли конфігурацій
+## Introduction
 
-##### Глобальні конфігурації
+The architecture of our project is based on the Cinnamon system, which is used by most projects in our company. This architecture involves the use of certain patterns and standards that help ensure uniformity and efficiency of all services.
 
-Усі глобальні конфігурації зберігаються у файлі `configs/main.json`. Цей файл містить:
+#### Configuration Files
 
-- URL і порт для Redis
-- Лінки на Ethereum-ноду
-- Інші загальні змінні, необхідні для роботи сервісів
+##### Global Configurations
 
-##### Конфігурації сервісів
+All global configurations are stored in the `configs/main.json` file. This file contains:
 
-Кожен проект має свої власні конфігурації, які зберігаються в папці `config.workers`. Основний файл конфігурації для кожного проекту має назву `services.json`. У цьому файлі визначені:
+- URL and port for Redis
+- Links to Ethereum node
+- Other general variables necessary for the operation of services
 
-- Об'єкт `Default Settings`, що містить спільні налаштування для всіх протоколів
-- Налаштування для окремих протоколів (AAVE V1, AAVE V2, AAVE V3, Compound)
+##### Service Configurations
 
-##### MQTT спілкування
+Each project has its own configurations, which are stored in the `configs/workers` folder. The main configuration file for each project is named `<serviceName>services.json`, for example: `blacklistServices.json`. This file defines:
 
-У файлі `sys.config.json` вказаний URL для спілкування через MQTT-топіки. Усі сервіси нашої компанії, включаючи сервіси ліквідації, працюють через MQTT, відправляючи один одному повідомлення з певними топіками. Кожен сервіс має визначені топіки для відправки (`Notify`) і прослуховування (`Listen`).
+- `Default Settings` object, which contains shared settings for all protocols
+- Settings for individual protocols (AAVE V1, AAVE V2, AAVE V3, Compound). Here, a parameter hierarchy works. If some settings are specified in `Default Settings`, they are used first. But if some parameter is specified in a specific protocol, for example `V1`, then these settings will be higher in the hierarchy. This is done to avoid parameter duplication.
 
-##### Приклад конфігурації топіків
+##### MQTT Communication
 
-У конфігураційних файлах кожного сервісу вказані параметри `Notify` та `Listen`. Наприклад, у файлі `services.json`:
+The `sys.config.json` file specifies the URL for communication via MQTT topics. All services of our company, including liquidation services, work through MQTT, sending messages to each other with certain topics. Each service has defined topics for sending (`Notify`) and listening (`Listen`).
+
+##### REDIS - Main Database
+
+In the early versions, PostgreSQL was used as the main database. Now, the only database of the project is Redis.
+All `redis namespaces` are specified in the `configs/redisNamespaces.js` file
+
+##### Example of Topic Configuration
+
+The configuration files of each service specify the `Notify` and `Listen` parameters. For example, in the `services.json` file:
 
 ```json
-{
-  "Notify": ["topic1", "topic2"],
-  "Listen": ["topic3", "topic4"]
-}
+    "listen": {
+      "onReservesData": {
+        "topic": "data/reserves/V1",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "drain": {
+        "topic": "event/drain/subgraph/V1"
+      }
+    },
 ```
 
-#### Структура папок
+##### Service Instances
 
-##### Папка systems
+All services are launched in four instances for each protocol (AAVE V1, AAVE V2, AAVE V3, Compound). For example, you can launch the entire system (archive, proxy, subgraph, data fetcher, and transmit) for just one protocol, for example, V1.
 
-Це головна папка, що містить основну архітектуру нашої системи.
+#### Folder Structure
 
-##### Папка configs
+##### Systems Folder
 
-Тут зберігаються всі конфігураційні файли.
+This is the main folder that contains files responsible for the operation of our system's architecture.
 
-##### Папка services
+##### Configs Folder
 
-Містить вхідні точки для кожного сервісу.
+All configuration files are stored here.
 
-##### Папка lib
+##### Services Folder
 
-Містить усі допоміжні бібліотеки. У папці `lib/services` зберігаються всі окремі підпроекти. Наприклад, проект `subgraph` має свою окрему папку з налаштуваннями та описом.
+Contains entry points for each service.
 
-#### ООП шаблони
+##### Lib Folder
 
-Усі сервіси побудовані за принципами об'єктно-орієнтованого програмування (ООП). Наприклад:
+Contains all auxiliary libraries. The `lib/services` folder stores all working files of certain projects. For example, the `subgraph` project has its own separate folder with settings and description, which is located in `lib/services/subgraph`
 
-- **Fetcher** – основний клас для обробників
-- **Fetcher.av** – клас для AAVE
-- **Fetcher.av.v1**, **Fetcher.av.v2**, **Fetcher.av.v3** – класи для різних версій AAVE, що наслідуються від **Fetcher.av**
+#### OOP Patterns
 
-#### Механізм черги
+All services are built according to the principles of object-oriented programming (OOP). For example:
 
-Деякі з наших сервісів, такі як Blacklist і Subgraph, мають механізм черги. Мета черги – згладжувати пікові навантаження, які приходять на сервіс. Наприклад, сервіс Proxy відправляє на Subgraph десятки тисяч користувачів за декілька секунд. Subgraph додає цих користувачів у чергу і потім обробляє їх по одному або групами.
+- **fetcher.js** – main class for handlers
+- **fetcher-aave.js** – class for AAVE, which
+- **fetcher-aave-v1.js**, **fetcher-aave-v1.js**, **fetcher-aave-v1.js** – classes for different versions of AAVE that inherit from **fetcher-aave.js**
+- **fetcher-compound.js** – class for the compound protocol, which inherits directly from the main class **fetcher.js**
 
-##### Приклад коду черги
+#### Queue Mechanism
 
-#### Запуск сервісів
+Some of our services, such as Blacklist and Subgraph, have a queue mechanism. The purpose of the queue is to smooth out peak loads that come to the service. For example, the Proxy service sends tens of thousands of users to Subgraph in a few seconds. Subgraph adds these users to the queue and then processes them one by one or in groups, in queue order. After processing, the queue initiates an `emit` event - which notifies that the queue is empty.
 
-##### Екземпляри сервісів
+#### Using Forks
 
-Усі сервіси запущені в чотирьох екземплярах для кожного протоколу (AAVE V1, AAVE V2, AAVE V3, Compound). Наприклад, можна запустити всю систему (архів, проксі, subgraph, data fetcher і transmit) лише для одного протоколу, наприклад, V1.
+##### What are Forks
 
-##### Використання PM2
+Each service can operate in multiple forks mode, i.e., simultaneous launch of multiple instances. This can be useful for load distribution and improving service performance. However, currently, there's no point in launching all services in multiple forks mode. This makes sense only for the Subgraph service, especially when one protocol (for example, AAVE V2) needs to work with several independent simulator instances. If you launch services in multiple forks mode but use the same simulator instance, you won't achieve any speed improvement.
+Currently, we've achieved such service speed that it works optimally in `forks=1` mode.
 
-Сервіси запускаються через менеджер процесів PM2. Для запуску всіх сервісів використовується команда `npm run all`, яка запускає всі сервіси через PM2. Для дебагінгу можна використовувати команду `npm run debug [назва сервісу]`. Наприклад:
+##### Fork Parameters
 
-```sh
-npm run debug subgraph v1
-```
+In the service configuration files, you can specify the `forks` and `roundrobing` parameters:
 
-де `v1` означає версію протоколу.
+- **forks** – number of simultaneous service instances. For example, if `forks=2`, the service will be launched in two instances.
+- **roundrobing** – parameter that determines how data is distributed between instances:
+  - **true** – data from MQTT comes to instances in turn. For example, if 2 Subgraph instances are running, Proxy will send the first 30 users to the first instance, and the next 30 to the second instance.
+  - **false** – data comes to each instance in parallel. For example, Proxy will send 30 users to each instance simultaneously.
 
-#### Використання FORKS
+## Conclusion
 
-##### Що таке FORKS
-
-Кожен сервіс може працювати в режимі декількох FORKS, тобто одночасного запуску декількох інстанцій. Це може бути корисним для розподілу навантаження і підвищення продуктивності сервісу. Проте, наразі, немає сенсу запускати всі сервіси в режимі багатьох FORKS. Це має сенс лише для сервісу Subgraph, особливо коли потрібно, щоб один протокол (наприклад, AAVE V2) працював з декількома незалежними інстанціями симулятора.
-
-##### Параметри FORKS
-
-У конфігураційних файлах сервісів можна вказати параметр `FORKS` і `ROUND DROPPING`:
-
-- **FORKS** – кількість одночасних інстанцій сервісу. Наприклад, якщо `FORKS=2`, то сервіс буде запущений у двох інстанціях.
-- **ROUND DROPPING** – параметр, який визначає, як дані розподіляються між інстанціями:
-  - **TRUE** – дані від MQTT надходять на інстанції по черзі. Наприклад, якщо запущено 2 інстанції Subgraph, то Proxy відправить перші 30 користувачів на першу інстанцію, а наступні 30 – на другу інстанцію.
-  - **FALSE** – дані надходять на кожну інстанцію паралельно. Наприклад, Proxy відправить по 30 користувачів на кожну інстанцію одночасно.
-
-### Висновок
-
-Архітектура проекту побудована на системі Cinnamon і використовує стандартизовані шаблони для забезпечення уніфікованості і ефективності роботи. Кожен сервіс має свої конфігураційні файли, які визначають вхідні та вихідні точки, а також параметри для взаємодії з іншими сервісами через MQTT. Механізм черги допомагає згладжувати пікові навантаження, забезпечуючи стабільну роботу сервісів. Запуск сервісів здійснюється через PM2, що забезпечує стабільність і простоту управління процесами. Режим FORKS дозволяє масштабувати сервіси для підвищення продуктивності.
+The project architecture is built on the Cinnamon system and uses standardized templates to ensure uniformity and efficiency of operation. Each service has its own configuration files that define input and output points, as well as parameters for interaction with other services via MQTT. The queue mechanism helps smooth peak loads, ensuring stable service operation. Services are launched through PM2, which ensures stability, background operation, and ease of process management. Fork mode, in theory, allows scaling services to increase productivity.

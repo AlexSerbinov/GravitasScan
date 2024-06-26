@@ -48,6 +48,8 @@ All these services work as a single mechanism, gradually narrowing down the list
 
 After finding positions for liquidation by the LiqRegistry service, LiqExecutor analyzes the possibility of liquidation and potential profit from it, considering possible liquidation paths, gas price for the liquidation transaction, etc.
 
+![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
+
 You can find detailed documentation in folder `doc`
 
 # Project Launch
@@ -244,8 +246,3 @@ Here's the literal translation of the provided section into English:
 ## 2023-10-31
 
 1. History: Add transmit txn to liquidations from history
-
-# Requirements:
-
-1. Redis-server at least 6.2++
-2. PSQL 12++ works fine

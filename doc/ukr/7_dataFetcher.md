@@ -4,6 +4,8 @@ DataFetcher – це один із кінцевих сервісів у сист
 
 ## Основні принципи роботи DataFetcher
 
+![Data fetcher flow](../images/dataFetcherFlow.jpg)
+
 ### 1. Ініціалізація:
 
 - DataFetcher приймає користувачів тільки від сервісу Subgraph. Він не має механізмів читання юзерів (на вході) з баз даних (Redis).

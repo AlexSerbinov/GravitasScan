@@ -183,6 +183,8 @@ In the service configuration files, you can specify the `forks` and `roundrobing
   - **true** – data from MQTT comes to instances in turn. For example, if 2 Subgraph instances are running, Proxy will send the first 30 users to the first instance, and the next 30 to the second instance.
   - **false** – data comes to each instance in parallel. For example, Proxy will send 30 users to each instance simultaneously.
 
+![Cinamon forking mode](../images/forkingMode.jpg)
+
 ## Conclusion
 
 The project architecture is built on the Cinnamon system and uses standardized templates to ensure uniformity and efficiency of operation. Each service has its own configuration files that define input and output points, as well as parameters for interaction with other services via MQTT. The queue mechanism helps smooth peak loads, ensuring stable service operation. Services are launched through PM2, which ensures stability, background operation, and ease of process management. Fork mode, in theory, allows scaling services to increase productivity.

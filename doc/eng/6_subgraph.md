@@ -2,6 +2,8 @@
 
 Subgraph is a service that filters users for further liquidation. Subgraph focuses on users with HF, MinBorrow, and MinCollateral values close to liquidation possibility. Its main task is to filter users and, if their HF is close to liquidation, send them to DataFetcher.
 
+![Users flow](../images/archiveToSubgraphFlow.jpg)
+
 #### Main Principles of Subgraph Operation
 
 1. **Initialization**:

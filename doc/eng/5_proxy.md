@@ -26,6 +26,8 @@ However, currently, the interaction between Proxy and Subgraph services is very 
    - Proxy sends users to Subgraph in a matter of seconds. And then users enter the queue in the Subgraph service. After processing all users, Subgraph sends a signal (event drain) to Proxy, indicating the completion of processing and readiness to receive new batches.
    - Proxy retrieves an updated list of users on each subsequent circle, taking into account possible changes in Archive or Blacklist, and sends the next batch of users to Subgraph.
 
+   ![Users flow](../images/archiveToSubgraphFlow.jpg)
+
 4. **Launch and Configuration**:
    - Subgraph should always be launched before Proxy, otherwise Proxy will simply send users into the void, and we won't receive a drain event.
    - Protection: If Proxy doesn't receive an event drain within an hour (parameter "SEND_WITHOUT_DRAIN_TIMEOUT": 3600000 (ms)), Proxy will send batches to Subgraph. This provides protection in case only the Subgraph service is restarted in production without Proxy. Don't set the SEND_WITHOUT_DRAIN_TIMEOUT parameter too small, otherwise it may create a problem of accumulating too many users in Subgraph instances. A value of 3600000 (ms) is quite safe, as currently Subgraph completes a circle in 90 seconds.

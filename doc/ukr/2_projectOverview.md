@@ -55,8 +55,10 @@ LiqRegistry - це ключовий компонент системи Liquidator
 
 Детальну роботу кожного сервісу ви можете знайти в окремих підрозділах документації
 
+![LiqRegistry Flow Diagram](../images/serviceFlow.jpg)
+
 ## Бізнес-логіка LiqExecutor
 
 Після знаходження позицій для ліквідації сервісом LiqRegistry, LiqExecutor аналізує можливість ліквідації та потенційний прибуток від неї, враховуючи можливі шляхи (path) ліквідації, ціну на газ для транзакції ліквідації тощо.
 
-![LiqRegistry Flow Diagram](../images/serviceFlow.jpg)
+

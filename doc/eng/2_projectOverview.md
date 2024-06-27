@@ -55,8 +55,9 @@ Each service has its own `filters` which specify parameters for selection. As th
 
 You can find detailed operation of each service in separate subsections of the documentation.
 
+![LiqRegistry Flow Diagram](../images/serviceFlow.jpg)
+
 ## Business Logic of LiqExecutor
 
 After finding positions for liquidation by the LiqRegistry service, LiqExecutor analyzes the possibility of liquidation and potential profit from it, considering possible liquidation paths, gas price for the liquidation transaction, etc.
 
-![LiqRegistry Flow Diagram](../images/serviceFlow.jpg)

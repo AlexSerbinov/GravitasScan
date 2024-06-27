@@ -4,6 +4,8 @@ DataFetcher is one of the final services in the system. Its main task is to make
 
 ## Main principles of DataFetcher operation
 
+![Data fetcher flow](../images/dataFetcherFlow.jpg)
+
 ### 1. Initialization:
 
 - DataFetcher accepts users only from the Subgraph service. It does not have mechanisms for reading users (at the input) from databases (Redis).

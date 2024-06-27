@@ -56,3 +56,5 @@ The `this.emit("info", message, ev="SIMULATION_ERROR")` command is used for logg
 
 **Important addition:**
 Keep in mind that `this.emit("info")` or `this.emit("error")` is used for logging, and their deletion or replacement will not affect the service operation, only the logs. However, in the service code, there are also service methods, for example `this.emit("fetch")` or `this.emit("sendUserToDataFetcher")` - their thoughtless change or deletion will break the service operation. Don't fall for this, because these are the rakes I've stepped on several times!
+
+![Log Screenshot](../images/logScreenshot.jpg)

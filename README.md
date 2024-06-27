@@ -52,6 +52,8 @@ After finding positions for liquidation by the LiqRegistry service, LiqExecutor 
 
 ## Services architecture Flow
 
+![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
+
 [Detailed services architecture can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
 
 You can find detailed documentation in folder `doc`

@@ -1,5 +1,7 @@
 # Liquidation Registry
 
+[Detailed documentation can be found in the `doc` folder](./doc)
+
 ## Introduction to the Liquidator Service
 
 The Liquidator service is a service that tracks potential positions for liquidations and subsequently liquidates them. Currently, Liquidator operates in DeFi liquidity protocols such as AAVE V1, AAVE V2, AAVE V3, and Compound. The main goal of the project is to identify users who are in the liquidation risk zone and liquidate their positions while making a profit from the liquidations.
@@ -48,7 +50,9 @@ All these services work as a single mechanism, gradually narrowing down the list
 
 After finding positions for liquidation by the LiqRegistry service, LiqExecutor analyzes the possibility of liquidation and potential profit from it, considering possible liquidation paths, gas price for the liquidation transaction, etc.
 
-![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
+## Services architecture Flow
+
+[Detailed services architecture can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
 
 You can find detailed documentation in folder `doc`
 

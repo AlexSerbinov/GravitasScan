@@ -29,6 +29,8 @@ TransmitFetcher is a service that monitors Transmit transactions in the mempool 
 - TransmitFetcher checks all tokens in Borrow and Collateral for the user before making a liquidation decision.
 - TransmitFetcher does not write or delete users from WatchList, it only retrieves users from WatchList for analysis. The DataFetcher service handles writing and deleting users from WatchList.
 
+![HF Leverage](../images/hfBalance.jpg)
+
 ### 4. Advantages of TransmitFetcher:
 
 - The largest and most profitable liquidations occur precisely through TransmitFetcher, as it monitors the mempool and can predict price changes.

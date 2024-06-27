@@ -16,6 +16,27 @@ Tracking potential users for liquidation involves monitoring liquidation ratios,
 
 This approach allows liquidators to quickly react to potential liquidations and more effectively protect liquidity protocols from losses. In addition, tracking potential users for liquidation can provide valuable information for liquidity providers, helping them make informed decisions about allocating their assets.
 
+## What is Health Factor (HF)?
+
+Health Factor (HF) is a key indicator in DeFi lending protocols that determines the stability of a user's position. It is calculated as the ratio of the collateral value to the loan amount, taking into account the liquidation threshold.
+
+![Health Factor Balance](../images/hfBalance.jpg)
+
+Health Factor can be visualized as a balance scale where:
+
+- On one side is the collateral value
+- On the other side is the loan amount (Borrow)
+- The pointer shows the current HF
+
+When HF = 1, the scale is balanced. If HF < 1, the position is at risk of liquidation. An HF > 1.5 is considered safe.
+
+- HF decreases when:
+  - The loan amount increases
+  - The collateral value decreases
+- HF increases when:
+  - The loan amount decreases
+  - The collateral value increases
+
 ## Liquidity Protocols
 
 ### Aave

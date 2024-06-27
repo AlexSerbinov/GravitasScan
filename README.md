@@ -54,7 +54,7 @@ After finding positions for liquidation by the LiqRegistry service, LiqExecutor 
 
 ![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
 
-[Detailed services architecture can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
+[Detailed services project overview can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
 
 You can find detailed documentation in folder `doc`
 
@@ -141,6 +141,9 @@ All launch scripts can be found in `package.json`
 I'd be happy to translate more sections if you need. Would you like me to continue with the next part?
 
 Here's the literal translation of the provided section into English:
+
+
+
 
 # Updates
 

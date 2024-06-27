@@ -1,40 +1,40 @@
 # User Liquidation and Liquidity Protocols
 
-In the world of decentralized finance (DeFi), liquidity protocols play an important role in ensuring the functioning of the ecosystem. These protocols allow users to borrow and lend cryptocurrency assets using smart contracts on the Ethereum blockchain. However, when users cannot repay their loans, there is a need to liquidate their positions to protect the protocol and other participants. In this section, we will look at the concept of user liquidation, the role of liquidity protocols such as Aave and Compound, and the importance of tracking potential users for liquidation.
+In the world of decentralized finance (DeFi), liquidity protocols play a crucial role in ensuring the functioning of the ecosystem. These protocols allow users to borrow and lend cryptocurrency assets using smart contracts on the Ethereum blockchain. However, when users' Health Factor falls below a critical level, there is a need to liquidate their positions to protect the protocol and other participants. In this section, we will examine the concept of user liquidation, the role of liquidity protocols such as Aave and Compound, and the importance of tracking potential users for liquidation.
 
 ## What is User Liquidation?
 
-User liquidation is a process where a liquidity protocol automatically closes the position of a user who cannot repay their debt. When a user takes a loan in a liquidity protocol, they must provide collateral in the form of cryptocurrency assets. If the value of the collateral falls below a certain threshold (usually 150% of the loan amount), the protocol initiates liquidation.
+User liquidation is a process where anyone can close the position of a user whose Health Factor has fallen below a critical level. When a user takes a loan in a liquidity protocol, they must provide collateral in the form of cryptocurrency assets. If the Health Factor falls below 1, the position becomes available for liquidation.
 
-During liquidation, the protocol sells the user's collateral on the open market to repay the debt and penalties. If the proceeds are insufficient, the protocol distributes the losses among liquidity providers. Liquidation is an important mechanism for maintaining the stability and security of liquidity protocols.
+During liquidation, the liquidator repays the user's debt to the protocol and receives a portion of the user's collateral plus a bonus as a reward. Liquidation is an important mechanism for maintaining the stability and security of liquidity protocols.
 
 ## Tracking Potential Users for Liquidation
 
-For the effective functioning of liquidity protocols and protection of liquidity providers, it is important to track potential users who can be liquidated. A project that deals with this task can significantly improve the stability and security of the DeFi ecosystem.
+For the effective functioning of liquidity protocols and protection of liquidity providers, it is important to track potential users who can be liquidated. Projects that deal with this task, such as CyBridge, can significantly improve the stability and security of the DeFi ecosystem.
 
-Tracking potential users for liquidation involves monitoring liquidation ratios, collateral values, and loan amounts of users in real-time. When a user's liquidation ratio approaches the critical threshold, the project can notify liquidators about the possibility of liquidating the position.
+Tracking potential users for liquidation involves constant monitoring of the Health Factor, collateral value, and loan amounts of users in real-time. When a user's Health Factor approaches 1 or falls below, liquidator teams can quickly react and perform liquidation.
 
-This approach allows liquidators to quickly react to potential liquidations and more effectively protect liquidity protocols from losses. In addition, tracking potential users for liquidation can provide valuable information for liquidity providers, helping them make informed decisions about allocating their assets.
+This approach allows liquidators to more effectively protect liquidity protocols from losses. Additionally, tracking potential users for liquidation provides an opportunity for liquidators to profit from liquidations.
 
 ## What is Health Factor (HF)?
 
-Health Factor (HF) is a key indicator in DeFi lending protocols that determines the stability of a user's position. It is calculated as the ratio of the collateral value to the loan amount, taking into account the liquidation threshold.
+Health Factor (HF) is a key indicator in DeFi lending protocols that determines the stability of a user's position. It is calculated as the ratio of collateral value to loan amount, taking into account the liquidation coefficient.
 
 ![Health Factor Balance](../images/hfBalance.jpg)
 
-Health Factor can be visualized as a balance scale where:
+Health Factor can be imagined as a balance, where:
 
-- On one side is the collateral value
-- On the other side is the loan amount (Borrow)
-- The pointer shows the current HF
+- On one side is the loan amount (Borrow)
+- On the other side is the collateral value (Collateral)
+- The arrow shows the current HF
 
-When HF = 1, the scale is balanced. If HF < 1, the position is at risk of liquidation. An HF > 1.5 is considered safe.
+When HF = 1, the balance is even. If HF < 1, the position can be liquidated.
 
 - HF decreases when:
-  - The loan amount increases
+  - The loan value increases
   - The collateral value decreases
 - HF increases when:
-  - The loan amount decreases
+  - The loan value decreases
   - The collateral value increases
 
 ## Liquidity Protocols
@@ -47,7 +47,7 @@ Aave is a decentralized liquidity protocol that allows users to borrow and lend 
 
 2. Aave v2: The second version, released in December 2020, added new features such as whitelists, delegated lending, and improved gas efficiency.
 
-3. Aave v3: The latest version of the protocol, launched in March 2022. It introduced capital efficiency, isolated liquidity pools, and translation gateways for better compatibility with other blockchains.
+3. Aave v3: The latest version of the protocol, launched in March 2022. It introduced capital efficiency, isolated liquidity pools, and portals for better compatibility with other blockchains.
 
 Aave uses an auction-based liquidation algorithm where liquidators compete for the right to liquidate a user's position. The protocol also has an incentive system for liquidators, paying them a reward for successful liquidation.
 
@@ -61,6 +61,6 @@ A project tracking potential users for liquidation can work closely with liquidi
 
 ## Conclusion
 
-User liquidation is an important aspect of the functioning of liquidity protocols such as Aave and Compound. This mechanism ensures the stability and security of the DeFi ecosystem, protecting protocols and liquidity providers from losses. Tracking potential users for liquidation is a key component of this process, allowing liquidators to quickly react to potential liquidations and more effectively protect protocols.
+User liquidation is an important aspect of the functioning of liquidity protocols such as Aave and Compound. This mechanism ensures the stability and security of the DeFi ecosystem, protecting protocols and liquidity providers from losses. Tracking potential users for liquidation is a key component of this process, allowing liquidators to quickly react to Health Factor falling below the critical level and more effectively protect protocols.
 
-Understanding the concept of liquidation, the role of liquidity protocols, and the importance of tracking potential users for liquidation is important for all participants in the DeFi space. Projects that deal with this task can significantly improve the stability, security, and efficiency of the decentralized finance ecosystem.
+Understanding the concept of liquidation, the role of liquidity protocols, and the importance of tracking users' Health Factor is crucial for all participants in the DeFi space. Projects that deal with this task can significantly improve the stability, security, and efficiency of the decentralized finance ecosystem.

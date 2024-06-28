@@ -25,4 +25,4 @@ The task of the archive is to collect all users who have ever interacted with ea
 
 This process allows us to maintain an up-to-date list of users for further tracking of their Health Factor and other parameters.
 
-It's also important to keep in mind that to scan users in past blocks, we need an archive full Ethereum node. Nodes like Infura or Alchemy usually only store the previous few dozen blocks. However, if Redis is filled with users, a cloud node can be used to monitor new users in real-time.
+It's also important to keep in mind that to scan users in past blocks, we need an archive full Ethereum node. Nodes like Infura or Alchemy usually only store the previous few dozen blocks (except paid subscriptions or special providers). However, if Redis is filled with users, a cloud node can be used to monitor new users in real-time.

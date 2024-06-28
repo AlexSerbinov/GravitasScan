@@ -1,38 +1,38 @@
-# Service Architecture
+# Архітектура сервісу
 
-## Introduction
+## Вступ
 
-The architecture of our project is based on the Cinnamon system, which is used by most projects in our company. This architecture involves the use of certain patterns and standards that help ensure uniformity and efficiency of all services.
+Архітектура нашого проекту базується на системі Cinnamon, яка використовується більшістю проектів у нашій компанії. Ця архітектура передбачає використання певних шаблонів та стандартів, які допомагають забезпечити уніфікованість та ефективність усіх сервісів.
 
-#### Configuration Files
+#### Конфігураційні файли
 
-##### Global Configurations
+##### Глобальні конфігурації
 
-All global configurations are stored in the `configs/main.json` file. This file contains:
+Усі глобальні конфігурації зберігаються у файлі `configs/main.json`. Цей файл містить:
 
-- URL and port for Redis
-- Links to Ethereum node
-- Other general variables necessary for the operation of services
+- URL та порт для Redis
+- Посилання на Ethereum ноду
+- Інші загальні змінні, необхідні для роботи сервісів
 
-##### Service Configurations
+##### Конфігурації сервісів
 
-Each project has its own configurations, which are stored in the `configs/workers` folder. The main configuration file for each project is named `<serviceName>services.json`, for example: `blacklistServices.json`. This file defines:
+Кожен проект має власні конфігурації, які зберігаються у папці `configs/workers`. Головний конфігураційний файл для кожного проекту називається `<назваСервісу>services.json`, наприклад: `blacklistServices.json`. Цей файл визначає:
 
-- `Default Settings` object, which contains shared settings for all protocols
-- Settings for individual protocols (AAVE V1, AAVE V2, AAVE V3, Compound). Here, a parameter hierarchy works. If some settings are specified in `Default Settings`, they are used first. But if some parameter is specified in a specific protocol, for example `V1`, then these settings will be higher in the hierarchy. This is done to avoid parameter duplication.
+- Об'єкт `Default Settings`, який містить спільні налаштування для всіх протоколів
+- Налаштування для окремих протоколів (AAVE V1, AAVE V2, AAVE V3, Compound). Тут працює ієрархія параметрів. Якщо деякі налаштування вказані в `Default Settings`, вони використовуються в першу чергу. Але якщо якийсь параметр вказаний у конкретному протоколі, наприклад `V1`, то ці налаштування будуть вищими в ієрархії. Це зроблено для уникнення дублювання параметрів.
 
-##### MQTT Communication
+##### MQTT комунікація
 
-The `sys.config.json` file specifies the URL for communication via MQTT topics. All services of our company, including liquidation services, work through MQTT, sending messages to each other with certain topics. Each service has defined topics for sending (`Notify`) and listening (`Listen`).
+Файл `sys.config.json` визначає URL для комунікації через MQTT теми. Усі сервіси нашої компанії, включаючи сервіси ліквідації, працюють через MQTT, надсилаючи повідомлення один одному з певними темами. Кожен сервіс має визначені теми для відправлення (`Notify`) та прослуховування (`Listen`).
 
-##### REDIS - Main Database
+##### REDIS - Основна база даних
 
-In the early versions, PostgreSQL was used as the main database. Now, the only database of the project is Redis.
-All `redis namespaces` are specified in the `configs/redisNamespaces.js` file
+У ранніх версіях як основна база даних використовувалася PostgreSQL. Тепер єдиною базою даних проекту є Redis.
+Усі `redis namespaces` вказані у файлі `configs/redisNamespaces.js`
 
-##### Example of Topic Configuration
+##### Приклад конфігурації тем
 
-The configuration files of each service specify the `Notify` and `Listen` parameters. For example, in the `services.json` file:
+У конфігураційних файлах кожного сервісу вказуються параметри `Notify` та `Listen`. Наприклад, у файлі `services.json`:
 
 ```json
     "listen": {
@@ -45,62 +45,61 @@ The configuration files of each service specify the `Notify` and `Listen` parame
       "drain": {
         "topic": "event/drain/subgraph/V1"
       }
-    },
+    }
 ```
 
-##### Service Instances
+##### Екземпляри сервісів
 
-All services are launched in four instances for each protocol (AAVE V1, AAVE V2, AAVE V3, Compound). For example, you can launch the entire system (archive, proxy, subgraph, data fetcher, and transmit) for just one protocol, for example, V1.
+Усі сервіси запускаються в чотирьох екземплярах для кожного протоколу (AAVE V1, AAVE V2, AAVE V3, Compound). Наприклад, ви можете запустити всю систему (archive, proxy, subgraph, data fetcher і transmit) лише для одного протоколу, наприклад, V1.
 
-#### Folder Structure
+#### Структура папок
 
-##### Systems Folder
+##### Папка Systems
 
-This is the main folder that contains files responsible for the operation of our system's architecture.
+Це головна папка, яка містить файли, відповідальні за роботу архітектури нашої системи.
 
-##### Configs Folder
+##### Папка Configs
 
-All configuration files are stored here.
+Тут зберігаються всі конфігураційні файли.
 
-##### Services Folder
+##### Папка Services
 
-Contains entry points for each service.
+Містить точки входу для кожного сервісу.
 
-##### Lib Folder
+##### Папка Lib
 
-Contains all auxiliary libraries. The `lib/services` folder stores all working files of certain projects. For example, the `subgraph` project has its own separate folder with settings and description, which is located in `lib/services/subgraph`
+Містить усі допоміжні бібліотеки. Папка `lib/services` зберігає всі робочі файли певних проектів. Наприклад, проект `subgraph` має свою окрему папку з налаштуваннями та описом, яка знаходиться в `lib/services/subgraph`
 
-#### OOP Patterns
+#### Шаблони ООП
 
-All services are built according to the principles of object-oriented programming (OOP). For example:
+Усі сервіси побудовані за принципами об'єктно-орієнтованого програмування (ООП). Наприклад:
 
-- **fetcher.js** – main class for handlers
-- **fetcher-aave.js** – class for AAVE, which
-- **fetcher-aave-v1.js**, **fetcher-aave-v1.js**, **fetcher-aave-v1.js** – classes for different versions of AAVE that inherit from **fetcher-aave.js**
-- **fetcher-compound.js** – class for the compound protocol, which inherits directly from the main class **fetcher.js**
+- **fetcher.js** – головний клас для обробників
+- **fetcher-aave.js** – клас для AAVE, який
+- **fetcher-aave-v1.js**, **fetcher-aave-v1.js**, **fetcher-aave-v1.js** – класи для різних версій AAVE, які наслідують від **fetcher-aave.js**
+- **fetcher-compound.js** – клас для протоколу compound, який наслідує безпосередньо від головного класу **fetcher.js**
 
-#### Queue Mechanism
+#### Механізм черги
 
-Some of our services, such as Blacklist and Subgraph, have a queue mechanism. The purpose of the queue is to smooth out peak loads that come to the service. For example, the Proxy service sends tens of thousands of users to Subgraph in a few seconds. Subgraph adds these users to the queue and then processes them one by one or in groups, in queue order. After processing, the queue initiates an `emit` event - which notifies that the queue is empty.
+Деякі з наших сервісів, такі як Blacklist і Subgraph, мають механізм черги. Мета черги - згладжувати пікові навантаження, які надходять на сервіс. Наприклад, сервіс Proxy надсилає десятки тисяч користувачів до Subgraph за кілька секунд. Subgraph додає цих користувачів до черги, а потім обробляє їх по одному або групами, в порядку черги. Після обробки черга ініціює подію `emit` - яка сповіщає, що черга порожня.
 
-#### Using Forks
+#### Використання форків
 
-##### What are Forks
+##### Що таке форки
 
-Each service can operate in multiple forks mode, i.e., simultaneous launch of multiple instances. This can be useful for load distribution and improving service performance. However, currently, there's no point in launching all services in multiple forks mode. This makes sense only for the Subgraph service, especially when one protocol (for example, AAVE V2) needs to work with several independent simulator instances. If you launch services in multiple forks mode but use the same simulator instance, you won't achieve any speed improvement.
-Currently, we've achieved such service speed that it works optimally in `forks=1` mode.
+Кожен сервіс може працювати в режимі множинних форків, тобто одночасного запуску кількох екземплярів. Це може бути корисно для розподілу навантаження та покращення продуктивності сервісу. Однак, наразі немає сенсу запускати всі сервіси в режимі множинних форків. Це має сенс лише для сервісу Subgraph, особливо коли один протокол (наприклад, AAVE V2) потребує роботи з кількома незалежними екземплярами симулятора. Якщо ви запустите сервіси в режимі множинних форків, але використовуватимете той самий екземпляр симулятора, ви не досягнете жодного покращення швидкості. Наразі ми досягли такої швидкості сервісу, що він оптимально працює в режимі `forks=1`.
 
-##### Fork Parameters
+##### Параметри форків
 
-In the service configuration files, you can specify the `forks` and `roundrobing` parameters:
+У конфігураційних файлах сервісу можна вказати параметри `forks` та `roundrobing`:
 
-- **forks** – number of simultaneous service instances. For example, if `forks=2`, the service will be launched in two instances.
-- **roundrobing** – parameter that determines how data is distributed between instances:
-  - **true** – data from MQTT comes to instances in turn. For example, if 2 Subgraph instances are running, Proxy will send the first 30 users to the first instance, and the next 30 to the second instance.
-  - **false** – data comes to each instance in parallel. For example, Proxy will send 30 users to each instance simultaneously.
+- **forks** – кількість одночасних екземплярів сервісу. Наприклад, якщо `forks=2`, сервіс буде запущено у двох екземплярах.
+- **roundrobing** – параметр, який визначає, як дані розподіляються між екземплярами:
+  - **true** – дані з MQTT надходять до екземплярів по черзі. Наприклад, якщо працюють 2 екземпляри Subgraph, Proxy надішле перших 30 користувачів першому екземпляру, а наступні 30 - другому екземпляру.
+  - **false** – дані надходять до кожного екземпляра паралельно. Наприклад, Proxy надішле 30 користувачів кожному екземпляру одночасно.
 
-![Cinamon forking mode](../images/forkingMode.jpg)
+![Режим форкінгу Cinamon](../images/forkingMode.jpg)
 
-## Conclusion
+## Висновок
 
-The project architecture is built on the Cinnamon system and uses standardized templates to ensure uniformity and efficiency of operation. Each service has its own configuration files that define input and output points, as well as parameters for interaction with other services via MQTT. The queue mechanism helps smooth peak loads, ensuring stable service operation. Services are launched through PM2, which ensures stability, background operation, and ease of process management. Fork mode, in theory, allows scaling services to increase productivity.
+Архітектура проекту побудована на системі Cinnamon і використовує стандартизовані шаблони для забезпечення уніфікованості та ефективності роботи. Кожен сервіс має власні конфігураційні файли, які визначають вхідні та вихідні точки, а також параметри для взаємодії з іншими сервісами через MQTT. Механізм черги допомагає згладжувати пікові навантаження, забезпечуючи стабільну роботу сервісу. Сервіси запускаються через PM2, що забезпечує стабільність, фонову роботу та легкість управління процесами. Режим форків теоретично дозволяє масштабувати сервіси для підвищення продуктивності.

@@ -28,13 +28,14 @@ The Liquidator service is a service that tracks potential positions for liquidat
 
 To launch the project, you need to perform the following steps:
 
-1. Make sure you have pm2 installed: `npm install -g pm2`
-2. Install npm packages with the command: `npm install`
-3. Set up all necessary infrastructure (Infrastructure Setup section)
-4. Launch all services with the command: `npm run all`
-5. To stop a specific service, use the command: `pm2 stop <service name or namespace>`
-6. To completely stop all services, use the command: `pm2 stop all`
-7. After updating the code, always execute the following commands, otherwise changes will not be accounted for in pm2: `pm2 stop all` `npm run all`
+1. Make sure that system have [nvm](https://github.com/nvm-sh/nvm) or node 20++ instaled
+2. Make sure you have pm2 installed: `npm install -g pm2`
+3. Install npm packages with the command: `npm install`
+4. Set up all necessary infrastructure (Infrastructure Setup section)
+5. Launch all services with the command: `npm run all`
+6. To stop a specific service, use the command: `pm2 stop <service name or namespace>`
+7. To completely stop all services, use the command: `pm2 stop all`
+8. After updating the code, always execute the following commands, otherwise changes will not be accounted for in pm2: `pm2 stop all` `npm run all`
 
 ## Infrastructure Setup
 
@@ -79,11 +80,13 @@ https://github.com/CybridgeTechnologies/ETH_ImpossibleParser
 Tip: You can subscribe to topics from the terminal to check if transmits are coming:
 `mqtt sub -h "<your_mqtt_host>" -t "listener/transmit"`
 
-Note: Transmits come quite rarely, waiting time can be up to 30 minutes.
+Note: Transmits come quite rarely, waiting time can be up to 30 minutes.\
+**WARN**: Current version of LiqRegistry (V0.0.8) requires customized ImpossibleParser to work properly - sercive expect to receive transmit hash with it's transaction body (TransactionReceipt)
 
 ## Log Tracking
+> You can track logs anytime with `mqtt sub -h [host] -t [topic]` just choose correct mqtt and topic wich is in you if desired service
 
-For tracking logs on prod or dev infrastructure, the `UniversalLogger.js.log` service must be running
+For tracking logs on prod or dev infrastructure, the `UniversalLogger.js.log` or `UniversalLogger.js.mongo` service must be running
 
 (Optional) https://github.com/CybridgeTechnologies/UniversalLogger.js.log
 

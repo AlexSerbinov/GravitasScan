@@ -18,7 +18,7 @@ Although error logs are also sent to the logger, the main task of logging is as 
 
    - Analysis of each service's load, circle completion time on each server, measuring time for each operation. Also, in the logs, you can find all users that we have on each protocol.
 
-3. **Third part without changes:**
+3. **Logging errors**
    - Logging errors, diagnosing problems, ensuring data integrity.
 
 #### Data Logging

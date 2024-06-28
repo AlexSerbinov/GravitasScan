@@ -57,4 +57,4 @@ fetcher.on("info", (data, ev = INFO) => {
 **Важливе доповнення:**
 Май на увазі, що `this.emit("info")` чи `this.emit("error")` використовується для логування, і їх видалення чи заміна не вплине на роботу сервісу, лише на логи. Проте в коді сервісів також трапляються службові методи, наприклад `this.emit("fetch")` чи `this.emit("sendUserToDataFetcher")` - їх необдумана зміна чи видалення поламає роботу сервісу. Не попадайся на це, бо це ті граблі, на які я наступав декілька разів!
 
-![Log Screenshot](../images/logScreenshot.jpg)
+![Log Screenshot](../images/logsScreenshot.jpg)

@@ -1,5 +1,7 @@
 # Архів (Archive)
 
+![Archive And Provider Types](../images/archiveAndProviderTypes.jpg)
+
 Задача архіву – зібрати всіх користувачів, які коли-небудь взаємодіяли з кожним окремим протоколом.
 
 ## Як працює архів?

@@ -2,6 +2,8 @@
 
 The task of the archive is to collect all users who have ever interacted with each individual protocol.
 
+![Archive And Provider Types](../images/archiveAndProviderTypes.jpg)
+
 ## How does the archive work?
 
 ### 1. Initialization:

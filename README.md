@@ -2,61 +2,25 @@
 
 [Detailed documentation can be found in the `doc` folder](./doc)
 
+## Doc sections
+
+1. [Run Services](./doc/eng/0_runServices.md)
+2. [What is Liquidation](./doc/eng/1_whatIsLiquidation.md)
+3. [Project Overview](./doc/eng/2_projectOverview.md)
+4. [Service Architecture](./doc/eng/3_serviceArchitecture.md)
+5. [Archive](./doc/eng/4_archive.md)
+6. [Blacklist](./doc/eng/5_blacklist.md)
+7. [Proxy](./doc/eng/6_proxy.md)
+8. [Subgraph](./doc/eng/7_subgraph.md)
+9. [Data Fetcher](./doc/eng/8_dataFetcher.md)
+10. [Transmit Fetcher](./doc/eng/9_transmitFethcer.md)
+11. [Events](./doc/eng/10_events.md)
+12. [Logger](./doc/eng/11_logger.md)
+13. [Simulator](./doc/eng/12_simulator.md)
+
 ## Introduction to the Liquidator Service
 
 The Liquidator service is a service that tracks potential positions for liquidations and subsequently liquidates them. Currently, Liquidator operates in DeFi liquidity protocols such as AAVE V1, AAVE V2, AAVE V3, and Compound. The main goal of the project is to identify users who are in the liquidation risk zone and liquidate their positions while making a profit from the liquidations.
-
-## Structure of the Liquidator Service
-
-The Liquidator service consists of two main sub-services:
-
-1. **LiqRegistry**: Responsible for collecting and filtering users who have interacted with supported liquidity protocols. It finds potential positions for liquidation.
-2. **LiqExecutor**: Responsible for executing the liquidation of user positions identified by LiqRegistry.
-
-This documentation focuses on describing the business logic of the LiqRegistry service.
-
-## Business Logic of LiqRegistry
-
-LiqRegistry works with liquidity protocols AAVE V1, AAVE V2, AAVE V3, and Compound. The main task of the service is to find users who have taken a loan in any of these protocols and track their Health Factor (an indicator of how close the user is to liquidation), Borrow, and Collateral.
-
-The LiqRegistry process can be divided into three main stages:
-
-1. **Blockchain filtering**: The service filters the entire blockchain to find users who have interacted with one of the four supported protocols.
-2. **User filtering**: Found users are filtered based on certain criteria such as minimum loan size (Borrow), minimum collateral size (Collateral), and Health Factor.
-3. **Detailed analysis of selected users**: More detailed analysis of certain users. Analysis of their assets in Borrow and Collateral. Also, simulation of Health Factor changes based on price change transactions (Transmit).
-4. **Data transfer to LiqExecutor**: After filtering, information about users subject to liquidation is transferred to the LiqExecutor service for liquidation execution.
-
-LiqRegistry is a key component of the Liquidator system, responsible for finding and tracking liquidity protocol users potentially suitable for liquidation. LiqRegistry consists of seven sub-services, each performing a specific role in the process of filtering and monitoring users:
-
-1. **Archive** - collects all users who have ever interacted with each individual protocol, starting from the protocol creation block. Archive also tracks new users in real-time.
-
-2. **Blacklist** - the first stage of filtering users by Health Factor, MinBorrow, and MinCollateral parameters. It filters out users whose parameters are too far from potentially interesting for liquidation.
-
-3. **Proxy** - an auxiliary service for Subgraph that distributes users among Subgraph instances for efficient processing.
-
-4. **Subgraph** - filters users, focusing on those whose Health Factor, MinBorrow, and MinCollateral parameters are close to the possibility of liquidation. Sends filtered users to DataFetcher.
-
-5. **DataFetcher** - makes decisions about liquidating users or adding them to the WatchList for further monitoring based on detailed analysis of their parameters.
-
-6. **TransmitFetcher** - monitors Transmit transactions in the mempool to detect changes in token prices affecting the Health Factor of users from the WatchList, allowing them to be liquidated in the same block where the Health Factor changes.
-
-Additionally, the
-
-7. **Events** service is responsible for monitoring new block outputs, sending these blocks via MQTT, and updating globalReservesData.
-
-All these services work as a single mechanism, gradually narrowing down the list of users at each stage to ultimately identify those most suitable for liquidation and pass these users to the next service, liqExecutor. This approach allows efficient use of limited system resources when working with a large number of liquidity protocol users.
-
-## Business Logic of LiqExecutor
-
-After finding positions for liquidation by the LiqRegistry service, LiqExecutor analyzes the possibility of liquidation and potential profit from it, considering possible liquidation paths, gas price for the liquidation transaction, etc.
-
-## Services architecture Flow
-
-![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
-
-[Detailed services project overview can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
-
-You can find detailed documentation in folder `doc`
 
 # Project Launch
 
@@ -138,14 +102,63 @@ To run events in debug mode
 
 All launch scripts can be found in `package.json`
 
-I'd be happy to translate more sections if you need. Would you like me to continue with the next part?
+## Structure of the Liquidator Service
 
-Here's the literal translation of the provided section into English:
+The Liquidator service consists of two main sub-services:
 
+1. **LiqRegistry**: Responsible for collecting and filtering users who have interacted with supported liquidity protocols. It finds potential positions for liquidation.
+2. **LiqExecutor**: Responsible for executing the liquidation of user positions identified by LiqRegistry.
 
+This documentation focuses on describing the business logic of the LiqRegistry service.
 
+## Business Logic of LiqRegistry
+
+LiqRegistry works with liquidity protocols AAVE V1, AAVE V2, AAVE V3, and Compound. The main task of the service is to find users who have taken a loan in any of these protocols and track their Health Factor (an indicator of how close the user is to liquidation), Borrow, and Collateral.
+
+The LiqRegistry process can be divided into three main stages:
+
+1. **Blockchain filtering**: The service filters the entire blockchain to find users who have interacted with one of the four supported protocols.
+2. **User filtering**: Found users are filtered based on certain criteria such as minimum loan size (Borrow), minimum collateral size (Collateral), and Health Factor.
+3. **Detailed analysis of selected users**: More detailed analysis of certain users. Analysis of their assets in Borrow and Collateral. Also, simulation of Health Factor changes based on price change transactions (Transmit).
+4. **Data transfer to LiqExecutor**: After filtering, information about users subject to liquidation is transferred to the LiqExecutor service for liquidation execution.
+
+LiqRegistry is a key component of the Liquidator system, responsible for finding and tracking liquidity protocol users potentially suitable for liquidation. LiqRegistry consists of seven sub-services, each performing a specific role in the process of filtering and monitoring users:
+
+1. **Archive** - collects all users who have ever interacted with each individual protocol, starting from the protocol creation block. Archive also tracks new users in real-time.
+
+2. **Blacklist** - the first stage of filtering users by Health Factor, MinBorrow, and MinCollateral parameters. It filters out users whose parameters are too far from potentially interesting for liquidation.
+
+3. **Proxy** - an auxiliary service for Subgraph that distributes users among Subgraph instances for efficient processing.
+
+4. **Subgraph** - filters users, focusing on those whose Health Factor, MinBorrow, and MinCollateral parameters are close to the possibility of liquidation. Sends filtered users to DataFetcher.
+
+5. **DataFetcher** - makes decisions about liquidating users or adding them to the WatchList for further monitoring based on detailed analysis of their parameters.
+
+6. **TransmitFetcher** - monitors Transmit transactions in the mempool to detect changes in token prices affecting the Health Factor of users from the WatchList, allowing them to be liquidated in the same block where the Health Factor changes.
+
+Additionally, the
+
+7. **Events** service is responsible for monitoring new block outputs, sending these blocks via MQTT, and updating globalReservesData.
+
+All these services work as a single mechanism, gradually narrowing down the list of users at each stage to ultimately identify those most suitable for liquidation and pass these users to the next service, liqExecutor. This approach allows efficient use of limited system resources when working with a large number of liquidity protocol users.
+
+## Services architecture Flow
+
+![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
+
+[Detailed services project overview can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
+
+## Business Logic of LiqExecutor
+
+After finding positions for liquidation by the LiqRegistry service, LiqExecutor analyzes the possibility of liquidation and potential profit from it, considering possible liquidation paths, gas price for the liquidation transaction, etc.
 
 # Updates
+
+## 2024-05-28
+
+1. Created branch V.0.0.7
+2. Added text documentation
+3. Added diagrams
 
 ## 2024-05-13
 

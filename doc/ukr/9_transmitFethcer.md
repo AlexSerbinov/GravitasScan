@@ -1,6 +1,6 @@
 # TransmitFetcher
 
-TransmitFetcher – це сервіс, який моніторить транзакції Transmit в mempool для виявлення змін цін на токени, які є у користувача в borrow або в collateral, що впливають на Health Factor користувачів. TransmitFetcher дає можливість ліквідувати користувача в тому ж блоці, де змінюється його Health Factor. По суті, це як дивитись в майбутнє на один блок.
+TransmitFetcher – це сервіс, який слухає Transmit транзакції з mempool. Щоб виявити зміни цін на токени, які є у користувача в borrow або в collateral, що впливають на Health Factor користувачів. TransmitFetcher дає можливість ліквідувати користувача в тому ж блоці, де змінюється його Health Factor. По суті, це як дивитись в майбутнє на один блок.
 
 ![Transmit fetcher flow](../images/transmitFetcherFlow.jpg)
 

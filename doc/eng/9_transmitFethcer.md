@@ -1,6 +1,6 @@
 # TransmitFetcher
 
-TransmitFetcher is a service that monitors Transmit transactions in the mempool to detect changes in token prices that are in the user's borrow or collateral, affecting users' Health Factor. TransmitFetcher allows liquidating a user in the same block where their Health Factor changes. In essence, it's like looking into the future by one block.
+TransmitFetcher is a service that listen Transmit transactions in the mempool to detect changes in token prices that are in the user's borrow or collateral, affecting users' Health Factor. TransmitFetcher allows liquidating a user in the same block where their Health Factor changes. In essence, it's like looking into the future by one block.
 
 ![Transmit fetcher flow](../images/transmitFetcherFlow.jpg)
 

@@ -117,10 +117,10 @@ fetcher.on("fetch", async data => {
   const { user, add } = data
 
   if (add) {
-    fetcher.emit("info", JSON.stringify(data), ADD_USER_TO_BLACKLIST)
+    // fetcher.emit("info", JSON.stringify(data), ADD_USER_TO_BLACKLIST)
     addUsersToBlacklistSet([user], protocol)
   } else {
-    fetcher.emit("info", JSON.stringify(data), REMOVE_USER_FROM_BLACKLIST)
+    // fetcher.emit("info", JSON.stringify(data), REMOVE_USER_FROM_BLACKLIST)
     removeUsersFromBlacklistSet([user], protocol)
   }
 })

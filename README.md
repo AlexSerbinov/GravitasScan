@@ -1,117 +1,167 @@
 # Liquidation Registry
 
-Liquidation Registry repository contains a few separately services: searcher, subgraph service, archive, history.
+[Detailed documentation can be found in the `doc` folder](./doc)
 
-- History service can be executed by **node historyExecuter.js.** It fetches history from all protocols at the same time. Its functions run with some interval that can be changed right in code.
+## Doc sections
 
-- Archive service is needed for cases when some subgraph api is down, and we need some other way to get protocol users. It has two main features inside: listener that saves new events and function that is looking for past protocol events.
-  It's executed through **node archiveExeturer.js** separately for each protocol. Can be executed all together with **SERVICE=ARCHIVE node runConcurrently.js**
+1. [Run Services](./doc/eng/0_runServices.md)
+2. [What is Liquidation](./doc/eng/1_whatIsLiquidation.md)
+3. [Project Overview](./doc/eng/2_projectOverview.md)
+4. [Service Architecture](./doc/eng/3_serviceArchitecture.md)
+5. [Archive](./doc/eng/4_archive.md)
+6. [Blacklist](./doc/eng/5_blacklist.md)
+7. [Proxy](./doc/eng/6_proxy.md)
+8. [Subgraph](./doc/eng/7_subgraph.md)
+9. [Data Fetcher](./doc/eng/8_dataFetcher.md)
+10. [Transmit Fetcher](./doc/eng/9_transmitFethcer.md)
+11. [Events](./doc/eng/10_events.md)
+12. [Logger](./doc/eng/11_logger.md)
+13. [Simulator](./doc/eng/12_simulator.md)
 
-- Subgraph service is used to make a lot of requests to blockchain and filter users with needed health factor. It gets all protocol users from subgraph or in case when subgraph is down - archive, and checks if they are appropriate for searcher service.
-  It runs separately for each protocol but can be executed all together with **SERVICE=SUBGRAPH node runConcurrently.js**
+## Introduction to the Liquidator Service
 
-- Searcher service is a service that mainly does only the second part of subgraph service. It doesn't need to get users from subgraph or archive, it gets already filtered users from registry and like subgraph makes requests to blockchain to check if users are valid.
-  It updates the data in registry or deletes user it's inappropriate anymore. If it finds user with good stats it sends event to path factory service.
-  It runs separately for each protocol but can be executed all together with **SERVICE=SEARCHER node runConcurrently.js**
-  !!! Can work only with Liquity, Maker_DAO
+The Liquidator service is a service that tracks potential positions for liquidations and subsequently liquidates them. Currently, Liquidator operates in DeFi liquidity protocols such as AAVE V1, AAVE V2, AAVE V3, and Compound. The main goal of the project is to identify users who are in the liquidation risk zone and liquidate their positions while making a profit from the liquidations.
 
-- Blacklist service checks hf, collateral, borrow for users from Archive service and
-  adds user to blacklist in Redis, key`s template : 'liq-registry:blacklist:[protocol]'. Blacklist service
-  works by loop.
-  It runs separately for each protocol but can be executed all together with **SERVICE=BLACKLIST node runConcurrently.js**
-  If you want to find user addresses in blacklist using redis:
+# Project Launch
 
-  - connect to redis
+## General Instructions
 
-  ```
-  redis-cli -h [hostname] -p [port]
-  ```
+To launch the project, you need to perform the following steps:
 
-  - find all users for protocol
+1. Make sure that system have [nvm](https://github.com/nvm-sh/nvm) or node 20++ instaled
+2. Make sure you have pm2 installed: `npm install -g pm2`
+3. Install npm packages with the command: `npm install`
+4. Set up all necessary infrastructure (Infrastructure Setup section)
+5. Launch all services with the command: `npm run all`
+6. To stop a specific service, use the command: `pm2 stop <service name or namespace>`
+7. To completely stop all services, use the command: `pm2 stop all`
+8. After updating the code, always execute the following commands, otherwise changes will not be accounted for in pm2: `pm2 stop all` `npm run all`
 
-  ```
-  SMEMBERS liq-registry:blacklist:[protocol]
-  ```
+## Infrastructure Setup
 
-  example:
+The project infrastructure has two environments: development and production. For each of these environments, you need to enable its own VPN.
 
-  ```
-  SMEMBERS liq-registry:blacklist:V1
-  ```
+## Connecting to Redis
 
-  - find user in blacklist
+Configuration file: `configs/Main.json`
 
-  ```
-  SMISMEMBER liq-registry:blacklist:[protocol] [user...]
-  ```
+## Connecting to MQTT host
 
-  example:
+Configuration file: `sys.config.json`
 
-  ```
-  SMISMEMBER liq-registry:blacklist:V1 '0x943a6Eda303F63EFddA7BF9028f860B87A247869' '0x943a6Eda303F63EFddA7BF9028f860B87A247864'
-  ```
+## Connecting to Ethereum node
 
-  expected output if user in blacklist: 1, 0
+Configuration file: `configs/Main.json`
 
-- DataFetcher service: This works almost like the old searcher. However, when the searcher begins to watch a user in a loop, DataFetcher adds the user to Redis with the key 'liq-registry:data-fetcher:[protocol]:[asset]'. If the searcher removes the user from the watch loop, DataFetcher deletes the user from Redis using the key 'liq-registry:data-fetcher:[protocol]:[asset]'.
-  !!! Can work only with V1, V2, V3, Compound
-  It runs separately for each protocol but can be executed all together with **SERVICE=DATA_FETCHER node runConcurrently.js**
+Note: For initial scanning, the Archive service must have access to an archival full Ethereum node.
 
-# Install
+## Access to local Enso simulator
 
-1. Install node js.
-2. Run command 'npm install'
-3. Create a Main.json file similar to Main.json.example in the configs folder
-4. Fill config with data in configs/Main.json
-5. Run command 'npm run <service> --config configs/Main.json'. Without config path, service will try to use configs/Main.json as default config.
+It is necessary to ensure access to the local Enso simulator for the correct operation of services.
 
-# Sequalize
+Links to the Enso simulator are specified in the files:
 
-Run all new migrations
+- `configs/workers/blacklistServices.json`
+- `configs/workers/subgraphServices.json`
+- `configs/workers/dataFetcherServices.json`
+- `configs/workers/transmitFetcherServices.json`
 
-```
-npm run db:migrate
-```
+## Service Dependencies
 
-Undo the momst recent migrations
+All services depend on `globalReservesData`, which comes on the topic `data/reserves/` (for example, `data/reserves/V1`). If your services have started but nothing is happening, check if the reason is that `globalReservesData` updates from the `Events` service have not arrived.
 
-```
-npm run db:migrate:undo
-```
+Note: Events service is in the repository
 
-# PM2
+## Transmit Fetcher Service Dependency
 
-Install
+The Transmit Fetcher service depends on an external service that sends transactions on the topic `listener/transmit`. Service name: `ETH_ImpossibleParser`
+https://github.com/CybridgeTechnologies/ETH_ImpossibleParser
 
-```
-npm install pm2 -g
-```
+Tip: You can subscribe to topics from the terminal to check if transmits are coming:
+`mqtt sub -h "<your_mqtt_host>" -t "listener/transmit"`
 
-### Run services
+Note: Transmits come quite rarely, waiting time can be up to 30 minutes.\
+**WARN**: Current version of LiqRegistry (V0.0.8) requires customized ImpossibleParser to work properly - sercive expect to receive transmit hash with it's transaction body (TransactionReceipt)
 
-Run all services
+## Log Tracking
+> You can track logs anytime with `mqtt sub -h [host] -t [topic]` just choose correct mqtt and topic wich is in you if desired service
 
-```
-pm2 start ./all.config.js
-```
+For tracking logs on prod or dev infrastructure, the `UniversalLogger.js.log` or `UniversalLogger.js.mongo` service must be running
 
-Run specific service, (eg archive)
+(Optional) https://github.com/CybridgeTechnologies/UniversalLogger.js.log
 
-```
-pm2 start ./archive.config.js
-```
+## Running in debug mode
 
-Run service only for specific protocols
+Running in debug mode is done with the command:
+`npm run debug<ServiceName> <Protocol><ServiceName>`
+For example:
+`npm run debugProxy V1Proxy`
 
-```
-PROTOCOLS="V1, V2" pm2 start archive.config.js
-```
+To run the events service in debug mode, you don't need to specify the protocol name, as the service is common for all protocols.
+To run events in debug mode
+`npm run debugEvents Events`
 
-### Manage
+## Launch Scripts
 
-https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
+All launch scripts can be found in `package.json`
+
+## Structure of the Liquidator Service
+
+The Liquidator service consists of two main sub-services:
+
+1. **LiqRegistry**: Responsible for collecting and filtering users who have interacted with supported liquidity protocols. It finds potential positions for liquidation.
+2. **LiqExecutor**: Responsible for executing the liquidation of user positions identified by LiqRegistry.
+
+This documentation focuses on describing the business logic of the LiqRegistry service.
+
+## Business Logic of LiqRegistry
+
+LiqRegistry works with liquidity protocols AAVE V1, AAVE V2, AAVE V3, and Compound. The main task of the service is to find users who have taken a loan in any of these protocols and track their Health Factor (an indicator of how close the user is to liquidation), Borrow, and Collateral.
+
+The LiqRegistry process can be divided into three main stages:
+
+1. **Blockchain filtering**: The service filters the entire blockchain to find users who have interacted with one of the four supported protocols.
+2. **User filtering**: Found users are filtered based on certain criteria such as minimum loan size (Borrow), minimum collateral size (Collateral), and Health Factor.
+3. **Detailed analysis of selected users**: More detailed analysis of certain users. Analysis of their assets in Borrow and Collateral. Also, simulation of Health Factor changes based on price change transactions (Transmit).
+4. **Data transfer to LiqExecutor**: After filtering, information about users subject to liquidation is transferred to the LiqExecutor service for liquidation execution.
+
+LiqRegistry is a key component of the Liquidator system, responsible for finding and tracking liquidity protocol users potentially suitable for liquidation. LiqRegistry consists of seven sub-services, each performing a specific role in the process of filtering and monitoring users:
+
+1. **Archive** - collects all users who have ever interacted with each individual protocol, starting from the protocol creation block. Archive also tracks new users in real-time.
+
+2. **Blacklist** - the first stage of filtering users by Health Factor, MinBorrow, and MinCollateral parameters. It filters out users whose parameters are too far from potentially interesting for liquidation.
+
+3. **Proxy** - an auxiliary service for Subgraph that distributes users among Subgraph instances for efficient processing.
+
+4. **Subgraph** - filters users, focusing on those whose Health Factor, MinBorrow, and MinCollateral parameters are close to the possibility of liquidation. Sends filtered users to DataFetcher.
+
+5. **DataFetcher** - makes decisions about liquidating users or adding them to the WatchList for further monitoring based on detailed analysis of their parameters.
+
+6. **TransmitFetcher** - monitors Transmit transactions in the mempool to detect changes in token prices affecting the Health Factor of users from the WatchList, allowing them to be liquidated in the same block where the Health Factor changes.
+
+Additionally, the
+
+7. **Events** service is responsible for monitoring new block outputs, sending these blocks via MQTT, and updating globalReservesData.
+
+All these services work as a single mechanism, gradually narrowing down the list of users at each stage to ultimately identify those most suitable for liquidation and pass these users to the next service, liqExecutor. This approach allows efficient use of limited system resources when working with a large number of liquidity protocol users.
+
+## Services architecture Flow
+
+![LiqRegistry Flow Diagram](doc/images/serviceFlow.jpg)
+
+[Detailed services project overview can be found in the `doc/` folder](./doc/eng/3_serviceArchitecture.md)
+
+## Business Logic of LiqExecutor
+
+After finding positions for liquidation by the LiqRegistry service, LiqExecutor analyzes the possibility of liquidation and potential profit from it, considering possible liquidation paths, gas price for the liquidation transaction, etc.
 
 # Updates
+
+## 2024-05-28
+
+1. Created branch V.0.0.7
+2. Added text documentation
+3. Added diagrams
 
 ## 2024-05-13
 
@@ -221,8 +271,3 @@ https://pm2.keymetrics.io/docs/usage/quick-start/#managing-processes
 ## 2023-10-31
 
 1. History: Add transmit txn to liquidations from history
-
-# Requirements:
-
-1. Redis-server at least 6.2++
-2. PSQL 12++ works fine

@@ -1,0 +1,133 @@
+{
+  "DefaultSettings": {
+    "forks": 1,
+    "script": "services/dataFetcher.js",
+    "namespace": "dataFetcher",
+    "notify": {
+      "errorMessage": {
+        "topic": "logger/liquidator"
+      },
+      "start": {
+        "topic": "logger/liquidator"
+      },
+      "info": {
+        "topic": "logger/liquidator"
+      },
+      "stop": {
+        "topic": "logger/liquidator"
+      }
+    },
+    "params": {
+      "service": "dataFetcher",
+      "filters": {
+        "minHfDel": "0.8",
+        "maxHfDel": "1.2",
+        "minHfLiq": "0.9",
+        "maxHfLiq": "1",
+        "minBorrow": "0.0002",
+        "minCollateral": "0.00002"
+      },
+      "configPath": "/configs/Main.json",
+      "useSimulatorInsteadOfNode": true,
+      "formattedTrace": false,
+      "simulationContract": "0xF50024f746D94F144a79003D00000000e380A500",
+      "stateOverrides": {
+        "0xF50024f746D94F144a79003D00000000e380A500": {
+          "code": "0x608080604052600436101561001357600080fd5b600324324u23i40x60808060405260043610156100135..." // big hex data
+        }
+      }
+    }
+  },
+
+  "V1DataFetcher": {
+    "listen": {
+      "processUser": {
+        "topic": "execute/dataFetcher/V1",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data/reserves/V1",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "liquidateCommand": {
+        "topic": "execute/liquidator/V1"
+      }
+    },
+    "params": {
+      "protocol": "V1",
+      "selector": "0x0fcefc71",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
+    }
+  },
+
+  "V2DataFetcher": {
+    "listen": {
+      "processUser": {
+        "topic": "execute/dataFetcher/V2",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data/reserves/V2",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "liquidateCommand": {
+        "topic": "execute/liquidator/V2"
+      }
+    },
+    "params": {
+      "protocol": "V2",
+      "selector": "0x4625709f",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
+    }
+  },
+
+  "V3DataFetcher": {
+    "listen": {
+      "processUser": {
+        "topic": "execute/dataFetcher/V3",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data/reserves/V3",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "liquidateCommand": {
+        "topic": "execute/liquidator/V3"
+      }
+    },
+    "params": {
+      "protocol": "V3",
+      "selector": "0xc8e0cd4c",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
+    }
+  },
+
+  "CompoundDataFetcher": {
+    "listen": {
+      "processUser": {
+        "topic": "execute/dataFetcher/Compound",
+        "roundrobing": true
+      },
+      "onReservesData": {
+        "topic": "data/reserves/Compound",
+        "roundrobing": false
+      }
+    },
+    "notify": {
+      "liquidateCommand": {
+        "topic": "execute/liquidator/Compound"
+      }
+    },
+    "params": {
+      "protocol": "Compound",
+      "selector": "0x4108bbd2",
+      "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
+    }
+  }
+}

@@ -41,7 +41,6 @@
       "enso_url": "http://10.10.100.82:9992/api/v1/simulate-bundle"
     }
   },
-
   "V1TransmitFetcher": {
     "listen": {
       "onReservesData": {
@@ -58,7 +57,6 @@
       "protocol": "V1"
     }
   },
-
   "V2TransmitFetcher": {
     "listen": {
       "onReservesData": {
@@ -75,7 +73,6 @@
       "protocol": "V2"
     }
   },
-
   "V3TransmitFetcher": {
     "listen": {
       "onReservesData": {
@@ -92,7 +89,6 @@
       "protocol": "V3"
     }
   },
-
   "CompoundTransmitFetcher": {
     "listen": {
       "onReservesData": {
